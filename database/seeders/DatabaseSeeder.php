@@ -1,0 +1,143 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\MenuItem;
+use App\Models\PickupLocation;
+use App\Models\User;
+// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
+
+class DatabaseSeeder extends Seeder
+{
+    /**
+     * Seed the application's database.
+     */
+    public function run(): void
+    {
+        $this->call(RolePermissionSeeder::class);
+
+        $menuItems = [
+            [
+                'name' => 'Cappuccino',
+                'description' => 'Espresso with steamed milk foam.',
+                'price' => 180,
+                'category' => 'Drinks',
+                'image_url' => null,
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'name' => 'Iced Latte',
+                'description' => 'Cold espresso latte served over ice.',
+                'price' => 170,
+                'category' => 'Drinks',
+                'image_url' => null,
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'name' => 'Butter Croissant',
+                'description' => 'Freshly baked flaky croissant.',
+                'price' => 90,
+                'category' => 'Pastries',
+                'image_url' => null,
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'name' => 'Blueberry Muffin',
+                'description' => 'Soft muffin with blueberry filling.',
+                'price' => 95,
+                'category' => 'Pastries',
+                'image_url' => null,
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'name' => 'Avocado Toast',
+                'description' => 'Sourdough toast with avocado mash.',
+                'price' => 220,
+                'category' => 'Specials',
+                'image_url' => null,
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        ];
+
+        foreach ($menuItems as $item) {
+            MenuItem::query()->updateOrCreate(
+                ['name' => $item['name']],
+                $item,
+            );
+        }
+
+        $pickupLocations = [
+            [
+                'name' => 'Bole Branch',
+                'address' => 'Bole Road, Addis Ababa',
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'name' => 'Piassa Branch',
+                'address' => 'Churchill Avenue, Addis Ababa',
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        ];
+
+        foreach ($pickupLocations as $location) {
+            PickupLocation::query()->updateOrCreate(
+                ['name' => $location['name']],
+                $location,
+            );
+        }
+
+        $allBranchIds = PickupLocation::query()->pluck('id')->all();
+
+        $admin = User::query()->updateOrCreate(
+            ['email' => 'admin@example.com'],
+            [
+                'name' => 'Admin User',
+                'password' => Hash::make('password'),
+                'role' => 'admin',
+                'email_verified_at' => now(),
+            ],
+        );
+        $admin->syncRolesBySlugs(['admin']);
+        $admin->syncPickupLocationsByIds([]);
+
+        $manager = User::query()->updateOrCreate(
+            ['email' => 'manager@example.com'],
+            [
+                'name' => 'Manager User',
+                'password' => Hash::make('password'),
+                'role' => 'branch_manager',
+                'email_verified_at' => now(),
+            ],
+        );
+        $manager->syncRolesBySlugs(['branch_manager']);
+        $manager->syncPickupLocationsByIds($allBranchIds);
+
+        $staff = User::query()->updateOrCreate(
+            ['email' => 'staff@example.com'],
+            [
+                'name' => 'Staff User',
+                'password' => Hash::make('password'),
+                'role' => 'branch_staff',
+                'email_verified_at' => now(),
+            ],
+        );
+        $staff->syncRolesBySlugs(['branch_staff']);
+        $staff->syncPickupLocationsByIds($allBranchIds);
+    }
+}
