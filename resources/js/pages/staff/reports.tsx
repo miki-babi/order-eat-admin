@@ -1,5 +1,5 @@
 import { Head, router, useForm } from '@inertiajs/react';
-import { AreaChart, BarChart3, ChartNoAxesCombined, CreditCard, Filter, MapPin, Package, Send, TrendingUp } from 'lucide-react';
+import { AreaChart, BarChart3, CreditCard, Filter, MapPin, Package, Send, TrendingUp } from 'lucide-react';
 import type { FormEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

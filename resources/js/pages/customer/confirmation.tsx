@@ -1,7 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
-import { BadgeCheck, Clock3, MapPin, ExternalLink, ShoppingBag, ArrowRight } from 'lucide-react';
+import { BadgeCheck, Clock3, MapPin, ShoppingBag, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import {  CardContent } from '@/components/ui/card';
 
 type OrderItem = {
     id: number;

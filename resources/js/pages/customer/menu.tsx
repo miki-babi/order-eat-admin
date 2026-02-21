@@ -1,10 +1,8 @@
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { Head, useForm, usePage } from '@inertiajs/react';
 import { ArrowRight, CheckCircle2, Clock3, ExternalLink, MapPin, Search, ShoppingCart, Upload } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import InputError from '@/components/input-error';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
@@ -90,7 +88,6 @@ export default function Menu({
     categories,
     pickupLocations,
     filters,
-    staffRoute,
 }: PageProps) {
     const { auth, flash } = usePage<SharedProps>().props;
     const channel = filters.channel ?? 'web';
