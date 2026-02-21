@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { BarChart3, ClipboardList, Coffee, KeyRound, MapPin, MessageSquareText, Store, Users, ExternalLink, QrCode } from 'lucide-react';
+import { BarChart3, ClipboardList, Coffee, ConciergeBell, ExternalLink, KeyRound, MapPin, MessageSquareText, MonitorSmartphone, QrCode, Store, Users, UtensilsCrossed, Wallet } from 'lucide-react';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -45,6 +45,15 @@ export function AppSidebar() {
         ...(can('orders.view')
             ? [{ title: 'Order Queue', href: '/staff/orders', icon: ClipboardList }]
             : []),
+        ...(can('orders.view')
+            ? [{ title: 'Waiter Board', href: '/staff/waiter-board', icon: ConciergeBell }]
+            : []),
+        ...(can('orders.view')
+            ? [{ title: 'Kitchen Board', href: '/staff/kitchen-board', icon: UtensilsCrossed }]
+            : []),
+        ...(can('orders.view')
+            ? [{ title: 'Cashier Board', href: '/staff/cashier-board', icon: Wallet }]
+            : []),
         ...(can('customers.view')
             ? [{ title: 'Customers', href: '/staff/customers', icon: Users }]
             : []),
@@ -53,6 +62,9 @@ export function AppSidebar() {
             : []),
         ...(can('pickup_locations.manage')
             ? [{ title: 'Table Managment', href: '/staff/table-qr', icon: QrCode }]
+            : []),
+        ...(can('branches.assign')
+            ? [{ title: 'Screen Routing', href: '/staff/screens', icon: MonitorSmartphone }]
             : []),
         ...(can('menu_items.manage')
             ? [{ title: 'Menu Catalog', href: '/staff/menu-items', icon: Coffee }]

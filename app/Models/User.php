@@ -210,6 +210,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Branch operation screens assigned to this user.
+     */
+    public function branchScreens(): BelongsToMany
+    {
+        return $this->belongsToMany(BranchScreen::class);
+    }
+
+    /**
      * Table sessions verified by this user.
      */
     public function verifiedTableSessions(): HasMany

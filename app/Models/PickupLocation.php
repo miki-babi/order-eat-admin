@@ -59,4 +59,12 @@ class PickupLocation extends Model
     {
         return $this->hasMany(DiningTable::class);
     }
+
+    /**
+     * Staff operation screens configured for this branch.
+     */
+    public function branchScreens(): HasMany
+    {
+        return $this->hasMany(BranchScreen::class);
+    }
 }

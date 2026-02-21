@@ -3,13 +3,17 @@
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\QrMenuController;
 use App\Http\Controllers\Staff\AccessControlController;
+use App\Http\Controllers\Staff\BranchScreenController;
+use App\Http\Controllers\Staff\CashierBoardController;
 use App\Http\Controllers\Staff\CustomerController;
+use App\Http\Controllers\Staff\KitchenBoardController;
 use App\Http\Controllers\Staff\MenuItemController;
 use App\Http\Controllers\Staff\OrderController as StaffOrderController;
 use App\Http\Controllers\Staff\PickupLocationController;
 use App\Http\Controllers\Staff\ReportController;
 use App\Http\Controllers\Staff\SmsTemplateController;
 use App\Http\Controllers\Staff\TableQrController;
+use App\Http\Controllers\Staff\WaiterBoardController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -60,6 +64,27 @@ Route::middleware(['auth', 'verified', 'staff'])
             ->middleware('permission:orders.update')
             ->name('orders.update');
 
+        Route::get('waiter-board', [WaiterBoardController::class, 'index'])
+            ->middleware('permission:orders.view')
+            ->name('waiter.index');
+        Route::patch('waiter-board/orders/{order}/confirm', [WaiterBoardController::class, 'confirm'])
+            ->middleware('permission:orders.update')
+            ->name('waiter.confirm');
+        Route::patch('waiter-board/orders/{order}/serve', [WaiterBoardController::class, 'serve'])
+            ->middleware('permission:orders.update')
+            ->name('waiter.serve');
+
+        Route::get('kitchen-board', [KitchenBoardController::class, 'index'])
+            ->middleware('permission:orders.view')
+            ->name('kitchen.index');
+        Route::patch('kitchen-board/statuses/{orderScreenStatus}', [KitchenBoardController::class, 'update'])
+            ->middleware('permission:orders.update')
+            ->name('kitchen.update');
+
+        Route::get('cashier-board', [CashierBoardController::class, 'index'])
+            ->middleware('permission:orders.view')
+            ->name('cashier.index');
+
         Route::get('customers', [CustomerController::class, 'index'])
             ->middleware('permission:customers.view')
             ->name('customers.index');
@@ -92,6 +117,19 @@ Route::middleware(['auth', 'verified', 'staff'])
         Route::patch('table-sessions/{tableSession}/verify', [TableQrController::class, 'verifySession'])
             ->middleware('permission:pickup_locations.manage')
             ->name('table-sessions.verify');
+
+        Route::get('screens', [BranchScreenController::class, 'index'])
+            ->middleware('permission:branches.assign')
+            ->name('screens.index');
+        Route::post('screens', [BranchScreenController::class, 'store'])
+            ->middleware('permission:branches.assign')
+            ->name('screens.store');
+        Route::put('screens/{branchScreen}', [BranchScreenController::class, 'update'])
+            ->middleware('permission:branches.assign')
+            ->name('screens.update');
+        Route::patch('screens/{branchScreen}/assignments', [BranchScreenController::class, 'syncAssignments'])
+            ->middleware('permission:branches.assign')
+            ->name('screens.assignments');
 
         Route::get('menu-items', [MenuItemController::class, 'index'])
             ->middleware('permission:menu_items.manage')

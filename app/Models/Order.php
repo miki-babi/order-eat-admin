@@ -18,6 +18,12 @@ class Order extends Model
 
     public const SOURCE_TABLE = 'table';
 
+    public const WAITER_STATUS_PENDING_CONFIRMATION = 'pending_confirmation';
+
+    public const WAITER_STATUS_CONFIRMED = 'confirmed';
+
+    public const WAITER_STATUS_SERVED = 'served';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -30,6 +36,9 @@ class Order extends Model
         'dining_table_id',
         'table_session_id',
         'source_channel',
+        'waiter_status',
+        'waiter_confirmed_at',
+        'served_at',
         'receipt_url',
         'receipt_status',
         'order_status',
@@ -50,6 +59,8 @@ class Order extends Model
             'pickup_date' => 'date',
             'total_amount' => 'decimal:2',
             'notify_when_ready' => 'boolean',
+            'waiter_confirmed_at' => 'datetime',
+            'served_at' => 'datetime',
         ];
     }
 
@@ -62,6 +73,18 @@ class Order extends Model
             self::SOURCE_WEB,
             self::SOURCE_TELEGRAM,
             self::SOURCE_TABLE,
+        ];
+    }
+
+    /**
+     * @return list<string>
+     */
+    public static function waiterStatuses(): array
+    {
+        return [
+            self::WAITER_STATUS_PENDING_CONFIRMATION,
+            self::WAITER_STATUS_CONFIRMED,
+            self::WAITER_STATUS_SERVED,
         ];
     }
 
@@ -103,5 +126,13 @@ class Order extends Model
     public function items(): HasMany
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    /**
+     * Per-screen workflow statuses for this order.
+     */
+    public function screenStatuses(): HasMany
+    {
+        return $this->hasMany(OrderScreenStatus::class);
     }
 }
