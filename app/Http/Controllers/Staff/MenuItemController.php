@@ -46,6 +46,7 @@ class MenuItemController extends Controller
                 'price' => (float) $item->price,
                 'category' => $item->category,
                 'is_active' => $item->is_active,
+                'visibility_channels' => $this->normalizeVisibilityChannels($item->visibility_channels),
                 'image_url' => $this->toPublicAssetUrl($item->image_url),
                 'order_items_count' => $item->order_items_count,
                 'updated_at' => $item->updated_at?->toDateTimeString(),
@@ -66,6 +67,7 @@ class MenuItemController extends Controller
                 'category' => $category,
                 'status' => $status,
             ],
+            'visibilityChannels' => MenuItem::visibilityChannels(),
             'summary' => [
                 'total_items' => MenuItem::query()->count(),
                 'active_items' => MenuItem::query()->where('is_active', true)->count(),
@@ -79,6 +81,7 @@ class MenuItemController extends Controller
     public function store(StoreMenuItemRequest $request): RedirectResponse
     {
         $validated = $request->validated();
+        $visibilityChannels = $this->normalizeVisibilityChannels($validated['visibility_channels'] ?? []);
 
         $imagePath = $request->file('image')?->store('menu-items', 'public');
 
@@ -89,6 +92,7 @@ class MenuItemController extends Controller
             'category' => $validated['category'] ?? null,
             'image_url' => $imagePath,
             'is_active' => $request->boolean('is_active', true),
+            'visibility_channels' => $visibilityChannels,
         ]);
 
         return back()->with('success', 'Menu item created.');
@@ -100,6 +104,7 @@ class MenuItemController extends Controller
     public function update(UpdateMenuItemRequest $request, MenuItem $menuItem): RedirectResponse
     {
         $validated = $request->validated();
+        $visibilityChannels = $this->normalizeVisibilityChannels($validated['visibility_channels'] ?? []);
 
         $imagePath = $menuItem->image_url;
 
@@ -118,6 +123,7 @@ class MenuItemController extends Controller
             'category' => $validated['category'] ?? null,
             'image_url' => $imagePath,
             'is_active' => $request->boolean('is_active', $menuItem->is_active),
+            'visibility_channels' => $visibilityChannels,
         ]);
 
         return back()->with('success', 'Menu item updated.');
@@ -155,5 +161,18 @@ class MenuItemController extends Controller
         return str_starts_with($path, 'http://') || str_starts_with($path, 'https://')
             ? $path
             : Storage::disk('public')->url($path);
+    }
+
+    /**
+     * @param  array<array-key, mixed>|null  $channels
+     * @return list<string>
+     */
+    protected function normalizeVisibilityChannels(?array $channels): array
+    {
+        $normalized = MenuItem::normalizeVisibilityChannels($channels ?? []);
+
+        return $normalized !== []
+            ? $normalized
+            : MenuItem::visibilityChannels();
     }
 }

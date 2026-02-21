@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Orders;
 
+use App\Models\MenuItem;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Log;
@@ -36,6 +37,10 @@ class StoreOrderRequest extends FormRequest
      */
     public function rules(): array
     {
+        $channel = MenuItem::normalizeVisibilityChannel(
+            is_string($this->input('channel')) ? $this->input('channel') : null,
+        );
+
         return [
             'name' => ['required', 'string', 'max:255'],
             'phone' => ['required', 'string', 'max:20', 'regex:/^(?:\+?251|0)?[79]\d{8}$/'],
@@ -45,12 +50,17 @@ class StoreOrderRequest extends FormRequest
                 'integer',
                 Rule::exists('pickup_locations', 'id')->where('is_active', true),
             ],
+            'channel' => ['nullable', Rule::in(MenuItem::visibilityChannels())],
             'notify_when_ready' => ['nullable', 'boolean'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.menu_item_id' => [
                 'required',
                 'integer',
-                Rule::exists('menu_items', 'id')->where('is_active', true),
+                Rule::exists('menu_items', 'id')->where(function ($query) use ($channel): void {
+                    $query
+                        ->where('is_active', true)
+                        ->whereJsonContains('visibility_channels', $channel);
+                }),
             ],
             'items.*.quantity' => ['required', 'integer', 'min:1', 'max:100'],
             'receipt' => ['nullable', 'image', 'max:5120'],
@@ -81,6 +91,9 @@ class StoreOrderRequest extends FormRequest
             'phone' => $this->input('phone'),
             'pickup_date' => $this->input('pickup_date'),
             'pickup_location_id' => $this->input('pickup_location_id'),
+            'channel' => MenuItem::normalizeVisibilityChannel(
+                is_string($this->input('channel')) ? $this->input('channel') : null,
+            ),
             'notify_when_ready' => $this->boolean('notify_when_ready'),
             'items_count' => is_array($items) ? count($items) : 0,
             'has_receipt' => $this->hasFile('receipt'),

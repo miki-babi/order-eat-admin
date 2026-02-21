@@ -31,9 +31,13 @@ class OrderController extends Controller
     {
         $search = trim((string) $request->input('search', ''));
         $category = $request->input('category');
+        $channel = MenuItem::normalizeVisibilityChannel(
+            is_string($request->input('channel')) ? $request->input('channel') : null,
+        );
 
         $menuItems = MenuItem::query()
             ->where('is_active', true)
+            ->visibleIn($channel)
             ->when($search !== '', function ($query) use ($search): void {
                 $query->where(function ($builder) use ($search): void {
                     $builder
@@ -57,6 +61,7 @@ class OrderController extends Controller
 
         $categories = MenuItem::query()
             ->where('is_active', true)
+            ->visibleIn($channel)
             ->whereNotNull('category')
             ->orderBy('category')
             ->distinct()
@@ -75,6 +80,7 @@ class OrderController extends Controller
             'filters' => [
                 'search' => $search,
                 'category' => $category,
+                'channel' => $channel,
             ],
             'staffRoute' => $request->user()?->canAccessStaffPanel() ? route('staff.orders.index') : null,
         ]);
@@ -96,11 +102,15 @@ class OrderController extends Controller
 
         try {
             $validated = $request->validated();
+            $channel = MenuItem::normalizeVisibilityChannel(
+                is_string($validated['channel'] ?? null) ? $validated['channel'] : null,
+            );
             $items = collect($validated['items']);
             $menuItemIds = $items->pluck('menu_item_id')->unique()->values();
 
             Log::info('orders.store.received', [
                 'attempt_id' => $attemptId,
+                'channel' => $channel,
                 'name' => $validated['name'],
                 'phone' => $validated['phone'],
                 'pickup_date' => $validated['pickup_date'],
@@ -116,6 +126,7 @@ class OrderController extends Controller
 
             $menuItems = MenuItem::query()
                 ->where('is_active', true)
+                ->visibleIn($channel)
                 ->whereIn('id', $menuItemIds)
                 ->get()
                 ->keyBy('id');
@@ -123,6 +134,7 @@ class OrderController extends Controller
             if ($menuItems->count() !== $menuItemIds->count()) {
                 Log::warning('orders.store.unavailable_items', [
                     'attempt_id' => $attemptId,
+                    'channel' => $channel,
                     'requested_item_ids' => $menuItemIds->all(),
                     'available_item_ids' => $menuItems->keys()->all(),
                 ]);

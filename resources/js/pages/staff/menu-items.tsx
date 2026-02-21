@@ -17,6 +17,7 @@ type MenuItemRow = {
     price: number;
     category: string | null;
     is_active: boolean;
+    visibility_channels: string[];
     image_url: string | null;
     order_items_count: number;
     updated_at: string | null;
@@ -48,17 +49,31 @@ function currency(value: number): string {
     }).format(value);
 }
 
+const defaultVisibilityChannels = ['telegram', 'web', 'qr_menu'];
+const visibilityChannelLabels: Record<string, string> = {
+    telegram: 'Telegram',
+    web: 'Web',
+    qr_menu: 'QR Menu',
+};
+
+function visibilityChannelLabel(channel: string): string {
+    return visibilityChannelLabels[channel] ?? channel;
+}
+
 export default function MenuItems({
     items,
     categories,
     filters,
     summary,
+    visibilityChannels,
 }: {
     items: MenuItemRow[];
     categories: string[];
     filters: Filters;
     summary: Summary;
+    visibilityChannels: string[];
 }) {
+    const channelOptions = visibilityChannels.length > 0 ? visibilityChannels : defaultVisibilityChannels;
     const [editing, setEditing] = useState<MenuItemRow | null>(null);
 
     const filterForm = useForm({
@@ -74,6 +89,7 @@ export default function MenuItems({
         category: '',
         image: null as File | null,
         is_active: true,
+        visibility_channels: [...channelOptions],
     });
 
     const editForm = useForm({
@@ -84,6 +100,7 @@ export default function MenuItems({
         category: '',
         image: null as File | null,
         is_active: true,
+        visibility_channels: [...channelOptions],
     });
 
     const applyFilters = (event: FormEvent<HTMLFormElement>) => {
@@ -102,6 +119,7 @@ export default function MenuItems({
             onSuccess: () => {
                 createForm.reset();
                 createForm.setData('is_active', true);
+                createForm.setData('visibility_channels', [...channelOptions]);
             },
         });
     };
@@ -116,6 +134,7 @@ export default function MenuItems({
             category: item.category ?? '',
             image: null,
             is_active: item.is_active,
+            visibility_channels: [...item.visibility_channels],
         });
     };
 
@@ -143,6 +162,18 @@ export default function MenuItems({
         router.delete(`/staff/menu-items/${item.id}`, {
             preserveScroll: true,
         });
+    };
+
+    const nextVisibilityChannels = (current: string[], channel: string, checked: boolean): string[] => {
+        const selected = new Set(current);
+
+        if (checked) {
+            selected.add(channel);
+        } else {
+            selected.delete(channel);
+        }
+
+        return channelOptions.filter((value) => selected.has(value));
     };
 
     return (
@@ -310,6 +341,33 @@ export default function MenuItems({
                                     <InputError message={editForm.errors.image} />
                                 </div>
 
+                                <div className="grid gap-2 md:col-span-3">
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">Visible On</Label>
+                                    <div className="flex flex-wrap gap-2">
+                                        {channelOptions.map((channel) => (
+                                            <label key={`edit-${channel}`} className="flex cursor-pointer items-center gap-2 rounded-xl bg-zinc-50 px-4 py-2 ring-1 ring-zinc-200">
+                                                <input
+                                                    type="checkbox"
+                                                    className="h-4 w-4 rounded border-zinc-300 text-[#F57C00] focus:ring-[#F57C00]/20"
+                                                    checked={editForm.data.visibility_channels.includes(channel)}
+                                                    onChange={(event) =>
+                                                        editForm.setData(
+                                                            'visibility_channels',
+                                                            nextVisibilityChannels(
+                                                                editForm.data.visibility_channels,
+                                                                channel,
+                                                                event.target.checked,
+                                                            ),
+                                                        )
+                                                    }
+                                                />
+                                                <span className="text-xs font-bold text-zinc-600">{visibilityChannelLabel(channel)}</span>
+                                            </label>
+                                        ))}
+                                    </div>
+                                    <InputError message={editForm.errors.visibility_channels} />
+                                </div>
+
                                 <div className="flex items-center gap-2 md:col-span-3">
                                     <div className="flex items-center gap-2 rounded-xl bg-zinc-50 px-4 py-2 ring-1 ring-zinc-200">
                                         <input
@@ -379,6 +437,13 @@ export default function MenuItems({
                                                 <Badge className={`w-fit font-black uppercase tracking-widest text-[9px] shadow-xl ${item.is_active ? 'bg-[#F57C00] text-white' : 'bg-white text-zinc-500 ring-1 ring-zinc-200'}`}>
                                                     {item.is_active ? 'Live' : 'Draft'}
                                                 </Badge>
+                                                <div className="flex flex-wrap gap-1">
+                                                    {item.visibility_channels.map((channel) => (
+                                                        <Badge key={`${item.id}-${channel}`} className="w-fit bg-white/90 text-zinc-700 font-black uppercase tracking-widest text-[9px] ring-1 ring-zinc-200/80">
+                                                            {visibilityChannelLabel(channel)}
+                                                        </Badge>
+                                                    ))}
+                                                </div>
                                             </div>
                                         </div>
 
@@ -496,6 +561,33 @@ export default function MenuItems({
                                     }
                                 />
                                 <InputError message={createForm.errors.image} />
+                            </div>
+
+                            <div className="grid gap-2 md:col-span-3">
+                                <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">Visible On</Label>
+                                <div className="flex flex-wrap gap-2">
+                                    {channelOptions.map((channel) => (
+                                        <label key={`new-${channel}`} className="flex cursor-pointer items-center gap-2 rounded-xl bg-zinc-50 px-4 py-2 ring-1 ring-zinc-200">
+                                            <input
+                                                type="checkbox"
+                                                className="h-4 w-4 rounded border-zinc-300 text-[#F57C00] focus:ring-[#F57C00]/20"
+                                                checked={createForm.data.visibility_channels.includes(channel)}
+                                                onChange={(event) =>
+                                                    createForm.setData(
+                                                        'visibility_channels',
+                                                        nextVisibilityChannels(
+                                                            createForm.data.visibility_channels,
+                                                            channel,
+                                                            event.target.checked,
+                                                        ),
+                                                    )
+                                                }
+                                            />
+                                            <span className="text-xs font-bold text-zinc-600">{visibilityChannelLabel(channel)}</span>
+                                        </label>
+                                    ))}
+                                </div>
+                                <InputError message={createForm.errors.visibility_channels} />
                             </div>
 
                             <div className="flex items-center gap-2 md:col-span-3">

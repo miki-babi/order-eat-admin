@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Staff;
 
+use App\Models\MenuItem;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateMenuItemRequest extends FormRequest
 {
@@ -20,6 +22,8 @@ class UpdateMenuItemRequest extends FormRequest
             'category' => ['nullable', 'string', 'max:50'],
             'image' => ['nullable', 'image', 'max:5120'],
             'is_active' => ['nullable', 'boolean'],
+            'visibility_channels' => ['required', 'array', 'min:1'],
+            'visibility_channels.*' => ['string', Rule::in(MenuItem::visibilityChannels())],
         ];
     }
 }

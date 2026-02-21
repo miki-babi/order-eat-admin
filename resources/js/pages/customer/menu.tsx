@@ -36,6 +36,7 @@ type PageProps = {
     filters: {
         search?: string | null;
         category?: string | null;
+        channel?: string | null;
     };
     staffRoute?: string | null;
 };
@@ -57,6 +58,7 @@ type OrderForm = {
     phone: string;
     pickup_date: string;
     pickup_location_id: number | '';
+    channel: string;
     notify_when_ready: boolean;
     receipt: File | null;
 };
@@ -91,6 +93,7 @@ export default function Menu({
     staffRoute,
 }: PageProps) {
     const { auth, flash } = usePage<SharedProps>().props;
+    const channel = filters.channel ?? 'web';
     const [step, setStep] = useState(1);
     const [search, setSearch] = useState(filters.search ?? '');
     const [activeCategory, setActiveCategory] = useState(filters.category ?? 'all');
@@ -101,6 +104,7 @@ export default function Menu({
         phone: '',
         pickup_date: todayDate(),
         pickup_location_id: pickupLocations[0]?.id ?? '',
+        channel,
         notify_when_ready: false,
         receipt: null,
     });

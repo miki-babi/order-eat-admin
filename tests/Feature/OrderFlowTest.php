@@ -10,6 +10,71 @@ use App\Models\User;
 use Illuminate\Support\Str;
 use Inertia\Testing\AssertableInertia as Assert;
 
+test('public menu only returns items visible in requested channel', function () {
+    $webItem = MenuItem::query()->create([
+        'name' => 'Web Latte',
+        'description' => 'Shown on web',
+        'price' => 120,
+        'category' => 'Drinks',
+        'is_active' => true,
+        'visibility_channels' => ['web'],
+    ]);
+
+    MenuItem::query()->create([
+        'name' => 'Telegram Latte',
+        'description' => 'Shown on telegram',
+        'price' => 125,
+        'category' => 'Drinks',
+        'is_active' => true,
+        'visibility_channels' => ['telegram'],
+    ]);
+
+    $this->get(route('home', ['channel' => 'web']))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('customer/menu')
+            ->where('filters.channel', 'web')
+            ->has('menuItems', 1)
+            ->where('menuItems.0.id', $webItem->id)
+        );
+});
+
+test('customers can not order items hidden from the selected channel', function () {
+    $hiddenFromWeb = MenuItem::query()->create([
+        'name' => 'Telegram Exclusive',
+        'description' => 'Only for telegram',
+        'price' => 140,
+        'category' => 'Drinks',
+        'is_active' => true,
+        'visibility_channels' => ['telegram'],
+    ]);
+
+    $location = PickupLocation::query()->create([
+        'name' => 'Test Branch',
+        'address' => 'Addis Ababa',
+        'is_active' => true,
+    ]);
+
+    $this->from(route('home'))
+        ->post(route('orders.store'), [
+            'name' => 'Customer One',
+            'phone' => '251911000000',
+            'pickup_date' => now()->addDay()->toDateString(),
+            'pickup_location_id' => $location->id,
+            'channel' => 'web',
+            'items' => [
+                [
+                    'menu_item_id' => $hiddenFromWeb->id,
+                    'quantity' => 1,
+                ],
+            ],
+        ])
+        ->assertRedirect(route('home'))
+        ->assertSessionHasErrors('items.0.menu_item_id');
+
+    expect(Order::query()->count())->toBe(0);
+});
+
 test('customers can place an order from the public menu flow', function () {
     $menuItem = MenuItem::query()->create([
         'name' => 'Test Latte',
