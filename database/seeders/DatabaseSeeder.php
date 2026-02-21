@@ -5,10 +5,8 @@ namespace Database\Seeders;
 use App\Models\DiningTable;
 use App\Models\MenuItem;
 use App\Models\PickupLocation;
-use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -144,42 +142,6 @@ class DatabaseSeeder extends Seeder
             );
         }
 
-        $allBranchIds = PickupLocation::query()->pluck('id')->all();
-
-        $admin = User::query()->updateOrCreate(
-            ['email' => 'admin@example.com'],
-            [
-                'name' => 'Admin User',
-                'password' => Hash::make('password'),
-                'role' => 'admin',
-                'email_verified_at' => now(),
-            ],
-        );
-        $admin->syncRolesBySlugs(['admin']);
-        $admin->syncPickupLocationsByIds([]);
-
-        $manager = User::query()->updateOrCreate(
-            ['email' => 'manager@example.com'],
-            [
-                'name' => 'Manager User',
-                'password' => Hash::make('password'),
-                'role' => 'branch_manager',
-                'email_verified_at' => now(),
-            ],
-        );
-        $manager->syncRolesBySlugs(['branch_manager']);
-        $manager->syncPickupLocationsByIds($allBranchIds);
-
-        $staff = User::query()->updateOrCreate(
-            ['email' => 'staff@example.com'],
-            [
-                'name' => 'Staff User',
-                'password' => Hash::make('password'),
-                'role' => 'branch_staff',
-                'email_verified_at' => now(),
-            ],
-        );
-        $staff->syncRolesBySlugs(['branch_staff']);
-        $staff->syncPickupLocationsByIds($allBranchIds);
+        $this->call(DemoUsersSeeder::class);
     }
 }
