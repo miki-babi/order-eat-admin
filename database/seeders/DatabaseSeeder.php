@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\DiningTable;
 use App\Models\MenuItem;
 use App\Models\PickupLocation;
 use App\Models\User;
@@ -101,6 +102,45 @@ class DatabaseSeeder extends Seeder
             PickupLocation::query()->updateOrCreate(
                 ['name' => $location['name']],
                 $location,
+            );
+        }
+
+        $boleBranch = PickupLocation::query()->where('name', 'Bole Branch')->first();
+        $piassaBranch = PickupLocation::query()->where('name', 'Piassa Branch')->first();
+
+        $diningTables = [
+            [
+                'pickup_location_id' => $boleBranch?->id,
+                'name' => 'Table 1',
+                'qr_code' => 'bole-table-01',
+                'is_active' => true,
+            ],
+            [
+                'pickup_location_id' => $boleBranch?->id,
+                'name' => 'Table 2',
+                'qr_code' => 'bole-table-02',
+                'is_active' => true,
+            ],
+            [
+                'pickup_location_id' => $piassaBranch?->id,
+                'name' => 'Table 1',
+                'qr_code' => 'piassa-table-01',
+                'is_active' => true,
+            ],
+        ];
+
+        foreach ($diningTables as $table) {
+            if (! $table['pickup_location_id']) {
+                continue;
+            }
+
+            DiningTable::query()->updateOrCreate(
+                ['qr_code' => $table['qr_code']],
+                [
+                    'pickup_location_id' => $table['pickup_location_id'],
+                    'name' => $table['name'],
+                    'is_active' => $table['is_active'],
+                ],
             );
         }
 

@@ -12,6 +12,12 @@ class Order extends Model
     /** @use HasFactory<\Database\Factories\OrderFactory> */
     use HasFactory;
 
+    public const SOURCE_WEB = 'web';
+
+    public const SOURCE_TELEGRAM = 'telegram';
+
+    public const SOURCE_TABLE = 'table';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -21,6 +27,9 @@ class Order extends Model
         'customer_id',
         'pickup_date',
         'pickup_location_id',
+        'dining_table_id',
+        'table_session_id',
+        'source_channel',
         'receipt_url',
         'receipt_status',
         'order_status',
@@ -45,6 +54,18 @@ class Order extends Model
     }
 
     /**
+     * @return list<string>
+     */
+    public static function sourceChannels(): array
+    {
+        return [
+            self::SOURCE_WEB,
+            self::SOURCE_TELEGRAM,
+            self::SOURCE_TABLE,
+        ];
+    }
+
+    /**
      * Get the customer that owns this order.
      */
     public function customer(): BelongsTo
@@ -58,6 +79,22 @@ class Order extends Model
     public function pickupLocation(): BelongsTo
     {
         return $this->belongsTo(PickupLocation::class);
+    }
+
+    /**
+     * Get the dining table used to place this order, if any.
+     */
+    public function diningTable(): BelongsTo
+    {
+        return $this->belongsTo(DiningTable::class);
+    }
+
+    /**
+     * Get the originating QR table session, if any.
+     */
+    public function tableSession(): BelongsTo
+    {
+        return $this->belongsTo(TableSession::class);
     }
 
     /**

@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
@@ -206,6 +207,14 @@ class User extends Authenticatable
     public function pickupLocations(): BelongsToMany
     {
         return $this->belongsToMany(PickupLocation::class);
+    }
+
+    /**
+     * Table sessions verified by this user.
+     */
+    public function verifiedTableSessions(): HasMany
+    {
+        return $this->hasMany(TableSession::class, 'verified_by_user_id');
     }
 
     /**

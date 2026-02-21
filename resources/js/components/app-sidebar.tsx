@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { BarChart3, ClipboardList, Coffee, KeyRound, MapPin, MessageSquareText, Store, Users, ExternalLink } from 'lucide-react';
+import { BarChart3, ClipboardList, Coffee, KeyRound, MapPin, MessageSquareText, Store, Users, ExternalLink, QrCode } from 'lucide-react';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -51,6 +51,9 @@ export function AppSidebar() {
             : []),
         ...(can('pickup_locations.manage')
             ? [{ title: 'Branch Points', href: '/staff/pickup-locations', icon: MapPin }]
+            : []),
+        ...(can('pickup_locations.manage')
+            ? [{ title: 'Table QR', href: '/staff/table-qr', icon: QrCode }]
             : []),
         ...(can('menu_items.manage')
             ? [{ title: 'Product Catalog', href: '/staff/menu-items', icon: Coffee }]

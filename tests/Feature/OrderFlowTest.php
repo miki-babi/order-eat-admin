@@ -1,11 +1,13 @@
 <?php
 
 use App\Models\Customer;
+use App\Models\DiningTable;
 use App\Models\MenuItem;
 use App\Models\Order;
 use App\Models\PickupLocation;
 use App\Models\SmsLog;
 use App\Models\SmsNotificationSetting;
+use App\Models\TableSession;
 use App\Models\User;
 use Illuminate\Support\Str;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -107,6 +109,7 @@ test('customers can place an order from the public menu flow', function () {
 
     expect($order)->not->toBeNull();
     expect($order->total_amount)->toEqual('240.00');
+    expect($order->source_channel)->toBe('web');
     expect(Customer::query()->where('phone', '251911000000')->exists())->toBeTrue();
     expect($order->items()->count())->toBe(1);
 
@@ -188,6 +191,107 @@ test('staff can filter orders by today, tomorrow, and upcoming pickup windows', 
             ->where('filters.time_bucket', 'upcoming')
             ->has('orders.data', 1)
             ->where('orders.data.0.id', $upcomingOrder->id)
+        );
+});
+
+test('staff can filter orders by source channel tabs', function () {
+    $staff = User::factory()->create([
+        'role' => 'staff',
+    ]);
+
+    $location = PickupLocation::query()->create([
+        'name' => 'Source Branch',
+        'address' => 'Addis Ababa',
+        'is_active' => true,
+    ]);
+
+    $staff->pickupLocations()->sync([$location->id]);
+
+    $webCustomer = Customer::query()->create([
+        'name' => 'Web Customer',
+        'phone' => '251966111111',
+    ]);
+
+    $telegramCustomer = Customer::query()->create([
+        'name' => 'Telegram Customer',
+        'phone' => '251966222222',
+        'telegram_id' => 999001,
+    ]);
+
+    $tableCustomer = Customer::query()->create([
+        'name' => 'Table Customer',
+        'phone' => 'q-source-table-01',
+        'telegram_id' => 999002,
+    ]);
+
+    $table = DiningTable::query()->create([
+        'pickup_location_id' => $location->id,
+        'name' => 'Table 1',
+        'qr_code' => 'source-branch-table-01',
+        'is_active' => true,
+    ]);
+
+    $tableSession = TableSession::query()->create([
+        'dining_table_id' => $table->id,
+        'session_token' => Str::random(64),
+        'started_at' => now()->subMinute(),
+        'last_seen_at' => now(),
+    ]);
+
+    $webOrder = $webCustomer->orders()->create([
+        'pickup_date' => now()->addDay()->toDateString(),
+        'pickup_location_id' => $location->id,
+        'source_channel' => 'web',
+        'tracking_token' => Str::random(40),
+        'total_amount' => 10,
+    ]);
+
+    $telegramOrder = $telegramCustomer->orders()->create([
+        'pickup_date' => now()->addDay()->toDateString(),
+        'pickup_location_id' => $location->id,
+        'source_channel' => 'telegram',
+        'tracking_token' => Str::random(40),
+        'total_amount' => 20,
+    ]);
+
+    $tableOrder = $tableCustomer->orders()->create([
+        'pickup_date' => now()->addDay()->toDateString(),
+        'pickup_location_id' => $location->id,
+        'dining_table_id' => $table->id,
+        'table_session_id' => $tableSession->id,
+        'source_channel' => 'table',
+        'tracking_token' => Str::random(40),
+        'total_amount' => 30,
+    ]);
+
+    $this->actingAs($staff)
+        ->get(route('staff.orders.index', ['source_channel' => 'web']))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('staff/orders')
+            ->where('filters.source_channel', 'web')
+            ->has('orders.data', 1)
+            ->where('orders.data.0.id', $webOrder->id)
+        );
+
+    $this->actingAs($staff)
+        ->get(route('staff.orders.index', ['source_channel' => 'telegram']))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('staff/orders')
+            ->where('filters.source_channel', 'telegram')
+            ->has('orders.data', 1)
+            ->where('orders.data.0.id', $telegramOrder->id)
+        );
+
+    $this->actingAs($staff)
+        ->get(route('staff.orders.index', ['source_channel' => 'table']))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('staff/orders')
+            ->where('filters.source_channel', 'table')
+            ->has('orders.data', 1)
+            ->where('orders.data.0.id', $tableOrder->id)
         );
 });
 

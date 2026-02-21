@@ -10,6 +10,7 @@ use App\Support\BranchAccess;
 use App\Services\SmsEthiopiaService;
 use App\Services\SmsNotificationService;
 use App\Services\SmsTemplateService;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -28,13 +29,15 @@ class OrderController extends Controller
         $user = $request->user();
         $today = Carbon::today();
         $tomorrow = $today->copy()->addDay();
+        $sourceChannel = $this->normalizeSourceChannel($request->input('source_channel'));
 
         $query = Order::query()
-            ->with(['customer', 'pickupLocation', 'items.menuItem'])
+            ->with(['customer', 'pickupLocation', 'diningTable', 'tableSession.verifiedBy', 'items.menuItem'])
             ->orderBy('pickup_date')
             ->orderBy('created_at');
 
         BranchAccess::scopeQuery($query, $user);
+        $this->scopeSourceChannel($query, $sourceChannel);
 
         if ($request->filled('search')) {
             $search = trim((string) $request->input('search'));
@@ -47,6 +50,12 @@ class OrderController extends Controller
                     $customerQuery
                         ->where('name', 'like', "%{$search}%")
                         ->orWhere('phone', 'like', "%{$search}%");
+                });
+
+                $builder->orWhereHas('diningTable', function ($tableQuery) use ($search): void {
+                    $tableQuery
+                        ->where('name', 'like', "%{$search}%")
+                        ->orWhere('qr_code', 'like', "%{$search}%");
                 });
             });
         }
@@ -92,6 +101,15 @@ class OrderController extends Controller
                 'customer_phone' => $order->customer?->phone,
                 'pickup_date' => $order->pickup_date?->toDateString(),
                 'pickup_location' => $order->pickupLocation?->name,
+                'source_channel' => $this->sourceChannelForOrder($order),
+                'table_name' => $order->diningTable?->name,
+                'table_qr_code' => $order->diningTable?->qr_code,
+                'table_session_id' => $order->tableSession?->id,
+                'table_session_token_short' => $order->tableSession
+                    ? substr($order->tableSession->session_token, 0, 12)
+                    : null,
+                'table_session_verified' => $order->tableSession?->verified_at !== null,
+                'table_session_verified_by' => $order->tableSession?->verifiedBy?->name,
                 'receipt_url' => $this->toPublicAssetUrl($order->receipt_url),
                 'receipt_status' => $order->receipt_status,
                 'order_status' => $order->order_status,
@@ -112,6 +130,12 @@ class OrderController extends Controller
 
         $statsBase = Order::query();
         BranchAccess::scopeQuery($statsBase, $user);
+        $sourceSummary = [
+            'all' => (clone $statsBase)->count(),
+            'web' => $this->scopeSourceChannel(clone $statsBase, 'web')->count(),
+            'telegram' => $this->scopeSourceChannel(clone $statsBase, 'telegram')->count(),
+            'table' => $this->scopeSourceChannel(clone $statsBase, 'table')->count(),
+        ];
 
         $pickupLocations = PickupLocation::query()
             ->orderBy('name');
@@ -132,11 +156,13 @@ class OrderController extends Controller
                 'pickup_location_id' => $request->input('pickup_location_id'),
                 'date' => $request->input('date'),
                 'time_bucket' => $timeBucket,
+                'source_channel' => $sourceChannel,
             ],
             'statusOptions' => ['pending', 'preparing', 'ready', 'completed'],
             'receiptStatusOptions' => ['pending', 'approved', 'disapproved'],
+            'sourceSummary' => $sourceSummary,
             'summary' => [
-                'total_orders' => (clone $statsBase)->count(),
+                'total_orders' => $sourceSummary['all'],
                 'pending_orders' => (clone $statsBase)->where('order_status', 'pending')->count(),
                 'pending_receipts' => (clone $statsBase)->where('receipt_status', 'pending')->count(),
                 'ready_orders' => (clone $statsBase)->where('order_status', 'ready')->count(),
@@ -264,5 +290,34 @@ class OrderController extends Controller
         return str_starts_with($path, 'http://') || str_starts_with($path, 'https://')
             ? $path
             : Storage::disk('public')->url($path);
+    }
+
+    protected function normalizeSourceChannel(mixed $sourceChannel): string
+    {
+        if (! is_string($sourceChannel)) {
+            return 'all';
+        }
+
+        $normalized = strtolower(trim($sourceChannel));
+
+        return in_array($normalized, ['all', ...Order::sourceChannels()], true)
+            ? $normalized
+            : 'all';
+    }
+
+    protected function scopeSourceChannel(Builder $query, string $sourceChannel): Builder
+    {
+        if ($sourceChannel === 'all') {
+            return $query;
+        }
+
+        return $query->where('source_channel', $sourceChannel);
+    }
+
+    protected function sourceChannelForOrder(Order $order): string
+    {
+        return in_array($order->source_channel, Order::sourceChannels(), true)
+            ? $order->source_channel
+            : Order::SOURCE_WEB;
     }
 }

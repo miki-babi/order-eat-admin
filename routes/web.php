@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\QrMenuController;
 use App\Http\Controllers\Staff\AccessControlController;
 use App\Http\Controllers\Staff\CustomerController;
 use App\Http\Controllers\Staff\MenuItemController;
@@ -8,12 +9,15 @@ use App\Http\Controllers\Staff\OrderController as StaffOrderController;
 use App\Http\Controllers\Staff\PickupLocationController;
 use App\Http\Controllers\Staff\ReportController;
 use App\Http\Controllers\Staff\SmsTemplateController;
+use App\Http\Controllers\Staff\TableQrController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
 
 Route::get('/', [OrderController::class, 'index'])->name('home');
+Route::get('/qr-menu/{diningTable:qr_code}', [QrMenuController::class, 'show'])->name('qr-menu.show');
+Route::post('/qr-menu/{diningTable:qr_code}/orders', [QrMenuController::class, 'store'])->name('qr-menu.orders.store');
 
 Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
 Route::get('/orders/{trackingToken}/confirmation', [OrderController::class, 'confirmation'])->name('orders.confirmation');
@@ -75,6 +79,19 @@ Route::middleware(['auth', 'verified', 'staff'])
         Route::delete('pickup-locations/{pickupLocation}', [PickupLocationController::class, 'destroy'])
             ->middleware('permission:pickup_locations.manage')
             ->name('pickup-locations.destroy');
+
+        Route::get('table-qr', [TableQrController::class, 'index'])
+            ->middleware('permission:pickup_locations.manage')
+            ->name('table-qr.index');
+        Route::post('table-qr', [TableQrController::class, 'store'])
+            ->middleware('permission:pickup_locations.manage')
+            ->name('table-qr.store');
+        Route::put('table-qr/{diningTable:id}', [TableQrController::class, 'update'])
+            ->middleware('permission:pickup_locations.manage')
+            ->name('table-qr.update');
+        Route::patch('table-sessions/{tableSession}/verify', [TableQrController::class, 'verifySession'])
+            ->middleware('permission:pickup_locations.manage')
+            ->name('table-sessions.verify');
 
         Route::get('menu-items', [MenuItemController::class, 'index'])
             ->middleware('permission:menu_items.manage')

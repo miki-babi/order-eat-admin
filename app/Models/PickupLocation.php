@@ -51,4 +51,12 @@ class PickupLocation extends Model
     {
         return $this->belongsToMany(User::class);
     }
+
+    /**
+     * Table QR definitions for this pickup location.
+     */
+    public function diningTables(): HasMany
+    {
+        return $this->hasMany(DiningTable::class);
+    }
 }

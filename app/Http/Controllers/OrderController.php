@@ -157,10 +157,13 @@ class OrderController extends Controller
                 'receipt_path' => $receiptPath,
             ]);
 
-            $order = DB::transaction(function () use ($validated, $items, $menuItems, $customer, $receiptPath): Order {
+            $order = DB::transaction(function () use ($validated, $items, $menuItems, $customer, $receiptPath, $channel): Order {
                 $order = $customer->orders()->create([
                     'pickup_date' => $validated['pickup_date'],
                     'pickup_location_id' => $validated['pickup_location_id'],
+                    'source_channel' => $channel === MenuItem::CHANNEL_TELEGRAM
+                        ? Order::SOURCE_TELEGRAM
+                        : Order::SOURCE_WEB,
                     'receipt_url' => $receiptPath,
                     'receipt_status' => 'pending',
                     'order_status' => 'pending',
@@ -288,7 +291,7 @@ class OrderController extends Controller
     protected function findOrderByToken(string $trackingToken): Order
     {
         return Order::query()
-            ->with(['customer', 'pickupLocation', 'items.menuItem'])
+            ->with(['customer', 'pickupLocation', 'diningTable', 'items.menuItem'])
             ->where('tracking_token', $trackingToken)
             ->firstOrFail();
     }
@@ -309,6 +312,11 @@ class OrderController extends Controller
                 'name' => $order->pickupLocation?->name,
                 'address' => $order->pickupLocation?->address,
                 'google_maps_url' => $order->pickupLocation?->google_maps_url,
+            ],
+            'dining_table' => [
+                'id' => $order->diningTable?->id,
+                'name' => $order->diningTable?->name,
+                'qr_code' => $order->diningTable?->qr_code,
             ],
             'customer' => [
                 'name' => $order->customer?->name,

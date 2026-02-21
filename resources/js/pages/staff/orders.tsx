@@ -32,6 +32,13 @@ type OrderRow = {
     customer_phone: string | null;
     pickup_date: string;
     pickup_location: string | null;
+    source_channel: 'web' | 'telegram' | 'table';
+    table_name: string | null;
+    table_qr_code: string | null;
+    table_session_id: number | null;
+    table_session_token_short: string | null;
+    table_session_verified: boolean;
+    table_session_verified_by: string | null;
     receipt_url: string | null;
     receipt_status: 'pending' | 'approved' | 'disapproved';
     order_status: 'pending' | 'preparing' | 'ready' | 'completed';
@@ -69,6 +76,7 @@ type Filters = {
     pickup_location_id?: string | null;
     date?: string | null;
     time_bucket?: string | null;
+    source_channel?: string | null;
 };
 
 type Summary = {
@@ -76,6 +84,13 @@ type Summary = {
     pending_orders: number;
     pending_receipts: number;
     ready_orders: number;
+};
+
+type SourceSummary = {
+    all: number;
+    web: number;
+    telegram: number;
+    table: number;
 };
 
 type UpdatePayload = {
@@ -126,6 +141,7 @@ export default function StaffOrders({
     filters,
     statusOptions,
     receiptStatusOptions,
+    sourceSummary,
     summary,
 }: {
     orders: Paginated<OrderRow>;
@@ -133,6 +149,7 @@ export default function StaffOrders({
     filters: Filters;
     statusOptions: string[];
     receiptStatusOptions: string[];
+    sourceSummary: SourceSummary;
     summary: Summary;
 }) {
     const [approveDialogOrder, setApproveDialogOrder] = useState<OrderRow | null>(null);
@@ -150,6 +167,7 @@ export default function StaffOrders({
         pickup_location_id: filters.pickup_location_id ?? '',
         date: filters.date ?? '',
         time_bucket: filters.time_bucket ?? '',
+        source_channel: filters.source_channel ?? 'all',
     });
 
     const applyFilters = (event: FormEvent<HTMLFormElement>) => {
@@ -168,9 +186,34 @@ export default function StaffOrders({
             pickup_location_id: '',
             date: '',
             time_bucket: '',
+            source_channel: 'all',
         });
         router.get('/staff/orders', {}, { preserveState: true, replace: true });
     };
+
+    const selectSourceTab = (sourceChannel: 'all' | 'web' | 'telegram' | 'table') => {
+        form.setData('source_channel', sourceChannel);
+        router.get(
+            '/staff/orders',
+            {
+                ...form.data,
+                source_channel: sourceChannel,
+            },
+            {
+                preserveState: true,
+                replace: true,
+            },
+        );
+    };
+
+    const sourceLabel: Record<'all' | 'web' | 'telegram' | 'table', string> = {
+        all: 'All',
+        web: 'Web',
+        telegram: 'Telegram',
+        table: 'Table',
+    };
+
+    const sourceTabs: Array<'all' | 'web' | 'telegram' | 'table'> = ['all', 'web', 'telegram', 'table'];
 
     const updateOrder = (orderId: number, payload: UpdatePayload, onSuccess?: () => void) => {
         setUpdatingOrderId(orderId);
@@ -312,6 +355,28 @@ export default function StaffOrders({
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="pt-6">
+                        <div className="mb-5 flex flex-wrap gap-2">
+                            {sourceTabs.map((source) => {
+                                const active = form.data.source_channel === source;
+
+                                return (
+                                    <Button
+                                        key={source}
+                                        type="button"
+                                        size="sm"
+                                        variant={active ? 'default' : 'outline'}
+                                        className={`rounded-full px-4 text-xs font-black uppercase tracking-widest transition-all ${
+                                            active
+                                                ? 'bg-[#F57C00] text-white shadow-lg shadow-[#F57C00]/20 hover:bg-[#E65100]'
+                                                : 'border-zinc-200 text-zinc-600 hover:bg-zinc-50'
+                                        }`}
+                                        onClick={() => selectSourceTab(source)}
+                                    >
+                                        {sourceLabel[source]} ({sourceSummary[source]})
+                                    </Button>
+                                );
+                            })}
+                        </div>
                         <form className="grid gap-6 md:grid-cols-4 lg:grid-cols-6" onSubmit={applyFilters}>
                             <div className="lg:col-span-2">
                                 <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]" htmlFor="search">Search</Label>
@@ -322,7 +387,7 @@ export default function StaffOrders({
                                         className="h-11 pl-10 rounded-xl border-zinc-200 focus:ring-[#F57C00] transition-all"
                                         value={form.data.search}
                                         onChange={(event) => form.setData('search', event.target.value)}
-                                        placeholder="Order ID, customer, phone..."
+                                        placeholder="Order ID, customer, phone, table..."
                                     />
                                 </div>
                             </div>
@@ -411,6 +476,15 @@ export default function StaffOrders({
                                             </div>
                                         </div>
                                         <div className="flex flex-wrap items-center gap-3">
+                                            <Badge className={`rounded-full px-4 py-1 text-[10px] font-black uppercase tracking-widest shadow-none border-none ${
+                                                order.source_channel === 'web'
+                                                    ? 'bg-zinc-100 text-zinc-700'
+                                                    : order.source_channel === 'telegram'
+                                                        ? 'bg-blue-100 text-blue-700'
+                                                        : 'bg-orange-100 text-orange-700'
+                                            }`}>
+                                                {order.source_channel}
+                                            </Badge>
                                             <Badge className={`rounded-full px-4 py-1 text-[10px] font-black uppercase tracking-widest shadow-none border-none ${badgeStyle(order.order_status)}`}>
                                                 {order.order_status}
                                             </Badge>
@@ -456,6 +530,21 @@ export default function StaffOrders({
                                                     <MapPin className="size-3" />
                                                     {order.pickup_location} • {order.pickup_date}
                                                 </p>
+                                                {order.table_name ? (
+                                                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                                                        <Badge className="bg-zinc-100 text-zinc-700">
+                                                            Table {order.table_name}
+                                                        </Badge>
+                                                        <Badge className={order.table_session_verified ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}>
+                                                            Session {order.table_session_verified ? 'Verified' : 'Unverified'}
+                                                        </Badge>
+                                                        {order.table_session_token_short ? (
+                                                            <span className="text-[10px] font-mono text-zinc-500">
+                                                                {order.table_session_token_short}...
+                                                            </span>
+                                                        ) : null}
+                                                    </div>
+                                                ) : null}
                                             </div>
                                         </div>
 
