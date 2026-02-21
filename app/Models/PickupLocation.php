@@ -20,6 +20,7 @@ class PickupLocation extends Model
     protected $fillable = [
         'name',
         'address',
+        'google_maps_url',
         'is_active',
     ];
 

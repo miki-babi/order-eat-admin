@@ -1,5 +1,5 @@
 import { Head, useForm } from '@inertiajs/react';
-import { KeyRound, Shield, UserCog, Users } from 'lucide-react';
+import { KeyRound, Shield, ShieldCheck, UserCog, Users } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
 import InputError from '@/components/input-error';
 import { Badge } from '@/components/ui/badge';
@@ -52,7 +52,7 @@ type Summary = {
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Access Control',
+        title: 'Security & Access',
         href: '/staff/access-control',
     },
 ];
@@ -213,533 +213,543 @@ export default function AccessControl({
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Access Control" />
-            <div className="space-y-5 p-4">
-                <div className="grid gap-3 md:grid-cols-3">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="text-sm text-zinc-500">Users</CardTitle>
-                        </CardHeader>
-                        <CardContent className="text-2xl font-semibold">{summary.total_users}</CardContent>
+            <Head title="Security & Access Control" />
+            <div className="space-y-8 bg-zinc-50/50 p-6 min-h-screen">
+                {/* 📌 Security Overview */}
+                <div className="grid gap-4 md:grid-cols-3">
+                    <Card className="border-none shadow-sm ring-1 ring-zinc-200">
+                        <CardContent className="pt-6">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">Operator Network</p>
+                                    <h3 className="mt-1 text-2xl font-black text-[#212121]">{summary.total_users} Users</h3>
+                                </div>
+                                <div className="rounded-2xl bg-zinc-100 p-3 text-zinc-500">
+                                    <Users className="size-5" />
+                                </div>
+                            </div>
+                        </CardContent>
                     </Card>
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="text-sm text-zinc-500">Roles</CardTitle>
-                        </CardHeader>
-                        <CardContent className="text-2xl font-semibold">{summary.total_roles}</CardContent>
+                    <Card className="border-none shadow-sm ring-1 ring-zinc-200">
+                        <CardContent className="pt-6">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-[#F57C00]">Authorization Tiers</p>
+                                    <h3 className="mt-1 text-2xl font-black text-[#212121]">{summary.total_roles} Levels</h3>
+                                </div>
+                                <div className="rounded-2xl bg-[#F57C00]/10 p-3 text-[#F57C00]">
+                                    <ShieldCheck className="size-5" />
+                                </div>
+                            </div>
+                        </CardContent>
                     </Card>
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="text-sm text-zinc-500">Permissions</CardTitle>
-                        </CardHeader>
-                        <CardContent className="text-2xl font-semibold">{summary.total_permissions}</CardContent>
+                    <Card className="border-none shadow-sm ring-1 ring-zinc-200">
+                        <CardContent className="pt-6">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">Protocol Constraints</p>
+                                    <h3 className="mt-1 text-2xl font-black text-[#212121]">{summary.total_permissions} Gates</h3>
+                                </div>
+                                <div className="rounded-2xl bg-[#212121] p-3 text-white">
+                                    <KeyRound className="size-5" />
+                                </div>
+                            </div>
+                        </CardContent>
                     </Card>
                 </div>
 
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-base">
-                            <KeyRound className="size-4" />
-                            Create Permission
+                {/* 📌 New Permission Protocol */}
+                <Card className="border-none shadow-md ring-1 ring-zinc-200">
+                    <CardHeader className="border-b border-zinc-100 bg-zinc-50/50 py-4">
+                        <CardTitle className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-[#212121]">
+                            <KeyRound className="size-4 text-[#F57C00]" />
+                            Declare new permission
                         </CardTitle>
                     </CardHeader>
-                    <CardContent>
-                        <form className="grid gap-3 md:grid-cols-4" onSubmit={submitPermission}>
+                    <CardContent className="pt-6">
+                        <form className="grid gap-6 md:grid-cols-4" onSubmit={submitPermission}>
                             <div className="grid gap-2">
-                                <Label htmlFor="permission-name">Name</Label>
+                                <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]" htmlFor="permission-name">Protocol Name</Label>
                                 <Input
                                     id="permission-name"
+                                    className="h-10 rounded-xl border-zinc-200 focus:ring-[#F57C00]"
                                     value={permissionForm.data.name}
                                     onChange={(event) => permissionForm.setData('name', event.target.value)}
+                                    placeholder="e.g. Audit Logs"
                                 />
                                 <InputError message={permissionForm.errors.name} />
                             </div>
                             <div className="grid gap-2">
-                                <Label htmlFor="permission-slug">Slug (optional)</Label>
+                                <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]" htmlFor="permission-slug">System slug</Label>
                                 <Input
                                     id="permission-slug"
+                                    className="h-10 rounded-xl border-zinc-200 focus:ring-[#F57C00]"
                                     value={permissionForm.data.slug}
                                     onChange={(event) => permissionForm.setData('slug', event.target.value)}
-                                    placeholder="customers_sms"
+                                    placeholder="system_audit"
                                 />
                                 <InputError message={permissionForm.errors.slug} />
                             </div>
                             <div className="grid gap-2 md:col-span-2">
-                                <Label htmlFor="permission-description">Description</Label>
-                                <Input
-                                    id="permission-description"
-                                    value={permissionForm.data.description}
-                                    onChange={(event) =>
-                                        permissionForm.setData('description', event.target.value)
-                                    }
-                                />
+                                <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]" htmlFor="permission-description">Contextual description</Label>
+                                <div className="flex gap-2">
+                                    <Input
+                                        id="permission-description"
+                                        className="h-10 flex-1 rounded-xl border-zinc-200 focus:ring-[#F57C00]"
+                                        value={permissionForm.data.description}
+                                        onChange={(event) =>
+                                            permissionForm.setData('description', event.target.value)
+                                        }
+                                        placeholder="Briefly define scope of this access level..."
+                                    />
+                                    <Button type="submit" className="h-10 px-6 rounded-xl bg-[#212121] font-black hover:bg-[#F57C00]" disabled={permissionForm.processing}>
+                                        Deploy
+                                    </Button>
+                                </div>
                                 <InputError message={permissionForm.errors.description} />
-                            </div>
-                            <div className="md:col-span-4">
-                                <Button type="submit" disabled={permissionForm.processing}>
-                                    Add Permission
-                                </Button>
                             </div>
                         </form>
                     </CardContent>
                 </Card>
 
-                <div className="grid gap-4 lg:grid-cols-2">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2 text-base">
-                                <Shield className="size-4" />
-                                Create Role
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <form className="space-y-3" onSubmit={submitCreateRole}>
-                                <div className="grid gap-2">
-                                    <Label htmlFor="role-name">Role Name</Label>
-                                    <Input
-                                        id="role-name"
-                                        value={createRoleForm.data.name}
-                                        onChange={(event) => createRoleForm.setData('name', event.target.value)}
-                                        placeholder="Promo Staff"
-                                    />
-                                    <InputError message={createRoleForm.errors.name} />
-                                </div>
-                                <div className="grid gap-2">
-                                    <Label htmlFor="role-description">Description</Label>
-                                    <Input
-                                        id="role-description"
-                                        value={createRoleForm.data.description}
-                                        onChange={(event) =>
-                                            createRoleForm.setData('description', event.target.value)
-                                        }
-                                    />
-                                    <InputError message={createRoleForm.errors.description} />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>Permissions</Label>
-                                    <div className="grid gap-2 rounded-md border p-3">
-                                        {permissions.map((permission) => (
-                                            <label
-                                                key={permission.id}
-                                                className="flex items-start gap-2 text-sm"
-                                            >
-                                                <input
-                                                    type="checkbox"
-                                                    checked={createRoleForm.data.permission_slugs.includes(
-                                                        permission.slug,
-                                                    )}
-                                                    onChange={() =>
-                                                        createRoleForm.setData(
-                                                            'permission_slugs',
-                                                            toggleString(
-                                                                createRoleForm.data.permission_slugs,
-                                                                permission.slug,
-                                                            ),
-                                                        )
-                                                    }
-                                                />
-                                                <span>
-                                                    <span className="font-medium">{permission.name}</span>{' '}
-                                                    <span className="text-zinc-500">({permission.slug})</span>
-                                                </span>
-                                            </label>
-                                        ))}
-                                    </div>
-                                    <InputError message={createRoleForm.errors.permission_slugs} />
-                                </div>
-                                <Button type="submit" disabled={createRoleForm.processing}>
-                                    Create Role
-                                </Button>
-                            </form>
-                        </CardContent>
-                    </Card>
+                <div className="grid gap-8 lg:grid-cols-2">
+                    {/* 📌 Tier Management */}
+                    <div className="space-y-4">
+                        <h2 className="flex items-center gap-2 text-sm font-black uppercase tracking-widest text-[#212121]">
+                            <Shield className="size-4 text-[#F57C00]" />
+                            Authorization Tiers
+                        </h2>
 
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="text-base">Roles</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-2">
+                        <Card className="border-none shadow-md ring-1 ring-zinc-200">
+                            <CardHeader className="border-b border-zinc-100 bg-zinc-50/50 py-4">
+                                <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-[#9E9E9E]">Configure role-based access</CardTitle>
+                            </CardHeader>
+                            <CardContent className="pt-6">
+                                <form className="space-y-6" onSubmit={submitCreateRole}>
+                                    <div className="grid gap-4 md:grid-cols-2">
+                                        <div className="grid gap-2">
+                                            <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]" htmlFor="role-name">Tier Label</Label>
+                                            <Input
+                                                id="role-name"
+                                                className="h-10 rounded-xl border-zinc-200"
+                                                value={createRoleForm.data.name}
+                                                onChange={(event) => createRoleForm.setData('name', event.target.value)}
+                                                placeholder="Executive"
+                                            />
+                                            <InputError message={createRoleForm.errors.name} />
+                                        </div>
+                                        <div className="grid gap-2">
+                                            <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]" htmlFor="role-description">Access Profile</Label>
+                                            <Input
+                                                id="role-description"
+                                                className="h-10 rounded-xl border-zinc-200"
+                                                value={createRoleForm.data.description}
+                                                onChange={(event) =>
+                                                    createRoleForm.setData('description', event.target.value)
+                                                }
+                                                placeholder="Full infra access"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="space-y-3">
+                                        <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">Inherited Protocol Slugs</Label>
+                                        <div className="grid gap-2 max-h-[220px] overflow-y-auto rounded-2xl border border-zinc-100 bg-zinc-50/50 p-4 ring-1 ring-zinc-100">
+                                            {permissions.map((permission) => (
+                                                <label
+                                                    key={permission.id}
+                                                    className="flex items-center justify-between group cursor-pointer"
+                                                >
+                                                    <div className="flex items-center gap-3">
+                                                        <input
+                                                            type="checkbox"
+                                                            className="h-4 w-4 rounded border-zinc-300 text-[#F57C00] focus:ring-[#F57C00]/20"
+                                                            checked={createRoleForm.data.permission_slugs.includes(permission.slug)}
+                                                            onChange={() =>
+                                                                createRoleForm.setData(
+                                                                    'permission_slugs',
+                                                                    toggleString(
+                                                                        createRoleForm.data.permission_slugs,
+                                                                        permission.slug,
+                                                                    ),
+                                                                )
+                                                            }
+                                                        />
+                                                        <div>
+                                                            <p className="text-xs font-black text-[#212121] group-hover:text-[#F57C00] transition-colors">{permission.name}</p>
+                                                            <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-tighter">{permission.slug}</p>
+                                                        </div>
+                                                    </div>
+                                                </label>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <Button type="submit" className="h-11 w-full rounded-xl bg-[#212121] font-black hover:bg-[#F57C00]" disabled={createRoleForm.processing}>
+                                        Register Tier
+                                    </Button>
+                                </form>
+                            </CardContent>
+                        </Card>
+
+                        {/* Roles Inventory */}
+                        <div className="space-y-3 pt-4">
                             {roles.map((role) => (
-                                <button
-                                    key={role.id}
-                                    type="button"
-                                    className={`w-full rounded-md border p-3 text-left ${
-                                        editingRole?.id === role.id ? 'border-zinc-900 bg-zinc-50' : ''
-                                    }`}
-                                    onClick={() => startEditRole(role)}
-                                >
-                                    <p className="font-medium">{role.name}</p>
-                                    <p className="text-xs text-zinc-500">{role.slug}</p>
-                                    <div className="mt-2 flex flex-wrap gap-1">
-                                        {role.permission_slugs.map((slug) => (
-                                            <Badge key={slug} variant="outline">
-                                                {slug}
-                                            </Badge>
-                                        ))}
-                                    </div>
-                                </button>
+                                <Card key={role.id} className={`border-none shadow-sm ring-1 transition-all ${editingRole?.id === role.id ? 'ring-2 ring-[#212121] shadow-lg' : 'ring-zinc-200 group'}`}>
+                                    <CardContent className="p-5">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <p className="text-xs font-black text-[#212121] uppercase tracking-wide">{role.name}</p>
+                                                <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-tighter">{role.slug}</p>
+                                            </div>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="h-8 rounded-lg text-[#F57C00] font-black uppercase text-[10px] hover:bg-[#F57C00]/10"
+                                                onClick={() => startEditRole(role)}
+                                            >
+                                                Adjust
+                                            </Button>
+                                        </div>
+                                        <div className="mt-4 flex flex-wrap gap-1.5">
+                                            {role.permission_slugs.map((slug) => (
+                                                <Badge key={slug} className="rounded-md border-none bg-zinc-100 px-2 py-0.5 text-[9px] font-black uppercase text-zinc-500">
+                                                    {slug}
+                                                </Badge>
+                                            ))}
+                                        </div>
+                                    </CardContent>
+                                </Card>
                             ))}
-                        </CardContent>
-                    </Card>
-                </div>
+                        </div>
+                    </div>
 
-                {editingRole ? (
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="text-base">Edit Role: {editingRole.name}</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <form className="space-y-3" onSubmit={submitEditRole}>
-                                <div className="grid gap-2 md:grid-cols-2">
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="edit-role-name">Role Name</Label>
-                                        <Input
-                                            id="edit-role-name"
-                                            value={editRoleForm.data.name}
-                                            onChange={(event) =>
-                                                editRoleForm.setData('name', event.target.value)
-                                            }
-                                        />
-                                        <InputError message={editRoleForm.errors.name} />
-                                    </div>
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="edit-role-description">Description</Label>
-                                        <Input
-                                            id="edit-role-description"
-                                            value={editRoleForm.data.description}
-                                            onChange={(event) =>
-                                                editRoleForm.setData('description', event.target.value)
-                                            }
-                                        />
-                                        <InputError message={editRoleForm.errors.description} />
-                                    </div>
-                                </div>
-                                <div className="grid gap-2 rounded-md border p-3">
-                                    {permissions.map((permission) => (
-                                        <label key={permission.id} className="flex items-start gap-2 text-sm">
-                                            <input
-                                                type="checkbox"
-                                                checked={editRoleForm.data.permission_slugs.includes(permission.slug)}
-                                                onChange={() =>
-                                                    editRoleForm.setData(
-                                                        'permission_slugs',
-                                                        toggleString(
-                                                            editRoleForm.data.permission_slugs,
-                                                            permission.slug,
-                                                        ),
-                                                    )
+                    {/* 📌 Identity Management */}
+                    <div className="space-y-4">
+                        <h2 className="flex items-center gap-2 text-sm font-black uppercase tracking-widest text-[#212121]">
+                            <UserCog className="size-4 text-[#F57C00]" />
+                            Identity Console
+                        </h2>
+
+                        <Card className="border-none shadow-md ring-1 ring-zinc-200">
+                            <CardHeader className="border-b border-zinc-100 bg-zinc-50/50 py-4">
+                                <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-[#9E9E9E]">Provision new operator</CardTitle>
+                            </CardHeader>
+                            <CardContent className="pt-6">
+                                <form className="space-y-4" onSubmit={submitCreateUser}>
+                                    <div className="grid gap-4 md:grid-cols-2">
+                                        <div className="grid gap-2">
+                                            <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]" htmlFor="user-name">Legal Name</Label>
+                                            <Input
+                                                id="user-name"
+                                                className="h-10 rounded-xl border-zinc-200"
+                                                value={createUserForm.data.name}
+                                                onChange={(event) =>
+                                                    createUserForm.setData('name', event.target.value)
                                                 }
                                             />
-                                            <span>
-                                                <span className="font-medium">{permission.name}</span>{' '}
-                                                <span className="text-zinc-500">({permission.slug})</span>
-                                            </span>
-                                        </label>
-                                    ))}
-                                </div>
-                                <div className="flex gap-2">
-                                    <Button type="submit" disabled={editRoleForm.processing}>
-                                        Save Role
-                                    </Button>
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        onClick={() => setEditingRole(null)}
-                                    >
-                                        Cancel
-                                    </Button>
-                                </div>
-                            </form>
-                        </CardContent>
-                    </Card>
-                ) : null}
+                                            <InputError message={createUserForm.errors.name} />
+                                        </div>
+                                        <div className="grid gap-2">
+                                            <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]" htmlFor="user-email">Comms Channel (Email)</Label>
+                                            <Input
+                                                id="user-email"
+                                                className="h-10 rounded-xl border-zinc-200"
+                                                value={createUserForm.data.email}
+                                                onChange={(event) =>
+                                                    createUserForm.setData('email', event.target.value)
+                                                }
+                                            />
+                                            <InputError message={createUserForm.errors.email} />
+                                        </div>
+                                    </div>
+                                    <div className="grid gap-4 md:grid-cols-2">
+                                        <div className="grid gap-2">
+                                            <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]" htmlFor="user-password">Secure Secret</Label>
+                                            <Input
+                                                id="user-password"
+                                                type="password"
+                                                className="h-10 rounded-xl border-zinc-200"
+                                                value={createUserForm.data.password}
+                                                onChange={(event) =>
+                                                    createUserForm.setData('password', event.target.value)
+                                                }
+                                            />
+                                        </div>
+                                        <div className="grid gap-2">
+                                            <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]" htmlFor="user-password-confirmation">Verify Secret</Label>
+                                            <Input
+                                                id="user-password-confirmation"
+                                                type="password"
+                                                className="h-10 rounded-xl border-zinc-200"
+                                                value={createUserForm.data.password_confirmation}
+                                                onChange={(event) =>
+                                                    createUserForm.setData('password_confirmation', event.target.value)
+                                                }
+                                            />
+                                        </div>
+                                    </div>
 
-                <div className="grid gap-4 lg:grid-cols-2">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2 text-base">
-                                <UserCog className="size-4" />
-                                Create User
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <form className="space-y-3" onSubmit={submitCreateUser}>
-                                <div className="grid gap-3 md:grid-cols-2">
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="user-name">Name</Label>
-                                        <Input
-                                            id="user-name"
-                                            value={createUserForm.data.name}
-                                            onChange={(event) =>
-                                                createUserForm.setData('name', event.target.value)
-                                            }
-                                        />
-                                        <InputError message={createUserForm.errors.name} />
+                                    <div className="grid gap-6 md:grid-cols-2">
+                                        <div className="space-y-3">
+                                            <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">Tier Assignments</Label>
+                                            <div className="grid gap-2 rounded-2xl border border-zinc-100 bg-zinc-50/50 p-4 ring-1 ring-zinc-100">
+                                                {roles.map((role) => (
+                                                    <label key={role.id} className="flex items-center gap-3 group cursor-pointer">
+                                                        <input
+                                                            type="checkbox"
+                                                            className="h-4 w-4 rounded border-zinc-300 text-[#F57C00] focus:ring-[#F57C00]/20"
+                                                            checked={createUserForm.data.role_slugs.includes(role.slug)}
+                                                            onChange={() =>
+                                                                createUserForm.setData(
+                                                                    'role_slugs',
+                                                                    toggleString(createUserForm.data.role_slugs, role.slug),
+                                                                )
+                                                            }
+                                                        />
+                                                        <span className="text-xs font-black text-zinc-600 transition-colors group-hover:text-[#212121]">{role.name}</span>
+                                                    </label>
+                                                ))}
+                                            </div>
+                                        </div>
+                                        <div className="space-y-3">
+                                            <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">Branch Sovereignty</Label>
+                                            <div className="grid gap-2 rounded-2xl border border-zinc-100 bg-zinc-50/50 p-4 ring-1 ring-zinc-100">
+                                                {pickupLocations.map((location) => (
+                                                    <label key={location.id} className="flex items-center gap-3 group cursor-pointer">
+                                                        <input
+                                                            type="checkbox"
+                                                            className="h-4 w-4 rounded border-zinc-300 text-[#F57C00] focus:ring-[#F57C00]/20"
+                                                            checked={createUserForm.data.pickup_location_ids.includes(location.id)}
+                                                            onChange={() =>
+                                                                createUserForm.setData(
+                                                                    'pickup_location_ids',
+                                                                    toggleNumber(
+                                                                        createUserForm.data.pickup_location_ids,
+                                                                        location.id,
+                                                                    ),
+                                                                )
+                                                            }
+                                                        />
+                                                        <span className="text-xs font-black text-zinc-600 transition-colors group-hover:text-[#212121]">{location.name}</span>
+                                                    </label>
+                                                ))}
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="user-email">Email</Label>
-                                        <Input
-                                            id="user-email"
-                                            type="email"
-                                            value={createUserForm.data.email}
-                                            onChange={(event) =>
-                                                createUserForm.setData('email', event.target.value)
-                                            }
-                                        />
-                                        <InputError message={createUserForm.errors.email} />
-                                    </div>
-                                </div>
-                                <div className="grid gap-3 md:grid-cols-2">
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="user-password">Password</Label>
-                                        <Input
-                                            id="user-password"
-                                            type="password"
-                                            value={createUserForm.data.password}
-                                            onChange={(event) =>
-                                                createUserForm.setData('password', event.target.value)
-                                            }
-                                        />
-                                        <InputError message={createUserForm.errors.password} />
-                                    </div>
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="user-password-confirmation">Confirm Password</Label>
-                                        <Input
-                                            id="user-password-confirmation"
-                                            type="password"
-                                            value={createUserForm.data.password_confirmation}
-                                            onChange={(event) =>
-                                                createUserForm.setData('password_confirmation', event.target.value)
-                                            }
-                                        />
-                                    </div>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>Roles</Label>
-                                    <div className="grid gap-2 rounded-md border p-3">
-                                        {roles.map((role) => (
-                                            <label key={role.id} className="flex items-center gap-2 text-sm">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={createUserForm.data.role_slugs.includes(role.slug)}
-                                                    onChange={() =>
-                                                        createUserForm.setData(
-                                                            'role_slugs',
-                                                            toggleString(createUserForm.data.role_slugs, role.slug),
-                                                        )
-                                                    }
-                                                />
-                                                <span>
-                                                    {role.name}{' '}
-                                                    <span className="text-zinc-500">({role.slug})</span>
-                                                </span>
-                                            </label>
-                                        ))}
-                                    </div>
-                                    <InputError message={createUserForm.errors.role_slugs} />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>Branch Assignment</Label>
-                                    <div className="grid gap-2 rounded-md border p-3">
-                                        {pickupLocations.map((location) => (
-                                            <label key={location.id} className="flex items-center gap-2 text-sm">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={createUserForm.data.pickup_location_ids.includes(
-                                                        location.id,
-                                                    )}
-                                                    onChange={() =>
-                                                        createUserForm.setData(
-                                                            'pickup_location_ids',
-                                                            toggleNumber(
-                                                                createUserForm.data.pickup_location_ids,
-                                                                location.id,
-                                                            ),
-                                                        )
-                                                    }
-                                                />
-                                                <span>{location.name}</span>
-                                            </label>
-                                        ))}
-                                    </div>
-                                    <InputError message={createUserForm.errors.pickup_location_ids} />
-                                </div>
-                                <Button type="submit" disabled={createUserForm.processing}>
-                                    Create User
-                                </Button>
-                            </form>
-                        </CardContent>
-                    </Card>
+                                    <Button type="submit" className="h-11 w-full rounded-xl bg-[#212121] font-black hover:bg-[#F57C00]" disabled={createUserForm.processing}>
+                                        Inaugurate User
+                                    </Button>
+                                </form>
+                            </CardContent>
+                        </Card>
 
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2 text-base">
-                                <Users className="size-4" />
-                                Users
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-2">
+                        {/* Users Inventory */}
+                        <div className="space-y-3 pt-4">
                             {users.map((user) => (
-                                <button
-                                    key={user.id}
-                                    type="button"
-                                    className={`w-full rounded-md border p-3 text-left ${
-                                        editingUser?.id === user.id ? 'border-zinc-900 bg-zinc-50' : ''
-                                    }`}
-                                    onClick={() => startEditUser(user)}
-                                >
-                                    <p className="font-medium">{user.name}</p>
-                                    <p className="text-xs text-zinc-500">{user.email}</p>
-                                    <p className="text-xs text-zinc-500">Primary Role: {user.role}</p>
-                                    <div className="mt-2 flex flex-wrap gap-1">
-                                        {user.role_slugs.map((slug) => (
-                                            <Badge key={slug} variant="outline">
-                                                {slug}
-                                            </Badge>
-                                        ))}
-                                    </div>
-                                    <p className="mt-1 text-xs text-zinc-500">
-                                        Branches:{' '}
-                                        {user.pickup_locations.length > 0
-                                            ? user.pickup_locations.join(', ')
-                                            : 'None'}
-                                    </p>
-                                </button>
+                                <Card key={user.id} className={`border-none shadow-sm ring-1 transition-all ${editingUser?.id === user.id ? 'ring-2 ring-[#212121] shadow-lg' : 'ring-zinc-200 group'}`}>
+                                    <CardContent className="p-5">
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-4">
+                                                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#212121] text-xs font-black text-white">
+                                                    {user.name.charAt(0)}
+                                                </div>
+                                                <div>
+                                                    <p className="text-xs font-black text-[#212121] uppercase tracking-wide">{user.name}</p>
+                                                    <p className="text-[10px] font-bold text-zinc-400">{user.email}</p>
+                                                </div>
+                                            </div>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="h-8 rounded-lg text-[#F57C00] font-black uppercase text-[10px] hover:bg-[#F57C00]/10"
+                                                onClick={() => startEditUser(user)}
+                                            >
+                                                Protocol
+                                            </Button>
+                                        </div>
+                                        <div className="mt-4 flex flex-wrap gap-2">
+                                            {user.role_slugs.map((slug) => (
+                                                <Badge key={slug} className="rounded-full bg-[#F57C00] px-3 text-[8px] font-black uppercase tracking-widest text-white shadow-sm ring-2 ring-white">
+                                                    {slug}
+                                                </Badge>
+                                            ))}
+                                        </div>
+                                        <div className="mt-3 flex items-center gap-2">
+                                            <span className="text-[9px] font-black uppercase tracking-widest text-zinc-300">Managed Branches:</span>
+                                            <span className="text-[9px] font-bold text-zinc-500">{user.pickup_locations.length > 0 ? user.pickup_locations.join(', ') : 'Global Ops'}</span>
+                                        </div>
+                                    </CardContent>
+                                </Card>
                             ))}
-                        </CardContent>
-                    </Card>
+                        </div>
+                    </div>
                 </div>
 
-                {editingUser ? (
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="text-base">Edit User: {editingUser.name}</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <form className="space-y-3" onSubmit={submitEditUser}>
-                                <div className="grid gap-3 md:grid-cols-2">
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="edit-user-name">Name</Label>
-                                        <Input
-                                            id="edit-user-name"
-                                            value={editUserForm.data.name}
-                                            onChange={(event) =>
-                                                editUserForm.setData('name', event.target.value)
-                                            }
-                                        />
-                                        <InputError message={editUserForm.errors.name} />
-                                    </div>
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="edit-user-email">Email</Label>
-                                        <Input
-                                            id="edit-user-email"
-                                            type="email"
-                                            value={editUserForm.data.email}
-                                            onChange={(event) =>
-                                                editUserForm.setData('email', event.target.value)
-                                            }
-                                        />
-                                        <InputError message={editUserForm.errors.email} />
-                                    </div>
-                                </div>
-                                <div className="grid gap-3 md:grid-cols-2">
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="edit-user-password">New Password (optional)</Label>
-                                        <Input
-                                            id="edit-user-password"
-                                            type="password"
-                                            value={editUserForm.data.password}
-                                            onChange={(event) =>
-                                                editUserForm.setData('password', event.target.value)
-                                            }
-                                        />
-                                        <InputError message={editUserForm.errors.password} />
-                                    </div>
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="edit-user-password-confirmation">
-                                            Confirm Password
-                                        </Label>
-                                        <Input
-                                            id="edit-user-password-confirmation"
-                                            type="password"
-                                            value={editUserForm.data.password_confirmation}
-                                            onChange={(event) =>
-                                                editUserForm.setData(
-                                                    'password_confirmation',
-                                                    event.target.value,
-                                                )
-                                            }
-                                        />
-                                    </div>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>Roles</Label>
-                                    <div className="grid gap-2 rounded-md border p-3">
-                                        {roles.map((role) => (
-                                            <label key={role.id} className="flex items-center gap-2 text-sm">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={editUserForm.data.role_slugs.includes(role.slug)}
-                                                    onChange={() =>
-                                                        editUserForm.setData(
-                                                            'role_slugs',
-                                                            toggleString(editUserForm.data.role_slugs, role.slug),
-                                                        )
-                                                    }
+                {/* 📌 Floating Modals for Adjustments */}
+                {(editingRole || editingUser) && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/60 p-6 backdrop-blur-md">
+                        {editingRole && (
+                            <Card className="max-w-xl w-full border-none shadow-2xl ring-1 ring-zinc-800 animate-in fade-in zoom-in duration-300">
+                                <CardHeader className="border-b border-zinc-100 bg-[#212121] text-white py-6">
+                                    <CardTitle className="text-sm font-black uppercase tracking-widest">Ajust Proto-Tier: {editingRole.name}</CardTitle>
+                                </CardHeader>
+                                <CardContent className="pt-8 space-y-6">
+                                    <form className="space-y-6" onSubmit={submitEditRole}>
+                                        <div className="grid gap-4 md:grid-cols-2">
+                                            <div className="grid gap-2">
+                                                <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">Protocol Label</Label>
+                                                <Input
+                                                    className="h-11 rounded-xl"
+                                                    value={editRoleForm.data.name}
+                                                    onChange={(event) => editRoleForm.setData('name', event.target.value)}
                                                 />
-                                                <span>
-                                                    {role.name}{' '}
-                                                    <span className="text-zinc-500">({role.slug})</span>
-                                                </span>
-                                            </label>
-                                        ))}
-                                    </div>
-                                    <InputError message={editUserForm.errors.role_slugs} />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>Branch Assignment</Label>
-                                    <div className="grid gap-2 rounded-md border p-3">
-                                        {pickupLocations.map((location) => (
-                                            <label key={location.id} className="flex items-center gap-2 text-sm">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={editUserForm.data.pickup_location_ids.includes(
-                                                        location.id,
-                                                    )}
-                                                    onChange={() =>
-                                                        editUserForm.setData(
-                                                            'pickup_location_ids',
-                                                            toggleNumber(
-                                                                editUserForm.data.pickup_location_ids,
-                                                                location.id,
-                                                            ),
-                                                        )
-                                                    }
+                                            </div>
+                                            <div className="grid gap-2">
+                                                <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">Protocol Description</Label>
+                                                <Input
+                                                    className="h-11 rounded-xl"
+                                                    value={editRoleForm.data.description}
+                                                    onChange={(event) => editRoleForm.setData('description', event.target.value)}
                                                 />
-                                                <span>{location.name}</span>
-                                            </label>
-                                        ))}
+                                            </div>
+                                        </div>
+                                        <div className="grid gap-2 max-h-[300px] overflow-y-auto rounded-2xl border bg-zinc-50/50 p-5 ring-1 ring-zinc-100">
+                                            {permissions.map((permission) => (
+                                                <label key={permission.id} className="flex items-center gap-3 cursor-pointer py-1">
+                                                    <input
+                                                        type="checkbox"
+                                                        className="h-4 w-4 rounded border-zinc-300 text-[#F57C00] focus:ring-[#F57C00]/20"
+                                                        checked={editRoleForm.data.permission_slugs.includes(permission.slug)}
+                                                        onChange={() =>
+                                                            editRoleForm.setData(
+                                                                'permission_slugs',
+                                                                toggleString(editRoleForm.data.permission_slugs, permission.slug),
+                                                            )
+                                                        }
+                                                    />
+                                                    <div className="flex flex-col">
+                                                        <span className="text-xs font-black text-zinc-700">{permission.name}</span>
+                                                        <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-tighter">{permission.slug}</span>
+                                                    </div>
+                                                </label>
+                                            ))}
+                                        </div>
+                                        <div className="flex gap-3">
+                                            <Button type="submit" className="flex-1 h-12 rounded-xl bg-[#F57C00] font-black shadow-lg shadow-[#F57C00]/20">Commit Updates</Button>
+                                            <Button type="button" variant="outline" className="h-12 rounded-xl font-bold border-zinc-200" onClick={() => setEditingRole(null)}>Abort</Button>
+                                        </div>
+                                    </form>
+                                </CardContent>
+                            </Card>
+                        )}
+
+                        {editingUser && (
+                            <Card className="max-w-2xl w-full border-none shadow-2xl ring-1 ring-zinc-800 animate-in fade-in zoom-in duration-300">
+                                <CardHeader className="border-b border-zinc-100 bg-[#212121] text-white py-6">
+                                    <div className="flex items-center gap-4">
+                                        <div className="size-12 rounded-2xl bg-white/10 flex items-center justify-center font-black text-xl text-[#F57C00] ring-1 ring-white/20">
+                                            {editingUser.name.charAt(0)}
+                                        </div>
+                                        <CardTitle className="text-sm font-black uppercase tracking-widest">Adjust user credentials: {editingUser.name}</CardTitle>
                                     </div>
-                                    <InputError message={editUserForm.errors.pickup_location_ids} />
-                                </div>
-                                <div className="flex gap-2">
-                                    <Button type="submit" disabled={editUserForm.processing}>
-                                        Save User
-                                    </Button>
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        onClick={() => setEditingUser(null)}
-                                    >
-                                        Cancel
-                                    </Button>
-                                </div>
-                            </form>
-                        </CardContent>
-                    </Card>
-                ) : null}
+                                </CardHeader>
+                                <CardContent className="pt-8">
+                                    <form className="space-y-6" onSubmit={submitEditUser}>
+                                        <div className="grid gap-4 md:grid-cols-2">
+                                            <div className="grid gap-2">
+                                                <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">Operator Name</Label>
+                                                <Input
+                                                    className="h-11 rounded-xl"
+                                                    value={editUserForm.data.name}
+                                                    onChange={(event) => editUserForm.setData('name', event.target.value)}
+                                                />
+                                            </div>
+                                            <div className="grid gap-2">
+                                                <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">Identity (Email)</Label>
+                                                <Input
+                                                    className="h-11 rounded-xl"
+                                                    value={editUserForm.data.email}
+                                                    onChange={(event) => editUserForm.setData('email', event.target.value)}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="grid gap-4 md:grid-cols-2">
+                                            <div className="grid gap-2">
+                                                <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">Override Secret (Optional)</Label>
+                                                <Input
+                                                    type="password"
+                                                    className="h-11 rounded-xl"
+                                                    value={editUserForm.data.password}
+                                                    onChange={(event) => editUserForm.setData('password', event.target.value)}
+                                                />
+                                            </div>
+                                            <div className="grid gap-2">
+                                                <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">Verify Secret</Label>
+                                                <Input
+                                                    type="password"
+                                                    className="h-11 rounded-xl"
+                                                    value={editUserForm.data.password_confirmation}
+                                                    onChange={(event) => editUserForm.setData('password_confirmation', event.target.value)}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="grid gap-6 md:grid-cols-2">
+                                            <div className="space-y-3">
+                                                <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">Tier Assignment</Label>
+                                                <div className="grid gap-2 rounded-2xl border bg-zinc-50/50 p-4 ring-1 ring-zinc-100">
+                                                    {roles.map((role) => (
+                                                        <label key={role.id} className="flex items-center gap-3 cursor-pointer py-1">
+                                                            <input
+                                                                type="checkbox"
+                                                                className="h-4 w-4 rounded border-zinc-300 text-[#F57C00] focus:ring-[#F57C00]/20"
+                                                                checked={editUserForm.data.role_slugs.includes(role.slug)}
+                                                                onChange={() =>
+                                                                    editUserForm.setData(
+                                                                        'role_slugs',
+                                                                        toggleString(editUserForm.data.role_slugs, role.slug),
+                                                                    )
+                                                                }
+                                                            />
+                                                            <span className="text-xs font-black text-zinc-700">{role.name}</span>
+                                                        </label>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                            <div className="space-y-3">
+                                                <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">Sovereign Control</Label>
+                                                <div className="grid gap-2 rounded-2xl border bg-zinc-50/50 p-4 ring-1 ring-zinc-100">
+                                                    {pickupLocations.map((location) => (
+                                                        <label key={location.id} className="flex items-center gap-3 cursor-pointer py-1">
+                                                            <input
+                                                                type="checkbox"
+                                                                className="h-4 w-4 rounded border-zinc-300 text-[#F57C00] focus:ring-[#F57C00]/20"
+                                                                checked={editUserForm.data.pickup_location_ids.includes(location.id)}
+                                                                onChange={() =>
+                                                                    editUserForm.setData(
+                                                                        'pickup_location_ids',
+                                                                        toggleNumber(
+                                                                            editUserForm.data.pickup_location_ids,
+                                                                            location.id,
+                                                                        ),
+                                                                    )
+                                                                }
+                                                            />
+                                                            <span className="text-xs font-black text-zinc-700">{location.name}</span>
+                                                        </label>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="flex gap-3">
+                                            <Button type="submit" className="flex-1 h-12 rounded-xl bg-[#212121] font-black text-white hover:bg-[#F57C00]">Sync Profile</Button>
+                                            <Button type="button" variant="outline" className="h-12 rounded-xl font-bold border-zinc-200" onClick={() => setEditingUser(null)}>Abort</Button>
+                                        </div>
+                                    </form>
+                                </CardContent>
+                            </Card>
+                        )}
+                    </div>
+                )}
             </div>
         </AppLayout>
     );
 }
-

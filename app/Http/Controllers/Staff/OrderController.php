@@ -103,6 +103,7 @@ class OrderController extends Controller
                 'items' => $order->items->map(fn ($item) => [
                     'id' => $item->id,
                     'name' => $item->menuItem?->name,
+                    'image_url' => $this->toPublicAssetUrl($item->menuItem?->image_url),
                     'quantity' => $item->quantity,
                     'price' => (float) $item->price,
                     'line_total' => (float) $item->price * $item->quantity,

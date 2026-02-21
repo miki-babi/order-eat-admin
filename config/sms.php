@@ -85,6 +85,10 @@ return [
         'itemids' => 'Comma-separated menu IDs',
         'itemlist' => 'Order item summary',
         'itemcount' => 'Total quantity of items',
+        'recent_item' => 'Most recent purchased item',
+        'recent_branch' => 'Most recent pickup branch',
+        'freq_item' => 'Most frequently purchased item',
+        'freq_branch' => 'Most frequently used pickup branch',
         'disapprovalreason' => 'Receipt disapproval reason',
     ],
 ];

@@ -111,6 +111,9 @@ Route::middleware(['auth', 'verified', 'staff'])
         Route::post('sms-contacts/import', [SmsTemplateController::class, 'importContacts'])
             ->middleware('permission:sms_templates.manage')
             ->name('sms-contacts.import');
+        Route::get('sms-campaigns/preview-audience', [SmsTemplateController::class, 'previewAudience'])
+            ->middleware('permission:sms_templates.manage')
+            ->name('sms-campaigns.preview-audience');
 
         Route::get('access-control', [AccessControlController::class, 'index'])
             ->middleware('permission:users.manage,roles.manage,permissions.manage')

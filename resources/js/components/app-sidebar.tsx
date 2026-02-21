@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { BarChart3, ClipboardList, Coffee, KeyRound, MapPin, MessageSquareText, Store, Users } from 'lucide-react';
+import { BarChart3, ClipboardList, Coffee, KeyRound, MapPin, MessageSquareText, Store, Users, ExternalLink } from 'lucide-react';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -17,14 +17,14 @@ import AppLogo from './app-logo';
 
 const footerNavItems: NavItem[] = [
     {
-        title: 'Customer Menu',
+        title: 'Customer Experience',
         href: '/',
         icon: Store,
     },
     {
-        title: 'Welcome Page',
+        title: 'System Welcome',
         href: '/welcome',
-        icon: BarChart3,
+        icon: ExternalLink,
     },
 ];
 
@@ -44,50 +44,48 @@ export function AppSidebar() {
 
     const mainNavItems: NavItem[] = [
         ...(can('orders.view')
-            ? [{ title: 'Orders', href: '/staff/orders', icon: ClipboardList }]
+            ? [{ title: 'Order Queue', href: '/staff/orders', icon: ClipboardList }]
             : []),
         ...(can('customers.view')
-            ? [{ title: 'Customers', href: '/staff/customers', icon: Users }]
+            ? [{ title: 'Audience', href: '/staff/customers', icon: Users }]
             : []),
         ...(can('pickup_locations.manage')
-            ? [{ title: 'Pickup Locations', href: '/staff/pickup-locations', icon: MapPin }]
+            ? [{ title: 'Branch Points', href: '/staff/pickup-locations', icon: MapPin }]
             : []),
         ...(can('menu_items.manage')
-            ? [{ title: 'Menu Items', href: '/staff/menu-items', icon: Coffee }]
+            ? [{ title: 'Product Catalog', href: '/staff/menu-items', icon: Coffee }]
             : []),
         ...(can('reports.view')
-            ? [{ title: 'Reports', href: '/staff/reports', icon: BarChart3 }]
+            ? [{ title: 'Insights & Ops', href: '/staff/reports', icon: BarChart3 }]
             : []),
         ...(can('sms_templates.manage')
-            ? [{ title: 'SMS Templates', href: '/staff/sms-templates', icon: MessageSquareText }]
+            ? [{ title: 'Outreach Lab', href: '/staff/sms-templates', icon: MessageSquareText }]
             : []),
         ...(can('users.manage') || can('roles.manage') || can('permissions.manage')
-            ? [{ title: 'Access Control', href: '/staff/access-control', icon: KeyRound }]
+            ? [{ title: 'Gatekeeper', href: '/staff/access-control', icon: KeyRound }]
             : []),
     ];
 
     const homeHref = mainNavItems[0]?.href ?? '/';
 
     return (
-        <Sidebar collapsible="icon" variant="inset">
-            <SidebarHeader>
+        <Sidebar collapsible="icon" variant="inset" className="bg-white/50 backdrop-blur-xl border-r border-zinc-100">
+            <SidebarHeader className="py-8">
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton size="lg" asChild>
-                            <Link href={homeHref} prefetch>
-                                <AppLogo />
-                            </Link>
-                        </SidebarMenuButton>
+                        <Link href={homeHref} prefetch className="block transition-all hover:opacity-80">
+                            <AppLogo />
+                        </Link>
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarHeader>
 
-            <SidebarContent>
+            <SidebarContent className="flex-1">
                 <NavMain items={mainNavItems} />
             </SidebarContent>
 
-            <SidebarFooter>
-                <NavFooter items={footerNavItems} className="mt-auto" />
+            <SidebarFooter className="p-4 space-y-4 border-t border-zinc-100/50">
+                <NavFooter items={footerNavItems} />
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

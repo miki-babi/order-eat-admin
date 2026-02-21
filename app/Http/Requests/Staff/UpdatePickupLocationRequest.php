@@ -16,6 +16,7 @@ class UpdatePickupLocationRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'address' => ['required', 'string'],
+            'google_maps_url' => ['nullable', 'url', 'max:2048'],
             'is_active' => ['nullable', 'boolean'],
         ];
     }

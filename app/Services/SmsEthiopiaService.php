@@ -4,10 +4,8 @@ namespace App\Services;
 
 use App\Models\Customer;
 use App\Models\SmsLog;
-use App\Models\SmsPhoneList;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Schema;
 
 class SmsEthiopiaService
 {
@@ -49,54 +47,6 @@ class SmsEthiopiaService
             ]);
 
             return $log->fresh();
-        }
-
-        if (Schema::hasTable('sms_phone_lists')) {
-            $isBlacklisted = SmsPhoneList::query()
-                ->where('list_type', 'blacklist')
-                ->where('normalized_phone', $normalizedPhone)
-                ->exists();
-
-            if ($isBlacklisted) {
-                $log->update([
-                    'status' => 'failed',
-                    'provider_response' => 'Phone is blacklisted for SMS.',
-                ]);
-
-                Log::warning('sms_ethiopia.send.failed', [
-                    'sms_log_id' => $log->id,
-                    'reason' => 'phone_blacklisted',
-                    'normalized_phone' => $normalizedPhone,
-                ]);
-
-                return $log->fresh();
-            }
-
-            $whitelistCount = SmsPhoneList::query()
-                ->where('list_type', 'whitelist')
-                ->count();
-
-            if ($whitelistCount > 0) {
-                $isWhitelisted = SmsPhoneList::query()
-                    ->where('list_type', 'whitelist')
-                    ->where('normalized_phone', $normalizedPhone)
-                    ->exists();
-
-                if (! $isWhitelisted) {
-                    $log->update([
-                        'status' => 'failed',
-                        'provider_response' => 'Phone not in whitelist while whitelist mode is active.',
-                    ]);
-
-                    Log::warning('sms_ethiopia.send.failed', [
-                        'sms_log_id' => $log->id,
-                        'reason' => 'phone_not_whitelisted',
-                        'normalized_phone' => $normalizedPhone,
-                    ]);
-
-                    return $log->fresh();
-                }
-            }
         }
 
         if (! $enabled) {

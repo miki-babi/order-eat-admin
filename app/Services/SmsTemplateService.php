@@ -6,6 +6,7 @@ use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\SmsTemplate;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 class SmsTemplateService
@@ -55,13 +56,19 @@ class SmsTemplateService
      */
     public function variablesForCustomer(Customer $customer, ?Order $order = null): array
     {
+        $recentOrder = $this->resolveRecentOrder($customer, $order);
+
         return array_merge(
             $this->emptyOrderVariables(),
             [
                 'name' => (string) ($customer->name ?? ''),
                 'phone' => (string) ($customer->phone ?? ''),
+                'recent_item' => $this->resolveRecentItem($recentOrder),
+                'recent_branch' => (string) ($recentOrder?->pickupLocation?->name ?? ''),
+                'freq_item' => $this->resolveFrequentItem($customer),
+                'freq_branch' => $this->resolveFrequentBranch($customer),
             ],
-            $order ? $this->variablesForOrder($order) : [],
+            $recentOrder ? $this->variablesForOrder($recentOrder) : [],
         );
     }
 
@@ -290,6 +297,100 @@ class SmsTemplateService
             'itemcount' => '',
             'disapprovalreason' => '',
         ];
+    }
+
+    /**
+     * Resolve latest known order for this customer.
+     */
+    protected function resolveRecentOrder(Customer $customer, ?Order $order = null): ?Order
+    {
+        if ($order) {
+            $order->loadMissing(['pickupLocation', 'items.menuItem']);
+
+            return $order;
+        }
+
+        $latestOrder = $customer->orders()
+            ->with(['pickupLocation', 'items.menuItem'])
+            ->latest()
+            ->first();
+
+        return $latestOrder instanceof Order ? $latestOrder : null;
+    }
+
+    /**
+     * Determine the most recent item name from the latest order.
+     */
+    protected function resolveRecentItem(?Order $order): string
+    {
+        if (! $order) {
+            return '';
+        }
+
+        $topItem = $order->items
+            ->sort(function (OrderItem $left, OrderItem $right): int {
+                $quantityComparison = (int) $right->quantity <=> (int) $left->quantity;
+
+                if ($quantityComparison !== 0) {
+                    return $quantityComparison;
+                }
+
+                return (int) $right->id <=> (int) $left->id;
+            })
+            ->first();
+
+        if (! $topItem) {
+            return '';
+        }
+
+        return (string) ($topItem->menuItem?->name ?? ('Item #'.$topItem->menu_item_id));
+    }
+
+    /**
+     * Determine most frequently purchased item name for the customer.
+     */
+    protected function resolveFrequentItem(Customer $customer): string
+    {
+        $row = OrderItem::query()
+            ->selectRaw(
+                'menu_items.name as item_name, order_items.menu_item_id as menu_item_id, SUM(order_items.quantity) as total_quantity, MAX(orders.created_at) as latest_purchase_at',
+            )
+            ->join('orders', 'orders.id', '=', 'order_items.order_id')
+            ->leftJoin('menu_items', 'menu_items.id', '=', 'order_items.menu_item_id')
+            ->where('orders.customer_id', $customer->id)
+            ->groupBy('order_items.menu_item_id', 'menu_items.name')
+            ->orderByDesc('total_quantity')
+            ->orderByDesc('latest_purchase_at')
+            ->limit(1)
+            ->first();
+
+        if (! $row) {
+            return '';
+        }
+
+        if ($row->item_name) {
+            return (string) $row->item_name;
+        }
+
+        return (string) ('Item #'.$row->menu_item_id);
+    }
+
+    /**
+     * Determine branch most frequently used by the customer.
+     */
+    protected function resolveFrequentBranch(Customer $customer): string
+    {
+        $row = DB::table('orders')
+            ->selectRaw('pickup_locations.name as branch_name, COUNT(orders.id) as total_orders, MAX(orders.created_at) as latest_order_at')
+            ->leftJoin('pickup_locations', 'pickup_locations.id', '=', 'orders.pickup_location_id')
+            ->where('orders.customer_id', $customer->id)
+            ->groupBy('orders.pickup_location_id', 'pickup_locations.name')
+            ->orderByDesc('total_orders')
+            ->orderByDesc('latest_order_at')
+            ->limit(1)
+            ->first();
+
+        return $row ? (string) ($row->branch_name ?? '') : '';
     }
 
     /**

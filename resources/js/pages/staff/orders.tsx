@@ -1,5 +1,5 @@
 import { Head, Link, router, useForm } from '@inertiajs/react';
-import { Filter, Receipt, Search } from 'lucide-react';
+import { ArrowRight, ChevronLeft, ChevronRight, ClipboardList, Clock3, Coffee, Filter, Receipt, Search, MapPin } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -20,6 +20,7 @@ import type { BreadcrumbItem } from '@/types';
 type OrderItem = {
     id: number;
     name: string | null;
+    image_url: string | null;
     quantity: number;
     price: number;
     line_total: number;
@@ -99,31 +100,29 @@ function currency(value: number): string {
     }).format(value);
 }
 
-function badgeVariant(
-    value: 'pending' | 'approved' | 'disapproved' | 'preparing' | 'ready' | 'completed',
-): 'default' | 'secondary' | 'destructive' | 'outline' {
-    if (value === 'approved' || value === 'ready') {
-        return 'default';
+function badgeStyle(
+    value: 'pending' | 'approved' | 'disapproved' | 'preparing' | 'ready' | 'completed' | string,
+): string {
+    switch (value) {
+        case 'pending':
+            return 'bg-amber-100 text-amber-700 ring-1 ring-amber-200';
+        case 'approved':
+        case 'completed':
+            return 'bg-emerald-100 text-emerald-700 ring-1 ring-emerald-200';
+        case 'disapproved':
+            return 'bg-rose-100 text-rose-700 ring-1 ring-rose-200';
+        case 'preparing':
+            return 'bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200';
+        case 'ready':
+            return 'bg-sky-100 text-sky-700 ring-1 ring-sky-200';
+        default:
+            return 'bg-zinc-100 text-zinc-700 ring-1 ring-zinc-200';
     }
-
-    if (value === 'disapproved') {
-        return 'destructive';
-    }
-
-    if (value === 'preparing') {
-        return 'secondary';
-    }
-
-    if (value === 'completed') {
-        return 'outline';
-    }
-
-    return 'secondary';
 }
 
 export default function StaffOrders({
     orders,
-    pickupLocations,
+    // pickupLocations,
     filters,
     statusOptions,
     receiptStatusOptions,
@@ -247,280 +246,298 @@ export default function StaffOrders({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Staff Orders" />
-            <div className="space-y-5 p-4">
-                <div className="grid gap-3 md:grid-cols-4">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="text-sm text-zinc-500">Total Orders</CardTitle>
-                        </CardHeader>
-                        <CardContent className="text-2xl font-semibold">{summary.total_orders}</CardContent>
+            <div className="space-y-8 bg-zinc-50/50 p-6 min-h-screen">
+                {/* 📌 Section 1 — Header Summary */}
+                <div className="grid gap-4 md:grid-cols-4">
+                    <Card className="border-none shadow-sm ring-1 ring-zinc-200">
+                        <CardContent className="pt-6">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-xs font-black uppercase tracking-widest text-[#9E9E9E]">Total Orders</p>
+                                    <h3 className="mt-2 text-3xl font-black text-[#212121]">{summary.total_orders}</h3>
+                                </div>
+                                <div className="rounded-2xl bg-zinc-100 p-3 text-zinc-500">
+                                    <ClipboardList className="size-6" />
+                                </div>
+                            </div>
+                        </CardContent>
                     </Card>
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="text-sm text-zinc-500">Pending Orders</CardTitle>
-                        </CardHeader>
-                        <CardContent className="text-2xl font-semibold">{summary.pending_orders}</CardContent>
+                    <Card className="border-none shadow-sm ring-1 ring-zinc-200">
+                        <CardContent className="pt-6">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-xs font-black uppercase tracking-widest text-amber-500">Pending</p>
+                                    <h3 className="mt-2 text-3xl font-black text-[#212121]">{summary.pending_orders}</h3>
+                                </div>
+                                <div className="rounded-2xl bg-amber-50 p-3 text-amber-500">
+                                    <Clock3 className="size-6" />
+                                </div>
+                            </div>
+                        </CardContent>
                     </Card>
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="text-sm text-zinc-500">Pending Receipts</CardTitle>
-                        </CardHeader>
-                        <CardContent className="text-2xl font-semibold">{summary.pending_receipts}</CardContent>
+                    <Card className="border-none shadow-sm ring-1 ring-zinc-200">
+                        <CardContent className="pt-6">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-xs font-black uppercase tracking-widest text-indigo-500">Wait Receipt</p>
+                                    <h3 className="mt-2 text-3xl font-black text-[#212121]">{summary.pending_receipts}</h3>
+                                </div>
+                                <div className="rounded-2xl bg-indigo-50 p-3 text-indigo-500">
+                                    <Receipt className="size-6" />
+                                </div>
+                            </div>
+                        </CardContent>
                     </Card>
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="text-sm text-zinc-500">Ready Orders</CardTitle>
-                        </CardHeader>
-                        <CardContent className="text-2xl font-semibold">{summary.ready_orders}</CardContent>
+                    <Card className="border-none shadow-sm ring-1 ring-zinc-200">
+                        <CardContent className="pt-6">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-xs font-black uppercase tracking-widest text-sky-500">Ready</p>
+                                    <h3 className="mt-2 text-3xl font-black text-[#212121]">{summary.ready_orders}</h3>
+                                </div>
+                                <div className="rounded-2xl bg-sky-50 p-3 text-sky-500">
+                                    <Coffee className="size-6" />
+                                </div>
+                            </div>
+                        </CardContent>
                     </Card>
                 </div>
 
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-base">
-                            <Filter className="size-4" />
+                {/* 📌 Section 2 — Filter Panel */}
+                <Card className="border-none shadow-md ring-1 ring-zinc-200">
+                    <CardHeader className="border-b border-zinc-100 bg-zinc-50/50 py-4">
+                        <CardTitle className="flex items-center gap-2 text-sm font-black uppercase tracking-widest text-[#212121]">
+                            <Filter className="size-4 text-[#F57C00]" />
                             Filters
                         </CardTitle>
                     </CardHeader>
-                    <CardContent>
-                        <form className="grid gap-3 md:grid-cols-7" onSubmit={applyFilters}>
-                            <div className="md:col-span-2">
-                                <Label htmlFor="search">Search</Label>
-                                <div className="relative">
-                                    <Search className="text-muted-foreground absolute top-2.5 left-3 size-4" />
+                    <CardContent className="pt-6">
+                        <form className="grid gap-6 md:grid-cols-4 lg:grid-cols-6" onSubmit={applyFilters}>
+                            <div className="lg:col-span-2">
+                                <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]" htmlFor="search">Search</Label>
+                                <div className="relative mt-1.5">
+                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-400" />
                                     <Input
                                         id="search"
-                                        className="pl-9"
+                                        className="h-11 pl-10 rounded-xl border-zinc-200 focus:ring-[#F57C00] transition-all"
                                         value={form.data.search}
                                         onChange={(event) => form.setData('search', event.target.value)}
-                                        placeholder="Order ID, customer, phone"
+                                        placeholder="Order ID, customer, phone..."
                                     />
                                 </div>
                             </div>
                             <div>
-                                <Label htmlFor="status">Order Status</Label>
+                                <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]" htmlFor="status">Order Status</Label>
                                 <select
                                     id="status"
-                                    className="border-input h-9 w-full rounded-md border bg-transparent px-3 text-sm"
+                                    className="mt-1.5 h-11 w-full rounded-xl border border-zinc-200 bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#F57C00]/20 transition-all font-medium"
                                     value={form.data.status}
                                     onChange={(event) => form.setData('status', event.target.value)}
                                 >
-                                    <option value="">All</option>
+                                    <option value="">All Statuses</option>
                                     {statusOptions.map((status) => (
                                         <option key={status} value={status}>
-                                            {status}
+                                            {status.charAt(0).toUpperCase() + status.slice(1)}
                                         </option>
                                     ))}
                                 </select>
                             </div>
                             <div>
-                                <Label htmlFor="receipt_status">Receipt Status</Label>
+                                <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]" htmlFor="receipt_status">Receipt</Label>
                                 <select
                                     id="receipt_status"
-                                    className="border-input h-9 w-full rounded-md border bg-transparent px-3 text-sm"
+                                    className="mt-1.5 h-11 w-full rounded-xl border border-zinc-200 bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#F57C00]/20 transition-all font-medium"
                                     value={form.data.receipt_status}
                                     onChange={(event) =>
                                         form.setData('receipt_status', event.target.value)
                                     }
                                 >
-                                    <option value="">All</option>
+                                    <option value="">All Receipts</option>
                                     {receiptStatusOptions.map((status) => (
                                         <option key={status} value={status}>
-                                            {status}
+                                            {status.charAt(0).toUpperCase() + status.slice(1)}
                                         </option>
                                     ))}
                                 </select>
                             </div>
                             <div>
-                                <Label htmlFor="location">Pickup Location</Label>
-                                <select
-                                    id="location"
-                                    className="border-input h-9 w-full rounded-md border bg-transparent px-3 text-sm"
-                                    value={form.data.pickup_location_id}
-                                    onChange={(event) =>
-                                        form.setData('pickup_location_id', event.target.value)
-                                    }
-                                >
-                                    <option value="">All</option>
-                                    {pickupLocations.map((location) => (
-                                        <option key={location.id} value={location.id}>
-                                            {location.name}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div>
-                                <Label htmlFor="date">Pickup Date</Label>
+                                <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]" htmlFor="date">Date</Label>
                                 <Input
                                     id="date"
                                     type="date"
+                                    className="mt-1.5 h-11 rounded-xl border-zinc-200 focus:ring-[#F57C00] transition-all"
                                     value={form.data.date}
                                     onChange={(event) => form.setData('date', event.target.value)}
                                 />
                             </div>
-                            <div>
-                                <Label htmlFor="time_bucket">Time Window</Label>
-                                <select
-                                    id="time_bucket"
-                                    className="border-input h-9 w-full rounded-md border bg-transparent px-3 text-sm"
-                                    value={form.data.time_bucket}
-                                    onChange={(event) => form.setData('time_bucket', event.target.value)}
-                                >
-                                    <option value="">All</option>
-                                    <option value="today">Today</option>
-                                    <option value="tomorrow">Tomorrow</option>
-                                    <option value="upcoming">Upcoming</option>
-                                </select>
-                            </div>
-                            <div className="md:col-span-7 flex items-end gap-2">
-                                <Button type="submit">Apply</Button>
-                                <Button type="button" variant="outline" onClick={clearFilters}>
-                                    Reset
-                                </Button>
+                            <div className="flex items-end gap-2 lg:col-span-1">
+                                <Button type="submit" className="h-11 flex-1 rounded-xl bg-[#F57C00] font-black shadow-lg shadow-[#F57C00]/20 hover:bg-[#E65100]">Apply</Button>
+                                <Button type="button" variant="outline" onClick={clearFilters} className="h-11 rounded-xl font-bold">Reset</Button>
                             </div>
                         </form>
                     </CardContent>
                 </Card>
 
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-base">
-                            <Receipt className="size-4" />
+                {/* 📌 Section 3 — Order Queue */}
+                <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                        <h2 className="flex items-center gap-2 text-lg font-black uppercase tracking-widest text-[#212121]">
+                            <ClipboardList className="size-5 text-[#F57C00]" />
                             Order Queue
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                        {orders.data.length === 0 ? (
-                            <p className="text-muted-foreground text-sm">No orders found for current filters.</p>
-                        ) : (
-                            orders.data.map((order) => (
-                                <div key={order.id} className="space-y-3 rounded-lg border p-4">
-                                    <div className="flex flex-wrap items-start justify-between gap-2">
-                                        <div>
-                                            <p className="text-sm font-semibold">
-                                                Order #{order.id} | {order.customer_name}
-                                            </p>
-                                            <p className="text-sm text-zinc-500">
-                                                {order.customer_phone} | Pickup: {order.pickup_date} at{' '}
-                                                {order.pickup_location}
-                                            </p>
-                                            <p className="text-xs text-zinc-500">
-                                                Ready SMS:{' '}
-                                                {order.notify_when_ready
-                                                    ? 'Customer opted in'
-                                                    : 'Customer opted out'}
-                                            </p>
-                                            <p className="text-sm font-medium">{currency(order.total_amount)}</p>
+                        </h2>
+                        <Badge variant="outline" className="rounded-full px-4 py-1 text-xs font-bold text-zinc-500">
+                            {orders.total} Total Orders
+                        </Badge>
+                    </div>
+
+                    {orders.data.length === 0 ? (
+                        <Card className="border-dashed border-2 p-12 text-center bg-white shadow-none">
+                            <p className="text-zinc-500 font-medium">No orders found for current filters.</p>
+                        </Card>
+                    ) : (
+                        orders.data.map((order) => (
+                            <Card key={order.id} className="overflow-hidden border-none shadow-md ring-1 ring-zinc-200 transition-all hover:ring-[#F57C00]/30 hover:shadow-xl">
+                                <div className="border-b border-zinc-100 bg-white px-6 py-4">
+                                    <div className="flex flex-wrap items-center justify-between gap-4">
+                                        <div className="flex items-center gap-4">
+                                            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#F57C00]/10 text-[#F57C00]">
+                                                <span className="text-base font-black">#{order.id}</span>
+                                            </div>
+                                            <div>
+                                                <h3 className="text-lg font-black text-[#212121]">{order.customer_name}</h3>
+                                                <p className="text-sm font-bold text-zinc-500">
+                                                    {order.customer_phone} • <span className="text-[#F57C00]">ETB {order.total_amount.toLocaleString()}</span>
+                                                </p>
+                                            </div>
                                         </div>
-                                        <div className="flex items-center gap-2">
-                                            <Badge variant={badgeVariant(order.order_status)}>
+                                        <div className="flex flex-wrap items-center gap-3">
+                                            <Badge className={`rounded-full px-4 py-1 text-[10px] font-black uppercase tracking-widest shadow-none border-none ${badgeStyle(order.order_status)}`}>
                                                 {order.order_status}
                                             </Badge>
-                                            <Badge variant={badgeVariant(order.receipt_status)}>
-                                                {order.receipt_status}
+                                            <Badge className={`rounded-full px-4 py-1 text-[10px] font-black uppercase tracking-widest shadow-none border-none ${badgeStyle(order.receipt_status)}`}>
+                                                Receipt {order.receipt_status}
                                             </Badge>
-                                            <a
-                                                href={order.tracking_url}
-                                                target="_blank"
-                                                rel="noreferrer"
-                                                className="text-sm text-blue-600 underline"
-                                            >
-                                                Tracking Link
-                                            </a>
-                                        </div>
-                                    </div>
-
-                                    <div className="grid gap-3 rounded-md bg-zinc-50 p-3 md:grid-cols-3">
-                                        <div className="space-y-2">
-                                            <Label className="text-xs">Order Status</Label>
-                                            <select
-                                                className="border-input h-9 w-full rounded-md border bg-white px-3 text-sm"
-                                                value={order.order_status}
-                                                disabled={updatingOrderId === order.id}
-                                                onChange={(event) =>
-                                                    updateOrder(order.id, {
-                                                        order_status: event.target.value,
-                                                    })
-                                                }
-                                            >
-                                                {statusOptions.map((status) => (
-                                                    <option key={status} value={status}>
-                                                        {status}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label className="text-xs">Receipt Status</Label>
-                                            <div className="flex flex-wrap gap-2">
-                                                <Button
-                                                    type="button"
-                                                    size="sm"
-                                                    variant="outline"
-                                                    disabled={updatingOrderId === order.id}
-                                                    onClick={() => openApproveDialog(order)}
-                                                >
-                                                    Approve
-                                                </Button>
-                                                <Button
-                                                    type="button"
-                                                    size="sm"
-                                                    variant="outline"
-                                                    disabled={updatingOrderId === order.id}
-                                                    onClick={() =>
-                                                        updateOrder(order.id, { receipt_status: 'pending' })
-                                                    }
-                                                >
-                                                    Pending
-                                                </Button>
-                                                <Button
-                                                    type="button"
-                                                    size="sm"
-                                                    variant="destructive"
-                                                    disabled={updatingOrderId === order.id}
-                                                    onClick={() => openDisapproveDialog(order)}
-                                                >
-                                                    Disapprove
-                                                </Button>
-                                            </div>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label className="text-xs">Receipt</Label>
-                                            {order.receipt_url ? (
-                                                <a
-                                                    href={order.receipt_url}
-                                                    target="_blank"
-                                                    rel="noreferrer"
-                                                    className="text-sm text-blue-600 underline"
-                                                >
-                                                    View uploaded receipt
+                                            <Button variant="ghost" size="sm" asChild className="h-8 gap-2 rounded-full text-[10px] font-black uppercase tracking-widest hover:text-[#F57C00]">
+                                                <a href={order.tracking_url} target="_blank" rel="noreferrer">
+                                                    Live Tracking <ArrowRight className="size-3" />
                                                 </a>
-                                            ) : (
-                                                <p className="text-sm text-zinc-500">No receipt uploaded.</p>
-                                            )}
-                                            {order.disapproval_reason ? (
-                                                <p className="text-xs text-red-600">
-                                                    Reason: {order.disapproval_reason}
-                                                </p>
-                                            ) : null}
+                                            </Button>
                                         </div>
-                                    </div>
-
-                                    <div className="space-y-1 text-sm">
-                                        {order.items.map((item) => (
-                                            <div key={item.id} className="flex justify-between">
-                                                <span>
-                                                    {item.name ?? 'Item'} x {item.quantity}
-                                                </span>
-                                                <span>{currency(item.line_total)}</span>
-                                            </div>
-                                        ))}
                                     </div>
                                 </div>
-                            ))
-                        )}
-                    </CardContent>
-                </Card>
+
+                                <CardContent className="p-6">
+                                    <div className="grid gap-8 lg:grid-cols-12">
+                                        {/* Order Details List */}
+                                        <div className="lg:col-span-5 space-y-4">
+                                            <h4 className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">Order Items</h4>
+                                            <div className="space-y-3">
+                                                {order.items.map((item) => (
+                                                    <div key={item.id} className="flex items-center justify-between rounded-xl bg-zinc-50 p-3 ring-1 ring-zinc-100">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="size-10 shrink-0 overflow-hidden rounded-lg border bg-white shadow-sm">
+                                                                {item.image_url ? (
+                                                                    <img src={item.image_url} alt={item.name ?? 'Item'} className="h-full w-full object-cover" />
+                                                                ) : (
+                                                                    <div className="flex h-full w-full items-center justify-center bg-zinc-50 text-[8px] font-bold uppercase text-zinc-400">Prep</div>
+                                                                )}
+                                                            </div>
+                                                            <div>
+                                                                <p className="text-sm font-bold text-[#212121]">{item.name}</p>
+                                                                <p className="text-xs font-medium text-zinc-500">Qty: {item.quantity}</p>
+                                                            </div>
+                                                        </div>
+                                                        <span className="text-sm font-black text-[#212121]">{currency(item.line_total)}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                            <div className="pt-2">
+                                                <p className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">
+                                                    <MapPin className="size-3" />
+                                                    {order.pickup_location} • {order.pickup_date}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        {/* Action Controls */}
+                                        <div className="lg:col-span-7 space-y-6 lg:border-l lg:border-zinc-100 lg:pl-8">
+                                            <div className="grid gap-6 md:grid-cols-2">
+                                                <div className="space-y-3">
+                                                    <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">Order Status</Label>
+                                                    <select
+                                                        className="h-11 w-full rounded-xl border border-zinc-200 bg-white px-3 text-sm font-bold text-[#212121] focus:ring-2 focus:ring-[#F57C00]/20 outline-none transition-all"
+                                                        value={order.order_status}
+                                                        disabled={updatingOrderId === order.id}
+                                                        onChange={(event) =>
+                                                            updateOrder(order.id, {
+                                                                order_status: event.target.value,
+                                                            })
+                                                        }
+                                                    >
+                                                        {statusOptions.map((status) => (
+                                                            <option key={status} value={status}>
+                                                                {status.charAt(0).toUpperCase() + status.slice(1)}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                                <div className="space-y-3">
+                                                    <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">Receipt Status</Label>
+                                                    <div className="grid grid-cols-2 gap-2">
+                                                        <Button
+                                                            size="sm"
+                                                            className={`h-11 rounded-xl font-bold shadow-sm transition-all ${order.receipt_status === 'approved' ? 'bg-emerald-600 text-white' : 'bg-white border-zinc-200 text-[#212121] hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200'}`}
+                                                            variant={order.receipt_status === 'approved' ? 'default' : 'outline'}
+                                                            disabled={updatingOrderId === order.id}
+                                                            onClick={() => openApproveDialog(order)}
+                                                        >
+                                                            Approve
+                                                        </Button>
+                                                        <Button
+                                                            size="sm"
+                                                            className={`h-11 rounded-xl font-bold shadow-sm transition-all ${order.receipt_status === 'disapproved' ? 'bg-rose-600 text-white' : 'bg-white border-zinc-200 text-[#212121] hover:bg-rose-50 hover:text-rose-700 hover:border-rose-200'}`}
+                                                            variant={order.receipt_status === 'disapproved' ? 'destructive' : 'outline'}
+                                                            disabled={updatingOrderId === order.id}
+                                                            onClick={() => openDisapproveDialog(order)}
+                                                        >
+                                                            Reject
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="rounded-2xl bg-zinc-50 p-4 ring-1 ring-zinc-100">
+                                                <div className="flex items-center justify-between">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="rounded-xl bg-white p-2.5 shadow-sm ring-1 ring-zinc-100">
+                                                            <Receipt className={`size-5 ${order.receipt_url ? 'text-[#F57C00]' : 'text-zinc-300'}`} />
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">Receipt Visualization</p>
+                                                            {order.receipt_url ? (
+                                                                <a href={order.receipt_url} target="_blank" rel="noreferrer" className="text-xs font-bold text-[#F57C00] hover:underline">
+                                                                    View Payment Receipt
+                                                                </a>
+                                                            ) : (
+                                                                <p className="text-xs font-bold text-zinc-400">No receipt uploaded yet</p>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                    {order.disapproval_reason && (
+                                                        <div className="text-right">
+                                                            <p className="text-[10px] font-black uppercase tracking-widest text-rose-400">Reject Reason</p>
+                                                            <p className="text-xs font-bold text-rose-600">{order.disapproval_reason}</p>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        ))
+                    )}
+                </div>
 
                 <div className="flex flex-wrap items-center justify-between gap-3">
                     <p className="text-muted-foreground text-sm">
@@ -534,13 +551,16 @@ export default function StaffOrders({
                                 size="sm"
                                 disabled={!link.url}
                                 asChild={Boolean(link.url)}
+                                className={`h-10 rounded-xl px-4 font-bold transition-all ${link.active ? 'bg-[#F57C00] text-white shadow-lg shadow-[#F57C00]/20' : 'text-zinc-500 border-zinc-200'}`}
                             >
                                 {link.url ? (
                                     <Link href={link.url} preserveState preserveScroll>
-                                        <span dangerouslySetInnerHTML={{ __html: link.label }} />
+                                        {link.label.includes('Previous') ? <ChevronLeft className="size-4" /> : link.label.includes('Next') ? <ChevronRight className="size-4" /> : <span dangerouslySetInnerHTML={{ __html: link.label }} />}
                                     </Link>
                                 ) : (
-                                    <span dangerouslySetInnerHTML={{ __html: link.label }} />
+                                    <span>
+                                        {link.label.includes('Previous') ? <ChevronLeft className="size-4" /> : link.label.includes('Next') ? <ChevronRight className="size-4" /> : <span dangerouslySetInnerHTML={{ __html: link.label }} />}
+                                    </span>
                                 )}
                             </Button>
                         ))}

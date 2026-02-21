@@ -82,6 +82,7 @@ class DatabaseSeeder extends Seeder
             [
                 'name' => 'Bole Branch',
                 'address' => 'Bole Road, Addis Ababa',
+                'google_maps_url' => 'https://www.google.com/maps/search/?api=1&query=Bole+Road,+Addis+Ababa',
                 'is_active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -89,6 +90,7 @@ class DatabaseSeeder extends Seeder
             [
                 'name' => 'Piassa Branch',
                 'address' => 'Churchill Avenue, Addis Ababa',
+                'google_maps_url' => 'https://www.google.com/maps/search/?api=1&query=Churchill+Avenue,+Addis+Ababa',
                 'is_active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),

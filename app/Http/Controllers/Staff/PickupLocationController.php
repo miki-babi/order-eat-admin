@@ -36,6 +36,7 @@ class PickupLocationController extends Controller
                 'id' => $location->id,
                 'name' => $location->name,
                 'address' => $location->address,
+                'google_maps_url' => $location->google_maps_url,
                 'is_active' => $location->is_active,
                 'orders_count' => $location->orders_count,
                 'updated_at' => $location->updated_at?->toDateTimeString(),
@@ -60,6 +61,7 @@ class PickupLocationController extends Controller
         PickupLocation::query()->create([
             'name' => $validated['name'],
             'address' => $validated['address'],
+            'google_maps_url' => $validated['google_maps_url'] ?? null,
             'is_active' => $request->boolean('is_active', true),
         ]);
 
@@ -78,6 +80,7 @@ class PickupLocationController extends Controller
         $pickupLocation->update([
             'name' => $validated['name'],
             'address' => $validated['address'],
+            'google_maps_url' => $validated['google_maps_url'] ?? null,
             'is_active' => $request->boolean('is_active', $pickupLocation->is_active),
         ]);
 

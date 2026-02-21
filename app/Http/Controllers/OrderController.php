@@ -66,7 +66,7 @@ class OrderController extends Controller
         $pickupLocations = PickupLocation::query()
             ->where('is_active', true)
             ->orderBy('name')
-            ->get(['id', 'name', 'address']);
+            ->get(['id', 'name', 'address', 'google_maps_url']);
 
         return Inertia::render('customer/menu', [
             'menuItems' => $menuItems,
@@ -296,6 +296,7 @@ class OrderController extends Controller
                 'id' => $order->pickupLocation?->id,
                 'name' => $order->pickupLocation?->name,
                 'address' => $order->pickupLocation?->address,
+                'google_maps_url' => $order->pickupLocation?->google_maps_url,
             ],
             'customer' => [
                 'name' => $order->customer?->name,
@@ -311,6 +312,7 @@ class OrderController extends Controller
             'items' => $order->items->map(fn ($item) => [
                 'id' => $item->id,
                 'name' => $item->menuItem?->name,
+                'image_url' => $this->toPublicAssetUrl($item->menuItem?->image_url),
                 'quantity' => $item->quantity,
                 'price' => (float) $item->price,
                 'line_total' => (float) $item->price * $item->quantity,

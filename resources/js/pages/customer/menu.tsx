@@ -1,5 +1,5 @@
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
-import { Search, ShoppingCart } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Clock3, ExternalLink, MapPin, Search, ShoppingCart, Upload } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import InputError from '@/components/input-error';
 import { Badge } from '@/components/ui/badge';
@@ -21,6 +21,7 @@ type PickupLocation = {
     id: number;
     name: string;
     address: string;
+    google_maps_url: string | null;
 };
 
 type CartEntry = MenuItem & {
@@ -170,6 +171,11 @@ export default function Menu({
         form.data.pickup_date &&
         form.data.pickup_location_id;
 
+    const selectedPickupLocation = useMemo(
+        () => pickupLocations.find((location) => location.id === form.data.pickup_location_id) ?? null,
+        [pickupLocations, form.data.pickup_location_id],
+    );
+
     const submitOrder = () => {
         const itemsPayload = cartItems.map((item) => ({
             menu_item_id: item.id,
@@ -181,10 +187,10 @@ export default function Menu({
             items: itemsPayload,
             receipt: form.data.receipt
                 ? {
-                      name: form.data.receipt.name,
-                      size: form.data.receipt.size,
-                      type: form.data.receipt.type,
-                  }
+                    name: form.data.receipt.name,
+                    size: form.data.receipt.size,
+                    type: form.data.receipt.type,
+                }
                 : null,
         };
 
@@ -238,407 +244,624 @@ export default function Menu({
     return (
         <>
             <Head title="Cafe Menu" />
-            <div className="min-h-screen bg-gradient-to-br from-orange-100 via-amber-50 to-white">
-                <header className="border-b bg-white/70 backdrop-blur">
-                    <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-4 md:px-6">
-                        <div>
-                            <p className="text-xs uppercase tracking-[0.25em] text-orange-700">Cafe Ordering</p>
-                            <h1 className="text-2xl font-semibold">Order for Pickup</h1>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            {staffRoute ? (
-                                <Link href={staffRoute}>
-                                    <Button variant="outline">Staff Dashboard</Button>
-                                </Link>
-                            ) : null}
-                            <Link href="/login">
-                                <Button variant="ghost">Staff Login</Button>
-                            </Link>
-                        </div>
-                    </div>
-                </header>
+            <div className="min-h-screen bg-[#FAFAFA] text-[#212121]">
 
-                <main className="mx-auto grid w-full max-w-7xl gap-6 px-4 py-6 md:grid-cols-[1fr_320px] md:px-6">
-                    <section className="space-y-4">
-                        {flash?.success ? (
-                            <div className="rounded-md border border-green-300 bg-green-50 px-4 py-3 text-sm text-green-800">
-                                {flash.success}
-                            </div>
-                        ) : null}
-                        {flash?.error ? (
-                            <div className="rounded-md border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800">
-                                {flash.error}
-                            </div>
-                        ) : null}
 
-                        <div className="rounded-xl border bg-white p-4">
-                            <div className="grid gap-2 md:grid-cols-4">
-                                {steps.map((label, index) => (
+                {/* Cart Floating Action Button */}
+                {step === 1 && cartCount > 0 && (
+                    <button
+                        onClick={() => {
+                            setStep(2);
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }}
+                        className="fixed bottom-24 right-6 z-[60] flex h-16 w-16 items-center justify-center rounded-full bg-[#212121] text-white shadow-[0_20px_50px_rgba(0,0,0,0.3)] ring-4 ring-white transition-all cursor-pointer hover:scale-110 active:scale-95 md:bottom-12 md:right-12"
+                    >
+                        <div className="relative">
+                            <ShoppingCart className="size-7" />
+                            <span className="absolute -top-3 -right-3 flex h-6 w-6 items-center justify-center rounded-full bg-[#F57C00] text-[11px] font-black text-white shadow-md ring-2 ring-white animate-in zoom-in-50 duration-300">
+                                {cartCount}
+                            </span>
+                        </div>
+                    </button>
+                )}
+
+                <main className="mx-auto w-full max-w-7xl px-4 py-8 md:px-8 pb-32 md:pb-12">
+                    {/* Material Step Tracker */}
+                    <div className="sticky top-[72px] z-40 mb-10 overflow-hidden rounded-2xl bg-white p-1.5 shadow-lg ring-1 ring-zinc-100 md:relative md:top-0 md:bg-white md:p-1 md:shadow-md">
+                        <div className="flex flex-row items-center gap-1">
+                            {steps.map((label, index) => {
+                                const isActive = step === index + 1;
+                                const isCompleted = step > index + 1;
+                                return (
                                     <div
                                         key={label}
-                                        className={`rounded-md border px-3 py-2 text-sm ${
-                                            step >= index + 1
-                                                ? 'border-orange-400 bg-orange-50 text-orange-900'
-                                                : 'border-zinc-200 text-zinc-500'
-                                        }`}
+                                        className={`flex flex-1 items-center justify-center rounded-xl px-2 py-2.5 transition-all duration-500 md:px-4 md:py-3 ${isActive
+                                            ? 'bg-[#FFF3E0] text-[#F57C00] shadow-sm'
+                                            : 'bg-transparent'
+                                            }`}
                                     >
-                                        {label}
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        {step === 1 ? (
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Browse Menu</CardTitle>
-                                    <CardDescription>
-                                        Pick your items. Cart updates instantly while you browse.
-                                    </CardDescription>
-                                </CardHeader>
-                                <CardContent className="space-y-4">
-                                    <div className="relative">
-                                        <Search className="text-muted-foreground absolute top-2.5 left-3 size-4" />
-                                        <Input
-                                            className="pl-9"
-                                            value={search}
-                                            onChange={(event) => setSearch(event.target.value)}
-                                            placeholder="Search by item, description, or category"
-                                        />
-                                    </div>
-                                    <div className="flex flex-wrap gap-2">
-                                        <Button
-                                            type="button"
-                                            variant={activeCategory === 'all' ? 'default' : 'outline'}
-                                            onClick={() => setActiveCategory('all')}
+                                        <div
+                                            className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10px] font-black transition-all duration-500 ${isActive
+                                                ? 'bg-[#F57C00] text-white shadow-md shadow-[#F57C00]/20 scale-110'
+                                                : isCompleted
+                                                    ? 'bg-[#2E7D32] text-white'
+                                                    : 'bg-zinc-100 text-zinc-400'
+                                                } ${isActive ? 'mr-2' : 'md:mr-3'}`}
                                         >
-                                            All
-                                        </Button>
-                                        {categories.map((category) => (
-                                            <Button
-                                                key={category}
+                                            {isCompleted ? <CheckCircle2 className="size-4" strokeWidth={3} /> : index + 1}
+                                        </div>
+                                        <span
+                                            className={`text-[11px] font-black uppercase tracking-tight md:text-sm md:normal-case md:tracking-normal ${isActive ? 'block' : 'hidden md:block'
+                                                } ${isActive ? 'text-[#F57C00]' : 'text-zinc-500'}`}
+                                        >
+                                            {label.split('. ')[1]}
+                                        </span>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+
+                    <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
+                        <section className="space-y-6">
+                            {flash?.success && (
+                                <div className="animate-in fade-in slide-in-from-top-4 rounded-xl border-l-4 border-[#2E7D32] bg-green-50 px-5 py-4 text-sm font-medium text-[#1B5E20] shadow-sm transition-all duration-500">
+                                    {flash.success}
+                                </div>
+                            )}
+                            {flash?.error && (
+                                <div className="animate-in fade-in slide-in-from-top-4 rounded-xl border-l-4 border-[#C62828] bg-red-50 px-5 py-4 text-sm font-medium text-[#B71C1C] shadow-sm transition-all duration-500">
+                                    {flash.error}
+                                </div>
+                            )}
+
+                            {step === 1 && (
+                                <div className="space-y-8 animate-in fade-in duration-500">
+                                    {/* Search & Filters */}
+                                    <div className="space-y-6">
+                                        <div className="group relative transition-all duration-300 focus-within:ring-2 focus-within:ring-[#F57C00]/20 rounded-2xl">
+                                            <Search className="absolute top-1/2 left-5 size-5 -translate-y-1/2 text-[#757575] group-focus-within:text-[#F57C00] transition-colors duration-300" />
+                                            <Input
+                                                className="h-14 rounded-2xl border-none pl-14 text-base shadow-sm ring-1 ring-zinc-200 transition-all duration-300 focus:ring-2 focus:ring-[#F57C00] placeholder:text-[#9E9E9E]"
+                                                value={search}
+                                                onChange={(event) => setSearch(event.target.value)}
+                                                placeholder="Search by item, description, or category"
+                                            />
+                                        </div>
+
+                                        <div className="flex flex-wrap gap-3 pb-2 transition-all duration-300">
+                                            <button
                                                 type="button"
-                                                variant={activeCategory === category ? 'default' : 'outline'}
-                                                onClick={() => setActiveCategory(category)}
+                                                className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 shadow-sm ${activeCategory === 'all'
+                                                    ? 'bg-[#F57C00] text-white shadow-[#F57C00]/20 scale-105'
+                                                    : 'bg-white text-[#757575] hover:bg-[#F5F5F5] ring-1 ring-zinc-200'
+                                                    }`}
+                                                onClick={() => setActiveCategory('all')}
                                             >
-                                                {category}
-                                            </Button>
-                                        ))}
+                                                All items
+                                            </button>
+                                            {categories.map((category) => (
+                                                <button
+                                                    key={category}
+                                                    type="button"
+                                                    className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 shadow-sm ${activeCategory === category
+                                                        ? 'bg-[#F57C00] text-white shadow-[#F57C00]/20 scale-105'
+                                                        : 'bg-white text-[#757575] hover:bg-[#F5F5F5] ring-1 ring-zinc-200'
+                                                        }`}
+                                                    onClick={() => setActiveCategory(category)}
+                                                >
+                                                    {category}
+                                                </button>
+                                            ))}
+                                        </div>
                                     </div>
 
-                                    <div className="grid gap-3 md:grid-cols-2">
+                                    {/* Food Grid (Photo-First) */}
+                                    <div className="grid gap-6 sm:grid-cols-2">
                                         {filteredItems.map((item) => (
                                             <div
                                                 key={item.id}
-                                                className="rounded-xl border border-zinc-200 bg-zinc-50 p-4"
+                                                className="group flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-zinc-200 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
                                             >
-                                                <div className="mb-2 flex items-center justify-between gap-2">
-                                                    <h3 className="font-medium">{item.name}</h3>
-                                                    <Badge variant="secondary">{currency(item.price)}</Badge>
+                                                <div className="relative aspect-[3/2] overflow-hidden">
+                                                    {item.image_url ? (
+                                                        <img
+                                                            src={item.image_url}
+                                                            alt={item.name}
+                                                            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                                            loading="lazy"
+                                                        />
+                                                    ) : (
+                                                        <div className="flex h-full w-full flex-col items-center justify-center bg-[#F5F5F5]">
+                                                            <div className="mb-2 h-12 w-12 rounded-full bg-zinc-200/50 flex items-center justify-center">
+                                                                <ShoppingCart className="size-6 text-zinc-400 opacity-50" />
+                                                            </div>
+                                                            <span className="text-xs font-medium text-zinc-400">Preparation in progress</span>
+                                                        </div>
+                                                    )}
+                                                    <div className="absolute top-4 right-4 rounded-full bg-black/40 px-3 py-1.5 text-xs font-black text-white backdrop-blur-md">
+                                                        {currency(item.price)}
+                                                    </div>
                                                 </div>
-                                                {item.category ? (
-                                                    <p className="mb-2 text-xs uppercase tracking-wide text-zinc-500">
-                                                        {item.category}
+
+                                                <div className="flex flex-1 flex-col p-5">
+                                                    <div className="mb-1 flex items-start justify-between">
+                                                        <div>
+                                                            {item.category && (
+                                                                <span className="block text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">
+                                                                    {item.category}
+                                                                </span>
+                                                            )}
+                                                            <h3 className="text-xl font-bold text-[#212121] leading-tight mt-1 group-hover:text-[#F57C00] transition-colors duration-300">
+                                                                {item.name}
+                                                            </h3>
+                                                        </div>
+                                                    </div>
+                                                    <p className="mt-2 text-sm leading-relaxed text-[#757575] line-clamp-2">
+                                                        {item.description ?? 'A delicious selection crafted with high-quality ingredients just for you.'}
                                                     </p>
-                                                ) : null}
-                                                <p className="mb-4 text-sm text-zinc-600">
-                                                    {item.description ?? 'No description available.'}
-                                                </p>
-                                                <div className="flex items-center gap-2">
-                                                    <Button
-                                                        type="button"
-                                                        variant="outline"
-                                                        size="sm"
-                                                        onClick={() =>
-                                                            updateItemQuantity(item.id, (cart[item.id] ?? 0) - 1)
-                                                        }
-                                                    >
-                                                        -
-                                                    </Button>
-                                                    <span className="w-10 text-center text-sm">
-                                                        {cart[item.id] ?? 0}
-                                                    </span>
-                                                    <Button
-                                                        type="button"
-                                                        variant="outline"
-                                                        size="sm"
-                                                        onClick={() =>
-                                                            updateItemQuantity(item.id, (cart[item.id] ?? 0) + 1)
-                                                        }
-                                                    >
-                                                        +
-                                                    </Button>
-                                                    <Button
-                                                        type="button"
-                                                        className="ml-auto"
-                                                        size="sm"
-                                                        onClick={() =>
-                                                            updateItemQuantity(item.id, Math.max(1, cart[item.id] ?? 0))
-                                                        }
-                                                    >
-                                                        Add to Cart
-                                                    </Button>
+
+                                                    <div className="mt-auto pt-6">
+                                                        <div className="flex items-center justify-between gap-4">
+                                                            <div className="flex items-center gap-1 rounded-full bg-[#FAFAFA] p-1 shadow-inner ring-1 ring-zinc-200">
+                                                                <button
+                                                                    type="button"
+                                                                    className="flex h-9 w-9 items-center justify-center rounded-full bg-white font-bold text-[#212121] shadow-sm transition-all hover:bg-[#F57C00] hover:text-white disabled:opacity-20 active:scale-95"
+                                                                    disabled={(cart[item.id] ?? 0) <= 0}
+                                                                    onClick={() => updateItemQuantity(item.id, (cart[item.id] ?? 0) - 1)}
+                                                                >
+                                                                    -
+                                                                </button>
+                                                                <span className="w-10 text-center text-[15px] font-black">
+                                                                    {cart[item.id] ?? 0}
+                                                                </span>
+                                                                <button
+                                                                    type="button"
+                                                                    className="flex h-9 w-9 items-center justify-center rounded-full bg-white font-bold text-[#212121] shadow-sm transition-all hover:bg-[#F57C00] hover:text-white active:scale-95"
+                                                                    onClick={() => updateItemQuantity(item.id, (cart[item.id] ?? 0) + 1)}
+                                                                >
+                                                                    +
+                                                                </button>
+                                                            </div>
+                                                            <Button
+                                                                type="button"
+                                                                className={`h-11 rounded-full px-6 font-bold transition-all duration-300 active:scale-95 ${(cart[item.id] ?? 0) > 0
+                                                                    ? 'bg-[#2E7D32] hover:bg-[#1B5E20]'
+                                                                    : 'bg-[#F57C00] hover:bg-[#E65100]'
+                                                                    }`}
+                                                                onClick={() => updateItemQuantity(item.id, Math.max(1, (cart[item.id] ?? 0) + 1))}
+                                                            >
+                                                                {(cart[item.id] ?? 0) > 0 ? 'Add more' : 'Add to cart'}
+                                                            </Button>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         ))}
                                     </div>
-                                </CardContent>
-                            </Card>
-                        ) : null}
 
-                        {step === 2 ? (
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Cart Review</CardTitle>
-                                    <CardDescription>Confirm quantities and totals before checkout.</CardDescription>
-                                </CardHeader>
-                                <CardContent className="space-y-3">
-                                    {cartItems.length === 0 ? (
-                                        <p className="text-muted-foreground text-sm">Your cart is empty.</p>
-                                    ) : (
-                                        cartItems.map((item) => (
-                                            <div
-                                                key={item.id}
-                                                className="flex items-center gap-3 rounded-md border p-3"
-                                            >
-                                                <div className="min-w-0 flex-1">
-                                                    <p className="truncate font-medium">{item.name}</p>
-                                                    <p className="text-sm text-zinc-500">
-                                                        {currency(item.price)} each
-                                                    </p>
-                                                </div>
-                                                <div className="flex items-center gap-2">
-                                                    <Button
-                                                        type="button"
-                                                        variant="outline"
-                                                        size="sm"
-                                                        onClick={() =>
-                                                            updateItemQuantity(item.id, item.quantity - 1)
-                                                        }
-                                                    >
-                                                        -
-                                                    </Button>
-                                                    <span className="w-10 text-center text-sm">
-                                                        {item.quantity}
-                                                    </span>
-                                                    <Button
-                                                        type="button"
-                                                        variant="outline"
-                                                        size="sm"
-                                                        onClick={() =>
-                                                            updateItemQuantity(item.id, item.quantity + 1)
-                                                        }
-                                                    >
-                                                        +
-                                                    </Button>
-                                                </div>
-                                                <p className="w-24 text-right text-sm font-medium">
-                                                    {currency(item.lineTotal)}
-                                                </p>
+                                    {filteredItems.length === 0 && (
+                                        <div className="flex flex-col items-center justify-center py-20 text-center">
+                                            <div className="mb-4 h-24 w-24 rounded-full bg-zinc-100 flex items-center justify-center">
+                                                <Search className="size-10 text-zinc-300" />
                                             </div>
-                                        ))
+                                            <h3 className="text-xl font-bold text-[#212121]">No items found</h3>
+                                            <p className="mt-2 text-[#757575]">Try adjusting your search or category filters.</p>
+                                        </div>
                                     )}
-                                    <InputError message={form.errors.items} />
-                                </CardContent>
-                            </Card>
-                        ) : null}
+                                </div>
+                            )}
 
-                        {step === 3 ? (
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Pickup and Contact Details</CardTitle>
-                                    <CardDescription>
-                                        Enter your phone and pickup preferences for SMS updates.
-                                    </CardDescription>
-                                </CardHeader>
-                                <CardContent className="grid gap-4">
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="name">Name</Label>
-                                        <Input
-                                            id="name"
-                                            value={form.data.name}
-                                            onChange={(event) => form.setData('name', event.target.value)}
-                                            placeholder="Full name"
-                                        />
-                                        <InputError message={form.errors.name} />
-                                    </div>
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="phone">Phone Number</Label>
-                                        <Input
-                                            id="phone"
-                                            value={form.data.phone}
-                                            onChange={(event) => form.setData('phone', event.target.value)}
-                                            placeholder="2519XXXXXXXX"
-                                        />
-                                        <InputError message={form.errors.phone} />
-                                    </div>
-                                    <div className="grid gap-2 md:grid-cols-2">
-                                        <div className="grid gap-2">
-                                            <Label htmlFor="pickup_date">Pickup Date</Label>
-                                            <Input
-                                                id="pickup_date"
-                                                type="date"
-                                                min={todayDate()}
-                                                value={form.data.pickup_date}
-                                                onChange={(event) =>
-                                                    form.setData('pickup_date', event.target.value)
-                                                }
-                                            />
-                                            <InputError message={form.errors.pickup_date} />
+                            {step === 2 && (
+                                <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
+                                    <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-zinc-200">
+                                        <div className="mb-6">
+                                            <h2 className="text-xl font-bold text-[#212121]">Review Your Cart</h2>
+                                            <p className="text-sm text-[#757575]">Confirm quantities and totals before we proceed to checkout.</p>
                                         </div>
-                                        <div className="grid gap-2">
-                                            <Label htmlFor="pickup_location">Pickup Location</Label>
-                                            <select
-                                                id="pickup_location"
-                                                className="border-input h-9 rounded-md border bg-transparent px-3 text-sm"
-                                                value={form.data.pickup_location_id}
-                                                onChange={(event) =>
-                                                    form.setData(
-                                                        'pickup_location_id',
-                                                        Number(event.target.value) || '',
-                                                    )
-                                                }
-                                            >
-                                                <option value="">Select location</option>
-                                                {pickupLocations.map((location) => (
-                                                    <option key={location.id} value={location.id}>
-                                                        {location.name} - {location.address}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                            <InputError message={form.errors.pickup_location_id} />
+
+                                        <div className="space-y-4">
+                                            {cartItems.length === 0 ? (
+                                                <div className="flex flex-col items-center justify-center py-20 text-center">
+                                                    <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-zinc-50 shadow-inner">
+                                                        <ShoppingCart className="size-10 text-zinc-300" />
+                                                    </div>
+                                                    <h3 className="text-xl font-bold text-[#212121]">Your cart is empty</h3>
+                                                    <p className="mt-2 text-[#757575]">Look like you haven't added anything to your order yet.</p>
+                                                    <Button
+                                                        onClick={() => setStep(1)}
+                                                        className="mt-8 h-12 rounded-xl bg-[#F57C00] px-8 font-black text-white shadow-lg shadow-[#F57C00]/20 hover:bg-[#E65100] active:scale-95 transition-all"
+                                                    >
+                                                        Browse Our Menu
+                                                        <ArrowRight className="ml-2 size-4" />
+                                                    </Button>
+                                                </div>
+                                            ) : (
+                                                cartItems.map((item) => (
+                                                    <div
+                                                        key={item.id}
+                                                        className="flex flex-col gap-4 rounded-xl border border-zinc-100 bg-[#FAFAFA] p-4 transition-all hover:shadow-md md:flex-row md:items-center"
+                                                    >
+                                                        <div className="flex flex-1 items-center gap-4">
+                                                            <div className="h-20 w-20 shrink-0 overflow-hidden rounded-lg border bg-white shadow-sm">
+                                                                {item.image_url ? (
+                                                                    <img
+                                                                        src={item.image_url}
+                                                                        alt={item.name}
+                                                                        className="h-full w-full object-cover"
+                                                                        loading="lazy"
+                                                                    />
+                                                                ) : (
+                                                                    <div className="flex h-full w-full items-center justify-center bg-zinc-50 text-[10px] font-bold uppercase tracking-tighter text-zinc-400">
+                                                                        No Photo
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                            <div className="min-w-0 flex-1">
+                                                                <p className="truncate text-lg font-bold text-[#212121]">{item.name}</p>
+                                                                <p className="text-sm font-black text-[#F57C00]">
+                                                                    {currency(item.price)} <span className="ml-1 text-xs font-medium text-[#9E9E9E]">each</span>
+                                                                </p>
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="flex items-center justify-between border-t border-zinc-100 pt-4 md:border-0 md:pt-0">
+                                                            <div className="flex items-center gap-1 rounded-full bg-white p-1 shadow-sm ring-1 ring-zinc-100">
+                                                                <button
+                                                                    type="button"
+                                                                    className="flex h-8 w-8 items-center justify-center rounded-full text-[#F57C00] transition-all hover:bg-[#F57C00] hover:text-white active:scale-90"
+                                                                    onClick={() => updateItemQuantity(item.id, item.quantity - 1)}
+                                                                >
+                                                                    -
+                                                                </button>
+                                                                <span className="w-8 text-center text-sm font-black">
+                                                                    {item.quantity}
+                                                                </span>
+                                                                <button
+                                                                    type="button"
+                                                                    className="flex h-8 w-8 items-center justify-center rounded-full text-[#F57C00] transition-all hover:bg-[#F57C00] hover:text-white active:scale-90"
+                                                                    onClick={() => updateItemQuantity(item.id, item.quantity + 1)}
+                                                                >
+                                                                    +
+                                                                </button>
+                                                            </div>
+                                                            <p className="text-right text-lg font-black text-[#212121] md:w-28">
+                                                                {currency(item.lineTotal)}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                ))
+                                            )}
+                                        </div>
+                                        <div className="mt-6">
+                                            <InputError message={form.errors.items} />
                                         </div>
                                     </div>
-                                    <label className="flex items-center gap-2 text-sm">
-                                        <input
-                                            type="checkbox"
-                                            checked={form.data.notify_when_ready}
-                                            onChange={(event) =>
-                                                form.setData('notify_when_ready', event.target.checked)
-                                            }
-                                        />
-                                        Notify me by SMS when my order is ready for pickup.
-                                    </label>
-                                </CardContent>
-                            </Card>
-                        ) : null}
+                                </div>
+                            )}
 
-                        {step === 4 ? (
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Payment Verification</CardTitle>
-                                    <CardDescription>
-                                        Upload your receipt now, or skip and upload later from the SMS tracking link.
-                                    </CardDescription>
-                                </CardHeader>
-                                <CardContent className="space-y-4">
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="receipt">Receipt Screenshot (optional)</Label>
-                                        <Input
-                                            id="receipt"
-                                            type="file"
-                                            accept="image/png,image/jpeg,image/jpg,image/webp"
-                                            onChange={(event) =>
-                                                form.setData('receipt', event.target.files?.[0] ?? null)
-                                            }
-                                        />
-                                        <p className="text-muted-foreground text-xs">
-                                            Accepted formats: PNG, JPG, JPEG, WEBP. Max size 5 MB.
-                                        </p>
-                                        <InputError message={form.errors.receipt} />
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        ) : null}
+                            {step === 3 && (
+                                <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
+                                    <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-zinc-200">
+                                        <div className="mb-8">
+                                            <h2 className="text-xl font-bold text-[#212121]">Pickup & Contact</h2>
+                                            <p className="text-sm text-[#757575]">Help us coordinate your pickup with accurate details.</p>
+                                        </div>
 
-                        <div className="flex items-center justify-between gap-3">
-                            <Button
-                                type="button"
-                                variant="outline"
-                                disabled={step === 1}
-                                onClick={() => setStep((value) => Math.max(1, value - 1))}
-                            >
-                                Back
-                            </Button>
-                            <div className="flex items-center gap-2">
-                                {step < 4 ? (
-                                    <Button
-                                        type="button"
-                                        disabled={
-                                            (step === 1 && cartItems.length === 0) ||
-                                            (step === 2 && cartItems.length === 0) ||
-                                            (step === 3 && !canContinueDetails)
-                                        }
-                                        onClick={() => setStep((value) => Math.min(4, value + 1))}
-                                    >
-                                        Continue
-                                    </Button>
-                                ) : (
-                                    <Button
-                                        type="button"
-                                        disabled={form.processing || cartItems.length === 0}
-                                        onClick={submitOrder}
-                                    >
-                                        {form.processing ? 'Submitting...' : 'Submit Order'}
-                                    </Button>
-                                )}
-                            </div>
-                        </div>
-                    </section>
+                                        <div className="grid gap-6">
+                                            <div className="grid gap-2">
+                                                <Label htmlFor="name" className="text-xs font-black uppercase tracking-widest text-[#9E9E9E]">Customer Name</Label>
+                                                <Input
+                                                    id="name"
+                                                    className="h-12 rounded-xl border-zinc-200 focus:ring-[#F57C00] focus:border-[#F57C00]"
+                                                    value={form.data.name}
+                                                    onChange={(event) => form.setData('name', event.target.value)}
+                                                    placeholder="Enter your full name"
+                                                />
+                                                <InputError message={form.errors.name} />
+                                            </div>
+                                            <div className="grid gap-2">
+                                                <Label htmlFor="phone" className="text-xs font-black uppercase tracking-widest text-[#9E9E9E]">Phone Number <span className="text-[#F57C00]">*</span></Label>
+                                                <Input
+                                                    id="phone"
+                                                    className="h-12 rounded-xl border-zinc-200 focus:ring-[#F57C00] focus:border-[#F57C00]"
+                                                    value={form.data.phone}
+                                                    onChange={(event) => form.setData('phone', event.target.value)}
+                                                    placeholder="251 9XX XXX XXX"
+                                                />
+                                                <p className="text-[10px] text-[#9E9E9E]">We'll send a tracking link to this number.</p>
+                                                <InputError message={form.errors.phone} />
+                                            </div>
+                                            <div className="grid gap-6 md:grid-cols-2">
+                                                <div className="grid gap-2">
+                                                    <Label htmlFor="pickup_date" className="text-xs font-black uppercase tracking-widest text-[#9E9E9E]">Pickup Date</Label>
+                                                    <Input
+                                                        id="pickup_date"
+                                                        type="date"
+                                                        min={todayDate()}
+                                                        className="h-12 rounded-xl border-zinc-200 focus:ring-[#F57C00] focus:border-[#F57C00]"
+                                                        value={form.data.pickup_date}
+                                                        onChange={(event) =>
+                                                            form.setData('pickup_date', event.target.value)
+                                                        }
+                                                    />
+                                                    <InputError message={form.errors.pickup_date} />
+                                                </div>
+                                                <div className="grid gap-2">
+                                                    <Label htmlFor="pickup_location" className="text-xs font-black uppercase tracking-widest text-[#9E9E9E]">Branch Location</Label>
+                                                    <select
+                                                        id="pickup_location"
+                                                        className="flex h-12 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F57C00] focus-visible:ring-offset-2"
+                                                        value={form.data.pickup_location_id}
+                                                        onChange={(event) =>
+                                                            form.setData(
+                                                                'pickup_location_id',
+                                                                Number(event.target.value) || '',
+                                                            )
+                                                        }
+                                                    >
+                                                        <option value="">Select a branch</option>
+                                                        {pickupLocations.map((location) => (
+                                                            <option key={location.id} value={location.id}>
+                                                                {location.name}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                    <InputError message={form.errors.pickup_location_id} />
+                                                </div>
+                                            </div>
 
-                    <aside className="space-y-4">
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2">
-                                    <ShoppingCart className="size-5" />
-                                    Cart Summary
-                                </CardTitle>
-                                <CardDescription>
-                                    {cartCount} item{cartCount === 1 ? '' : 's'} selected
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent className="space-y-3">
-                                {cartItems.length === 0 ? (
-                                    <p className="text-muted-foreground text-sm">No items yet.</p>
-                                ) : (
-                                    <>
-                                        {cartItems.slice(0, 4).map((item) => (
-                                            <div key={item.id} className="flex justify-between text-sm">
-                                                <span className="max-w-[180px] truncate">
-                                                    {item.name} x {item.quantity}
+                                            {selectedPickupLocation && (
+                                                <div className="rounded-2xl border border-[#FFF3E0] bg-[#FFF8F1] p-5 transition-all animate-in slide-in-from-top-2">
+                                                    <div className="flex items-start gap-4">
+                                                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#F57C00] text-white">
+                                                            <MapPin className="size-5" />
+                                                        </div>
+                                                        <div>
+                                                            <p className="font-bold text-[#212121]">{selectedPickupLocation.name}</p>
+                                                            <p className="mt-1 text-sm text-[#757575] leading-relaxed">{selectedPickupLocation.address}</p>
+                                                            {selectedPickupLocation.google_maps_url && (
+                                                                <a
+                                                                    className="mt-3 inline-flex items-center gap-1.5 text-sm font-bold text-[#F57C00] hover:underline"
+                                                                    href={selectedPickupLocation.google_maps_url}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                >
+                                                                    Open in Google Maps
+                                                                    <ExternalLink className="size-3" />
+                                                                </a>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-zinc-100 bg-[#FAFAFA] p-4 transition-all hover:bg-white hover:shadow-sm">
+                                                <input
+                                                    type="checkbox"
+                                                    className="mt-1 h-5 w-5 rounded border-zinc-300 text-[#F57C00] focus:ring-[#F57C00]"
+                                                    checked={form.data.notify_when_ready}
+                                                    onChange={(event) =>
+                                                        form.setData('notify_when_ready', event.target.checked)
+                                                    }
+                                                />
+                                                <span className="text-sm font-medium text-[#212121] leading-tight">
+                                                    SMS Ready Notification
+                                                    <span className="block mt-1 text-xs font-normal text-[#757575]">We'll text you as soon as your order is packaged and ready to go.</span>
                                                 </span>
-                                                <span>{currency(item.lineTotal)}</span>
-                                            </div>
-                                        ))}
-                                        {cartItems.length > 4 ? (
-                                            <p className="text-muted-foreground text-xs">
-                                                + {cartItems.length - 4} more item(s)
-                                            </p>
-                                        ) : null}
-                                        <div className="border-t pt-3">
-                                            <div className="flex justify-between font-semibold">
-                                                <span>Total</span>
-                                                <span>{currency(cartTotal)}</span>
-                                            </div>
+                                            </label>
                                         </div>
-                                    </>
-                                )}
-                            </CardContent>
-                        </Card>
+                                    </div>
+                                </div>
+                            )}
 
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="text-base">Customer Journey</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-2 text-sm text-zinc-600">
-                                <p>1. Browse menu and add items</p>
-                                <p>2. Review cart and quantities</p>
-                                <p>3. Select pickup date and location</p>
-                                <p>4. Upload receipt now or later</p>
-                                <p>5. Receive SMS tracking link after order</p>
-                            </CardContent>
-                        </Card>
-                    </aside>
+                            {step === 4 && (
+                                <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
+                                    <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-zinc-200">
+                                        <div className="mb-8">
+                                            <h2 className="text-xl font-bold text-[#212121]">Payment Upload</h2>
+                                            <p className="text-sm text-[#757575]">Upload your bank transfer receipt to verify your order.</p>
+                                        </div>
+
+                                        <div className="space-y-6">
+                                            <div className="group relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-zinc-200 bg-[#FAFAFA] p-10 transition-all hover:border-[#F57C00] hover:bg-white">
+                                                <div className="mb-4 rounded-full bg-white p-4 shadow-sm ring-1 ring-zinc-100 group-hover:scale-110 group-hover:text-[#F57C00] transition-all duration-300">
+                                                    <Upload className="size-8" />
+                                                </div>
+                                                <div className="text-center">
+                                                    <p className="text-base font-bold text-[#212121]">Click to upload receipt</p>
+                                                    <p className="mt-1 text-xs text-[#9E9E9E]">PNG, JPG or WEBP (Max 5MB)</p>
+                                                </div>
+                                                <input
+                                                    id="receipt"
+                                                    type="file"
+                                                    className="absolute inset-0 cursor-pointer opacity-0"
+                                                    accept="image/png,image/jpeg,image/jpg,image/webp"
+                                                    onChange={(event) =>
+                                                        form.setData('receipt', event.target.files?.[0] ?? null)
+                                                    }
+                                                />
+                                            </div>
+
+                                            {form.data.receipt && (
+                                                <div className="flex items-center gap-4 rounded-xl bg-[#E8F5E9] p-4 text-[#2E7D32] animate-in slide-in-from-bottom-2">
+                                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#2E7D32] text-white">
+                                                        <CheckCircle2 className="size-5" />
+                                                    </div>
+                                                    <div className="min-w-0 flex-1">
+                                                        <p className="truncate text-sm font-bold">File selected: {form.data.receipt.name}</p>
+                                                        <p className="text-[10px] opacity-80 uppercase font-black">Ready for submission</p>
+                                                    </div>
+                                                    <button
+                                                        type="button"
+                                                        className="text-xs font-black uppercase tracking-widest hover:underline"
+                                                        onClick={() => form.setData('receipt', null)}
+                                                    >
+                                                        Remove
+                                                    </button>
+                                                </div>
+                                            )}
+
+                                            <div className="rounded-xl bg-[#FFF3E0] p-4 text-[#E65100]">
+                                                <p className="text-xs font-medium leading-relaxed">
+                                                    <span className="font-black uppercase tracking-widest mr-2 underline">Note:</span>
+                                                    You can also skip this for now and upload later using the tracking link we'll send via SMS.
+                                                </p>
+                                            </div>
+
+                                            <InputError message={form.errors.receipt} />
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Navigation Bar (Floating on Mobile, Inline on Desktop) */}
+                            <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/90 p-4 shadow-[0_-8px_30px_rgb(0,0,0,0.12)] backdrop-blur-xl ring-1 ring-zinc-200/50 md:relative md:bottom-auto md:left-auto md:right-auto md:z-0 md:w-full md:max-w-none md:translate-x-0 md:bg-transparent md:p-0 md:pt-12 md:shadow-none md:ring-0 md:backdrop-blur-none">
+                                <div className="flex w-full items-center justify-between gap-4">
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        className={`h-14 rounded-2xl px-8 font-bold text-[#757575] transition-all hover:bg-zinc-100 ${step === 1 ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+                                        disabled={step === 1}
+                                        onClick={() => {
+                                            setStep((value) => Math.max(1, value - 1));
+                                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                                        }}
+                                    >
+                                        Back
+                                    </Button>
+                                    <div className="flex items-center gap-3">
+                                        {step < 4 ? (
+                                            <Button
+                                                type="button"
+                                                className="h-14 rounded-2xl px-12 font-black shadow-lg shadow-[#F57C00]/20 bg-[#F57C00] hover:bg-[#E65100] active:scale-95 transition-all text-white"
+                                                disabled={
+                                                    (step === 1 && cartItems.length === 0) ||
+                                                    (step === 2 && cartItems.length === 0) ||
+                                                    (step === 3 && !canContinueDetails)
+                                                }
+                                                onClick={() => {
+                                                    setStep((value) => Math.min(4, value + 1));
+                                                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                                                }}
+                                            >
+                                                Continue
+                                            </Button>
+                                        ) : (
+                                            <Button
+                                                type="button"
+                                                className="h-14 rounded-2xl px-12 font-black shadow-lg shadow-[#2E7D32]/20 bg-[#2E7D32] hover:bg-[#1B5E20] active:scale-95 transition-all text-white"
+                                                disabled={form.processing || cartItems.length === 0}
+                                                onClick={submitOrder}
+                                            >
+                                                {form.processing ? 'Submitting...' : 'Confirm Order'}
+                                            </Button>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <aside className="hidden lg:block">
+                            <div className="sticky top-24 space-y-6">
+                                {/* Cart Summary Card */}
+                                <div className="overflow-hidden rounded-2xl bg-white shadow-xl ring-1 ring-zinc-200">
+                                    <div className="bg-[#212121] px-6 py-5 text-white">
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-2">
+                                                <ShoppingCart className="size-5 text-[#F57C00]" />
+                                                <h3 className="font-black uppercase tracking-widest text-sm">Review Order</h3>
+                                            </div>
+                                            <span className="rounded-full bg-white/10 px-3 py-1 text-[10px] font-black uppercase">
+                                                {cartCount} items
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div className="p-6">
+                                        {cartItems.length === 0 ? (
+                                            <div className="flex flex-col items-center justify-center py-6 text-center" id="empty-cart-summary">
+                                                <div className="mb-4 h-16 w-16 rounded-full bg-zinc-50 flex items-center justify-center">
+                                                    <ShoppingCart className="size-6 text-zinc-300" />
+                                                </div>
+                                                <p className="text-sm font-medium text-[#9E9E9E]">Your bag is empty.</p>
+                                            </div>
+                                        ) : (
+                                            <div className="space-y-4">
+                                                {cartItems.slice(0, 5).map((item) => (
+                                                    <div key={item.id} className="flex items-center justify-between gap-4">
+                                                        <div className="flex min-w-0 items-center gap-3">
+                                                            <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg border border-zinc-100 bg-zinc-50 shadow-sm">
+                                                                {item.image_url ? (
+                                                                    <img
+                                                                        src={item.image_url}
+                                                                        alt={item.name}
+                                                                        className="h-full w-full object-cover"
+                                                                        loading="lazy"
+                                                                    />
+                                                                ) : (
+                                                                    <div className="flex h-full w-full items-center justify-center bg-zinc-100 text-[8px] font-black uppercase tracking-tighter text-zinc-400">
+                                                                        Prep
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                            <div className="min-w-0 flex-1">
+                                                                <p className="truncate text-sm font-bold text-[#212121]">{item.name}</p>
+                                                                <p className="text-xs font-medium text-[#757575]">Qty: {item.quantity}</p>
+                                                            </div>
+                                                        </div>
+                                                        <span className="text-sm font-black text-[#212121]">{currency(item.lineTotal)}</span>
+                                                    </div>
+                                                ))}
+                                                {cartItems.length > 5 && (
+                                                    <p className="text-center text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">
+                                                        + {cartItems.length - 5} additional items
+                                                    </p>
+                                                )}
+
+                                                <div className="mt-6 space-y-3 rounded-xl bg-[#FAFAFA] p-4 text-sm">
+                                                    <div className="flex justify-between text-[#757575]">
+                                                        <span>Subtotal</span>
+                                                        <span className="font-bold">{currency(cartTotal)}</span>
+                                                    </div>
+                                                    <div className="flex justify-between text-[#757575]">
+                                                        <span>Processing Fee</span>
+                                                        <span className="font-bold text-[#2E7D32]">FREE</span>
+                                                    </div>
+                                                    <div className="border-t border-zinc-200 pt-3">
+                                                        <div className="flex justify-between text-lg font-black text-[#212121]">
+                                                            <span>Total</span>
+                                                            <span className="text-[#F57C00]">{currency(cartTotal)}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Help Card */}
+                                <div className="rounded-2xl bg-[#FFF3E0] p-6 text-[#E65100]">
+                                    <div className="flex items-center gap-3 mb-4">
+                                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-sm">
+                                            <Clock3 className="size-4" />
+                                        </div>
+                                        <h4 className="text-sm font-black uppercase tracking-widest">Help & Info</h4>
+                                    </div>
+                                    <div className="space-y-3">
+                                        <div className="flex items-start gap-3">
+                                            <div className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#F57C00]"></div>
+                                            <p className="text-xs leading-relaxed font-medium">Pickup times are estimated and may vary based on demand.</p>
+                                        </div>
+                                        <div className="flex items-start gap-3">
+                                            <div className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#F57C00]"></div>
+                                            <p className="text-xs leading-relaxed font-medium">Please ensure your phone number is correct for tracking updates.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </aside>
+                    </div>
                 </main>
             </div>
         </>

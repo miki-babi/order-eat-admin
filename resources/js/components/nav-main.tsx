@@ -13,23 +13,38 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
     const { isCurrentUrl } = useCurrentUrl();
 
     return (
-        <SidebarGroup className="px-2 py-0">
-            <SidebarGroupLabel>Platform</SidebarGroupLabel>
-            <SidebarMenu>
-                {items.map((item) => (
-                    <SidebarMenuItem key={item.title}>
-                        <SidebarMenuButton
-                            asChild
-                            isActive={isCurrentUrl(item.href)}
-                            tooltip={{ children: item.title }}
-                        >
-                            <Link href={item.href} prefetch>
-                                {item.icon && <item.icon />}
-                                <span>{item.title}</span>
-                            </Link>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                ))}
+        <SidebarGroup className="px-3 py-4">
+            <SidebarGroupLabel className="mb-2 px-3 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
+                System Terminal
+            </SidebarGroupLabel>
+            <SidebarMenu className="gap-2">
+                {items.map((item) => {
+                    const active = isCurrentUrl(item.href);
+                    return (
+                        <SidebarMenuItem key={item.title}>
+                            <SidebarMenuButton
+                                asChild
+                                isActive={active}
+                                tooltip={{ children: item.title }}
+                                className={`h-11 rounded-xl px-4 transition-all duration-200 group/nav-item ${active
+                                    ? 'bg-[#212121] text-white shadow-lg shadow-[#212121]/10'
+                                    : 'text-zinc-500 hover:bg-zinc-100 hover:text-[#F57C00]'
+                                    }`}
+                            >
+                                <Link href={item.href} prefetch className="flex items-center gap-3">
+                                    {item.icon && (
+                                        <item.icon className={`size-4.5 transition-transform duration-200 ${active ? 'text-[#F57C00]' : 'group-hover/nav-item:scale-110'
+                                            }`} />
+                                    )}
+                                    <span className={`text-xs font-black uppercase tracking-widest ${active ? 'text-[#F57C00]' : 'text-zinc-600 group-hover/nav-item:text-[#F57C00]'
+                                        }`}>
+                                        {item.title}
+                                    </span>
+                                </Link>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                    );
+                })}
             </SidebarMenu>
         </SidebarGroup>
     );
