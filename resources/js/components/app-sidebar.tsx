@@ -47,16 +47,16 @@ export function AppSidebar() {
             ? [{ title: 'Order Queue', href: '/staff/orders', icon: ClipboardList }]
             : []),
         ...(can('customers.view')
-            ? [{ title: 'Audience', href: '/staff/customers', icon: Users }]
+            ? [{ title: 'Customers', href: '/staff/customers', icon: Users }]
             : []),
         ...(can('pickup_locations.manage')
-            ? [{ title: 'Branch Points', href: '/staff/pickup-locations', icon: MapPin }]
+            ? [{ title: 'Branch Locations', href: '/staff/pickup-locations', icon: MapPin }]
             : []),
         ...(can('pickup_locations.manage')
-            ? [{ title: 'Table QR', href: '/staff/table-qr', icon: QrCode }]
+            ? [{ title: 'Table Managment', href: '/staff/table-qr', icon: QrCode }]
             : []),
         ...(can('menu_items.manage')
-            ? [{ title: 'Product Catalog', href: '/staff/menu-items', icon: Coffee }]
+            ? [{ title: 'Menu Catalog', href: '/staff/menu-items', icon: Coffee }]
             : []),
         ...(can('reports.view')
             ? [{ title: 'Insights & Ops', href: '/staff/reports', icon: BarChart3 }]

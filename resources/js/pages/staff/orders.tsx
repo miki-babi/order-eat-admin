@@ -291,7 +291,7 @@ export default function StaffOrders({
             <Head title="Staff Orders" />
             <div className="space-y-8 bg-zinc-50/50 p-6 min-h-screen">
                 {/* 📌 Section 1 — Header Summary */}
-                <div className="grid gap-4 md:grid-cols-4">
+                <div className="hidden grid gap-4 md:grid-cols-4">
                     <Card className="border-none shadow-sm ring-1 ring-zinc-200">
                         <CardContent className="pt-6">
                             <div className="flex items-center justify-between">

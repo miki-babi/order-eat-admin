@@ -271,7 +271,7 @@ export default function Menu({
 
                 <main className="mx-auto w-full max-w-7xl px-4 py-8 md:px-8 pb-32 md:pb-12">
                     {/* Material Step Tracker */}
-                    <div className="sticky top-[72px] z-40 mb-10 overflow-hidden rounded-2xl bg-white p-1.5 shadow-lg ring-1 ring-zinc-100 md:relative md:top-0 md:bg-white md:p-1 md:shadow-md">
+                    <div className="sticky top-[0px] z-40 mb-10 overflow-hidden rounded-2xl bg-white p-1.5 shadow-lg ring-1 ring-zinc-100 md:relative md:top-0 md:bg-white md:p-1 md:shadow-md">
                         <div className="flex flex-row items-center gap-1">
                             {steps.map((label, index) => {
                                 const isActive = step === index + 1;
@@ -304,7 +304,37 @@ export default function Menu({
                                 );
                             })}
                         </div>
+                        
                     </div>
+
+                    <div className={`sticky top-[0px] z-40 mb-10 overflow-hidden rounded-2xl bg-white p-1.5 shadow-lg ring-1 ring-zinc-100 md:relative md:top-0 md:bg-white md:p-1 md:shadow-md ${step === 1 ? 'block' : 'hidden'}`}>
+
+                    <div className=" flex flex-wrap gap-3 p-2 transition-all duration-300">
+                                            <button
+                                                type="button"
+                                                className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 shadow-sm ${activeCategory === 'all'
+                                                    ? 'bg-[#F57C00] text-white shadow-[#F57C00]/20 scale-105'
+                                                    : 'bg-white text-[#757575] hover:bg-[#F5F5F5] ring-1 ring-zinc-200'
+                                                    }`}
+                                                onClick={() => setActiveCategory('all')}
+                                            >
+                                                All items
+                                            </button>
+                                            {categories.map((category) => (
+                                                <button
+                                                    key={category}
+                                                    type="button"
+                                                    className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 shadow-sm ${activeCategory === category
+                                                        ? 'bg-[#F57C00] text-white shadow-[#F57C00]/20 scale-105'
+                                                        : 'bg-white text-[#757575] hover:bg-[#F5F5F5] ring-1 ring-zinc-200'
+                                                        }`}
+                                                    onClick={() => setActiveCategory(category)}
+                                                >
+                                                    {category}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        </div>
 
                     <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
                         <section className="space-y-6">
@@ -333,31 +363,8 @@ export default function Menu({
                                             />
                                         </div>
 
-                                        <div className="flex flex-wrap gap-3 pb-2 transition-all duration-300">
-                                            <button
-                                                type="button"
-                                                className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 shadow-sm ${activeCategory === 'all'
-                                                    ? 'bg-[#F57C00] text-white shadow-[#F57C00]/20 scale-105'
-                                                    : 'bg-white text-[#757575] hover:bg-[#F5F5F5] ring-1 ring-zinc-200'
-                                                    }`}
-                                                onClick={() => setActiveCategory('all')}
-                                            >
-                                                All items
-                                            </button>
-                                            {categories.map((category) => (
-                                                <button
-                                                    key={category}
-                                                    type="button"
-                                                    className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 shadow-sm ${activeCategory === category
-                                                        ? 'bg-[#F57C00] text-white shadow-[#F57C00]/20 scale-105'
-                                                        : 'bg-white text-[#757575] hover:bg-[#F5F5F5] ring-1 ring-zinc-200'
-                                                        }`}
-                                                    onClick={() => setActiveCategory(category)}
-                                                >
-                                                    {category}
-                                                </button>
-                                            ))}
-                                        </div>
+                                        
+                                        
                                     </div>
 
                                     {/* Food Grid (Photo-First) */}
