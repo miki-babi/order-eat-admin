@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition } from './../../../../../wayfinder'
 /**
 * @see \Modules\TelegramBot\Http\Controllers\WebhookController::__invoke
-* @see Modules/TelegramBot/app/Http/Controllers/WebhookController.php:24
+* @see Modules/TelegramBot/app/Http/Controllers/WebhookController.php:26
 * @route '/api/telegram/webhook'
 */
 const WebhookController = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -16,7 +16,7 @@ WebhookController.definition = {
 
 /**
 * @see \Modules\TelegramBot\Http\Controllers\WebhookController::__invoke
-* @see Modules/TelegramBot/app/Http/Controllers/WebhookController.php:24
+* @see Modules/TelegramBot/app/Http/Controllers/WebhookController.php:26
 * @route '/api/telegram/webhook'
 */
 WebhookController.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ WebhookController.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \Modules\TelegramBot\Http\Controllers\WebhookController::__invoke
-* @see Modules/TelegramBot/app/Http/Controllers/WebhookController.php:24
+* @see Modules/TelegramBot/app/Http/Controllers/WebhookController.php:26
 * @route '/api/telegram/webhook'
 */
 WebhookController.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -35,7 +35,7 @@ WebhookController.post = (options?: RouteQueryOptions): RouteDefinition<'post'> 
 
 /**
 * @see \Modules\TelegramBot\Http\Controllers\WebhookController::__invoke
-* @see Modules/TelegramBot/app/Http/Controllers/WebhookController.php:24
+* @see Modules/TelegramBot/app/Http/Controllers/WebhookController.php:26
 * @route '/api/telegram/webhook'
 */
 const WebhookControllerForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -45,7 +45,7 @@ const WebhookControllerForm = (options?: RouteQueryOptions): RouteFormDefinition
 
 /**
 * @see \Modules\TelegramBot\Http\Controllers\WebhookController::__invoke
-* @see Modules/TelegramBot/app/Http/Controllers/WebhookController.php:24
+* @see Modules/TelegramBot/app/Http/Controllers/WebhookController.php:26
 * @route '/api/telegram/webhook'
 */
 WebhookControllerForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({

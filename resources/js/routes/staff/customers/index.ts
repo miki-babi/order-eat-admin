@@ -82,7 +82,7 @@ index.form = indexForm
 
 /**
 * @see \Modules\Customers\Http\Controllers\Staff\CustomerController::sms
-* @see Modules/Customers/app/Http/Controllers/Staff/CustomerController.php:193
+* @see Modules/Customers/app/Http/Controllers/Staff/CustomerController.php:201
 * @route '/staff/customers/sms'
 */
 export const sms = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -97,7 +97,7 @@ sms.definition = {
 
 /**
 * @see \Modules\Customers\Http\Controllers\Staff\CustomerController::sms
-* @see Modules/Customers/app/Http/Controllers/Staff/CustomerController.php:193
+* @see Modules/Customers/app/Http/Controllers/Staff/CustomerController.php:201
 * @route '/staff/customers/sms'
 */
 sms.url = (options?: RouteQueryOptions) => {
@@ -106,7 +106,7 @@ sms.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \Modules\Customers\Http\Controllers\Staff\CustomerController::sms
-* @see Modules/Customers/app/Http/Controllers/Staff/CustomerController.php:193
+* @see Modules/Customers/app/Http/Controllers/Staff/CustomerController.php:201
 * @route '/staff/customers/sms'
 */
 sms.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -116,7 +116,7 @@ sms.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \Modules\Customers\Http\Controllers\Staff\CustomerController::sms
-* @see Modules/Customers/app/Http/Controllers/Staff/CustomerController.php:193
+* @see Modules/Customers/app/Http/Controllers/Staff/CustomerController.php:201
 * @route '/staff/customers/sms'
 */
 const smsForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -126,7 +126,7 @@ const smsForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
 
 /**
 * @see \Modules\Customers\Http\Controllers\Staff\CustomerController::sms
-* @see Modules/Customers/app/Http/Controllers/Staff/CustomerController.php:193
+* @see Modules/Customers/app/Http/Controllers/Staff/CustomerController.php:201
 * @route '/staff/customers/sms'
 */
 smsForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({

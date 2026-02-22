@@ -71,8 +71,7 @@ class OrderController extends Controller
     ): Response {
         $search = trim((string) $request->input('search', ''));
         $category = $request->input('category');
-        $requestedChannel = is_string($request->input('channel')) ? $request->input('channel') : null;
-        $channel = $forcedChannel ?? MenuItem::normalizeVisibilityChannel($requestedChannel);
+        $channel = $this->resolveMenuVisibilityChannel($request, $forcedChannel);
 
         $menuItems = MenuItem::query()
             ->where('is_active', true)
@@ -129,6 +128,46 @@ class OrderController extends Controller
             ],
             'staffRoute' => $request->user()?->canAccessStaffPanel() ? route('staff.orders.index') : null,
         ]);
+    }
+
+    protected function resolveMenuVisibilityChannel(Request $request, ?string $forcedChannel = null): string
+    {
+        if (is_string($forcedChannel) && in_array($forcedChannel, MenuItem::visibilityChannels(), true)) {
+            return $forcedChannel;
+        }
+
+        if ($this->isTelegramMiniAppRequest($request)) {
+            return MenuItem::CHANNEL_TELEGRAM;
+        }
+
+        $requestedChannel = is_string($request->input('channel')) ? $request->input('channel') : null;
+
+        return MenuItem::normalizeVisibilityChannel($requestedChannel);
+    }
+
+    protected function isTelegramMiniAppRequest(Request $request): bool
+    {
+        $requestedChannel = MenuItem::normalizeVisibilityChannel(
+            is_string($request->input('channel')) ? $request->input('channel') : null,
+        );
+
+        if ($requestedChannel === MenuItem::CHANNEL_TELEGRAM) {
+            return true;
+        }
+
+        $query = $request->query();
+
+        if (! is_array($query) || $query === []) {
+            return false;
+        }
+
+        foreach (array_keys($query) as $key) {
+            if (is_string($key) && str_starts_with($key, 'tgWebApp')) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

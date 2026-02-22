@@ -42,6 +42,67 @@ test('public menu only returns items visible in requested channel', function () 
         );
 });
 
+test('public menu forces telegram visibility when telegram miniapp query params are present', function () {
+    MenuItem::query()->create([
+        'name' => 'Web Americano',
+        'description' => 'Shown on web',
+        'price' => 110,
+        'category' => 'Drinks',
+        'is_active' => true,
+        'visibility_channels' => ['web'],
+    ]);
+
+    $telegramItem = MenuItem::query()->create([
+        'name' => 'Telegram Mocha',
+        'description' => 'Shown on telegram',
+        'price' => 130,
+        'category' => 'Drinks',
+        'is_active' => true,
+        'visibility_channels' => ['telegram'],
+    ]);
+
+    $this->get(route('home', [
+        'tgWebAppData' => 'sample-init-data',
+        'tgWebAppVersion' => '7.7',
+    ]))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('customer/menu')
+            ->where('filters.channel', 'telegram')
+            ->has('menuItems', 1)
+            ->where('menuItems.0.id', $telegramItem->id)
+        );
+});
+
+test('telegram menu route only returns items visible in telegram channel', function () {
+    MenuItem::query()->create([
+        'name' => 'Web Espresso',
+        'description' => 'Shown on web',
+        'price' => 115,
+        'category' => 'Drinks',
+        'is_active' => true,
+        'visibility_channels' => ['web'],
+    ]);
+
+    $telegramItem = MenuItem::query()->create([
+        'name' => 'Telegram Espresso',
+        'description' => 'Shown on telegram',
+        'price' => 135,
+        'category' => 'Drinks',
+        'is_active' => true,
+        'visibility_channels' => ['telegram'],
+    ]);
+
+    $this->get(route('telegram.menu'))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('customer/telegram-menu')
+            ->where('filters.channel', 'telegram')
+            ->has('menuItems', 1)
+            ->where('menuItems.0.id', $telegramItem->id)
+        );
+});
+
 test('public menu pre-fills customer details from an existing token profile', function () {
     $customer = Customer::query()->create([
         'name' => 'Returning Customer',

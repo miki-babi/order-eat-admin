@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../wayfinder'
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::upload
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:323
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:362
 * @route '/orders/{trackingToken}/receipt'
 */
 export const upload = (args: { trackingToken: string | number } | [trackingToken: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -16,7 +16,7 @@ upload.definition = {
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::upload
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:323
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:362
 * @route '/orders/{trackingToken}/receipt'
 */
 upload.url = (args: { trackingToken: string | number } | [trackingToken: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -43,7 +43,7 @@ upload.url = (args: { trackingToken: string | number } | [trackingToken: string 
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::upload
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:323
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:362
 * @route '/orders/{trackingToken}/receipt'
 */
 upload.post = (args: { trackingToken: string | number } | [trackingToken: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -53,7 +53,7 @@ upload.post = (args: { trackingToken: string | number } | [trackingToken: string
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::upload
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:323
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:362
 * @route '/orders/{trackingToken}/receipt'
 */
 const uploadForm = (args: { trackingToken: string | number } | [trackingToken: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -63,7 +63,7 @@ const uploadForm = (args: { trackingToken: string | number } | [trackingToken: s
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::upload
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:323
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:362
 * @route '/orders/{trackingToken}/receipt'
 */
 uploadForm.post = (args: { trackingToken: string | number } | [trackingToken: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({

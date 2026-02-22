@@ -82,7 +82,7 @@ index.form = indexForm
 
 /**
 * @see \Modules\Customers\Http\Controllers\Staff\CustomerController::sendSms
-* @see Modules/Customers/app/Http/Controllers/Staff/CustomerController.php:193
+* @see Modules/Customers/app/Http/Controllers/Staff/CustomerController.php:201
 * @route '/staff/customers/sms'
 */
 export const sendSms = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -97,7 +97,7 @@ sendSms.definition = {
 
 /**
 * @see \Modules\Customers\Http\Controllers\Staff\CustomerController::sendSms
-* @see Modules/Customers/app/Http/Controllers/Staff/CustomerController.php:193
+* @see Modules/Customers/app/Http/Controllers/Staff/CustomerController.php:201
 * @route '/staff/customers/sms'
 */
 sendSms.url = (options?: RouteQueryOptions) => {
@@ -106,7 +106,7 @@ sendSms.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \Modules\Customers\Http\Controllers\Staff\CustomerController::sendSms
-* @see Modules/Customers/app/Http/Controllers/Staff/CustomerController.php:193
+* @see Modules/Customers/app/Http/Controllers/Staff/CustomerController.php:201
 * @route '/staff/customers/sms'
 */
 sendSms.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -116,7 +116,7 @@ sendSms.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \Modules\Customers\Http\Controllers\Staff\CustomerController::sendSms
-* @see Modules/Customers/app/Http/Controllers/Staff/CustomerController.php:193
+* @see Modules/Customers/app/Http/Controllers/Staff/CustomerController.php:201
 * @route '/staff/customers/sms'
 */
 const sendSmsForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -126,7 +126,7 @@ const sendSmsForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> =
 
 /**
 * @see \Modules\Customers\Http\Controllers\Staff\CustomerController::sendSms
-* @see Modules/Customers/app/Http/Controllers/Staff/CustomerController.php:193
+* @see Modules/Customers/app/Http/Controllers/Staff/CustomerController.php:201
 * @route '/staff/customers/sms'
 */
 sendSmsForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
