@@ -465,5 +465,6 @@ test('telegram miniapp identity endpoint auto-fills existing customer by telegra
             ],
         ]);
 
+    expect($customer->fresh()?->name)->toBe('MiniApp Existing Customer');
     expect($customer->fresh()?->tokens()->where('token', $expectedToken)->exists())->toBeTrue();
 });

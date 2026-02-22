@@ -47,6 +47,7 @@ class MiniAppIdentityController extends Controller
         $customerToken = $this->telegramToken((string) $identityPayload['telegram_id']);
         $customer = $customerIdentityService->resolveCustomer($customerToken, [
             'name' => $identityPayload['display_name'],
+            'allow_name_overwrite' => false,
             'telegram_id' => $identityPayload['telegram_id'],
             'telegram_username' => $identityPayload['telegram_username'],
             'source_channel' => Order::SOURCE_TELEGRAM,

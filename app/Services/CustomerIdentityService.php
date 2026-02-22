@@ -62,6 +62,9 @@ class CustomerIdentityService
         $token = $this->sanitizeToken($clientToken) ?? CustomerToken::generateToken();
         $name = $this->normalizeString($attributes['name'] ?? null);
         $phone = $this->normalizeString($attributes['phone'] ?? null);
+        $allowNameOverwrite = array_key_exists('allow_name_overwrite', $attributes)
+            ? (bool) $attributes['allow_name_overwrite']
+            : true;
         $telegramId = $this->normalizeTelegramId($attributes['telegram_id'] ?? null);
         $telegramUsername = $this->normalizeString($attributes['telegram_username'] ?? null);
         $lastSeenChannel = $this->normalizeString($attributes['source_channel'] ?? null);
@@ -73,6 +76,7 @@ class CustomerIdentityService
             $token,
             $name,
             $phone,
+            $allowNameOverwrite,
             $telegramId,
             $telegramUsername,
             $lastSeenChannel,
@@ -108,7 +112,7 @@ class CustomerIdentityService
                 $this->mergeCustomerInto($match, $customer);
             }
 
-            if ($name !== null && $this->shouldUpdateName($customer->name, $name)) {
+            if ($name !== null && $this->shouldUpdateName($customer->name, $name, $allowNameOverwrite)) {
                 $customer->name = $name;
             }
 
@@ -312,9 +316,17 @@ class CustomerIdentityService
         return $telegramId > 0 ? $telegramId : null;
     }
 
-    protected function shouldUpdateName(?string $current, string $incoming): bool
+    protected function shouldUpdateName(?string $current, string $incoming, bool $allowOverwrite = true): bool
     {
-        return $this->isPlaceholderName($current) || ! $this->isPlaceholderName($incoming);
+        if ($this->isPlaceholderName($current)) {
+            return true;
+        }
+
+        if (! $allowOverwrite) {
+            return false;
+        }
+
+        return ! $this->isPlaceholderName($incoming);
     }
 
     protected function isPlaceholderName(?string $value): bool
