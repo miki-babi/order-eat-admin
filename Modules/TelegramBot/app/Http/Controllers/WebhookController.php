@@ -128,7 +128,9 @@ class WebhookController extends Controller
             );
 
             if ($reply !== null) {
-                $telegramBotApiService->sendMessage($chatId, $reply['text'], array_merge([
+                $replyChatId = $this->replyTargetChatId($incomingMessage, $chatId, $telegramUserId);
+
+                $telegramBotApiService->sendMessage($replyChatId, $reply['text'], array_merge([
                     'disable_web_page_preview' => true,
                 ], $reply['options']), [
                     'source' => 'telegram.webhook.command_reply',
@@ -480,6 +482,15 @@ class WebhookController extends Controller
     protected function matchesCommand(string $message, string $command): bool
     {
         return preg_match('/^\/'.preg_quote($command, '/').'(?:@[\w_]+)?(?:\s|$)/i', $message) === 1;
+    }
+
+    protected function replyTargetChatId(string $message, int|string $chatId, int $telegramUserId): int|string
+    {
+        if ($this->matchesCommand($message, 'start')) {
+            return $telegramUserId;
+        }
+
+        return $chatId;
     }
 
     protected function startReply(): string

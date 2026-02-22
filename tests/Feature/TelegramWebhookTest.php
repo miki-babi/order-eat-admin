@@ -271,7 +271,7 @@ test('telegram webhook creates telegram customer and sends start response', func
 
         return is_array($data)
             && str_contains($request->url(), '/sendMessage')
-            && (string) ($data['chat_id'] ?? '') === '99887766'
+            && (string) ($data['chat_id'] ?? '') === '11223344'
             && str_contains((string) ($data['text'] ?? ''), 'Please share your phone number')
             && is_array($decodedMarkup)
             && data_get($decodedMarkup, 'keyboard.0.0.request_contact') === true;
@@ -392,7 +392,7 @@ test('telegram webhook sends inline miniapp launch when customer already has a p
 
         return is_array($data)
             && str_contains($request->url(), '/sendMessage')
-            && (string) ($data['chat_id'] ?? '') === '99887767'
+            && (string) ($data['chat_id'] ?? '') === '55667788'
             && str_contains((string) ($data['text'] ?? ''), 'Welcome')
             && is_array($decodedMarkup)
             && data_get($decodedMarkup, 'inline_keyboard.0.0.text') === 'Order'
@@ -554,7 +554,7 @@ test('telegram webhook uses admin miniapp button settings', function () {
 
         return is_array($data)
             && str_contains($request->url(), '/sendMessage')
-            && (string) ($data['chat_id'] ?? '') === '44001122'
+            && (string) ($data['chat_id'] ?? '') === '12345123'
             && is_array($decodedMarkup)
             && data_get($decodedMarkup, 'inline_keyboard.0.0.text') === 'Order Drinks'
             && data_get($decodedMarkup, 'inline_keyboard.0.0.web_app.url') === 'https://miniapp.example.test/launch';
@@ -621,7 +621,7 @@ test('telegram webhook rewrites same-origin miniapp launch url to dedicated tele
 
         return is_array($data)
             && str_contains($request->url(), '/sendMessage')
-            && (string) ($data['chat_id'] ?? '') === '44001123'
+            && (string) ($data['chat_id'] ?? '') === '88991234'
             && is_array($decodedMarkup)
             && data_get($decodedMarkup, 'inline_keyboard.0.0.text') === 'Order'
             && data_get($decodedMarkup, 'inline_keyboard.0.0.web_app.url') === 'https://example.test/telegram/menu';
