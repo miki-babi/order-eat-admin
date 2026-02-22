@@ -124,6 +124,8 @@ class CustomerIdentityService
 
             if ($telegramId !== null) {
                 $customer->telegram_id = $telegramId;
+            } elseif ($customer->telegram_id !== null && $this->normalizeTelegramId($customer->telegram_id) === null) {
+                $customer->telegram_id = null;
             }
 
             if ($telegramUsername !== null) {
@@ -209,8 +211,11 @@ class CustomerIdentityService
                 'updated_at' => now(),
             ]);
 
-        if (($target->telegram_id === null || $target->telegram_id === 0) && $source->telegram_id) {
-            $target->telegram_id = $source->telegram_id;
+        $targetTelegramId = $this->normalizeTelegramId($target->telegram_id);
+        $sourceTelegramId = $this->normalizeTelegramId($source->telegram_id);
+
+        if ($targetTelegramId === null && $sourceTelegramId !== null) {
+            $target->telegram_id = $sourceTelegramId;
         }
 
         if (

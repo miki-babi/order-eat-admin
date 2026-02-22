@@ -306,11 +306,11 @@ class CustomerController extends Controller
             return null;
         }
 
-        if (preg_match('/^-?\d+$/', $normalized) !== 1) {
+        if (preg_match('/^\d+$/', $normalized) !== 1) {
             return null;
         }
 
-        return in_array($normalized, ['0', '-0'], true) ? null : $normalized;
+        return $normalized === '0' ? null : $normalized;
     }
 
     /**

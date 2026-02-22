@@ -150,7 +150,7 @@ test('customers telegram outreach sends inline link button payload', function ()
     });
 });
 
-test('customers telegram outreach supports signed telegram chat ids', function () {
+test('customers telegram outreach skips negative telegram ids and requires user ids', function () {
     $staff = User::factory()->create([
         'role' => 'staff',
     ]);
@@ -191,18 +191,10 @@ test('customers telegram outreach supports signed telegram chat ids', function (
             'platform' => 'telegram',
             'message' => 'Hi {name}, signed chat id test.',
         ])
-        ->assertRedirect();
+        ->assertRedirect()
+        ->assertSessionHas('success', 'Telegram completed. Sent: 0, Failed: 1.');
 
-    Http::assertSent(function (HttpRequest $request): bool {
-        if (! str_contains($request->url(), '/sendMessage')) {
-            return false;
-        }
-
-        $payload = $request->data();
-
-        return ($payload['chat_id'] ?? null) === '-1857773598'
-            && ($payload['text'] ?? null) === 'Hi Signed Chat Customer, signed chat id test.';
-    });
+    Http::assertNothingSent();
 });
 
 test('customers telegram outreach skips username-only records without telegram id', function () {

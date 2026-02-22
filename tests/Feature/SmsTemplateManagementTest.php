@@ -109,7 +109,7 @@ test('staff can send telegram promo campaign and save template from wizard actio
     });
 });
 
-test('staff can send telegram promo campaign to signed telegram chat id', function () {
+test('staff telegram promo campaign skips negative telegram ids and requires user ids', function () {
     $staff = User::factory()->create([
         'role' => 'staff',
     ]);
@@ -147,18 +147,10 @@ test('staff can send telegram promo campaign to signed telegram chat id', functi
             'platform' => 'telegram',
             'message' => 'Hello {name}, signed promo test.',
         ])
-        ->assertRedirect();
+        ->assertRedirect()
+        ->assertSessionHas('success', 'Telegram promo sent. Sent: 0, Failed: 1, Audience: 1.');
 
-    Http::assertSent(function (HttpRequest $request): bool {
-        if (! str_contains($request->url(), '/sendMessage')) {
-            return false;
-        }
-
-        $payload = $request->data();
-
-        return ($payload['chat_id'] ?? null) === '-1857773598'
-            && ($payload['text'] ?? null) === 'Hello Signed Promo Target, signed promo test.';
-    });
+    Http::assertNothingSent();
 });
 
 test('staff telegram promo campaign skips username-only telegram audience records', function () {
