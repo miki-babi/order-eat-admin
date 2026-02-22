@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../wayfinder'
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::store
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:623
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:618
 * @route '/staff/sms-phone-lists'
 */
 export const store = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -16,7 +16,7 @@ store.definition = {
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::store
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:623
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:618
 * @route '/staff/sms-phone-lists'
 */
 store.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ store.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::store
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:623
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:618
 * @route '/staff/sms-phone-lists'
 */
 store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -35,7 +35,7 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::store
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:623
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:618
 * @route '/staff/sms-phone-lists'
 */
 const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -45,7 +45,7 @@ const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => 
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::store
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:623
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:618
 * @route '/staff/sms-phone-lists'
 */
 storeForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -57,7 +57,7 @@ store.form = storeForm
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::destroy
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:651
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:646
 * @route '/staff/sms-phone-lists/{smsPhoneList}'
 */
 export const destroy = (args: { smsPhoneList: number | { id: number } } | [smsPhoneList: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -72,7 +72,7 @@ destroy.definition = {
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::destroy
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:651
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:646
 * @route '/staff/sms-phone-lists/{smsPhoneList}'
 */
 destroy.url = (args: { smsPhoneList: number | { id: number } } | [smsPhoneList: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -105,7 +105,7 @@ destroy.url = (args: { smsPhoneList: number | { id: number } } | [smsPhoneList: 
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::destroy
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:651
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:646
 * @route '/staff/sms-phone-lists/{smsPhoneList}'
 */
 destroy.delete = (args: { smsPhoneList: number | { id: number } } | [smsPhoneList: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -115,7 +115,7 @@ destroy.delete = (args: { smsPhoneList: number | { id: number } } | [smsPhoneLis
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::destroy
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:651
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:646
 * @route '/staff/sms-phone-lists/{smsPhoneList}'
 */
 const destroyForm = (args: { smsPhoneList: number | { id: number } } | [smsPhoneList: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -130,7 +130,7 @@ const destroyForm = (args: { smsPhoneList: number | { id: number } } | [smsPhone
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::destroy
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:651
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:646
 * @route '/staff/sms-phone-lists/{smsPhoneList}'
 */
 destroyForm.delete = (args: { smsPhoneList: number | { id: number } } | [smsPhoneList: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({

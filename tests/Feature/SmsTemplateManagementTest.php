@@ -109,6 +109,58 @@ test('staff can send telegram promo campaign and save template from wizard actio
     });
 });
 
+test('staff can send telegram promo campaign to signed telegram chat id', function () {
+    $staff = User::factory()->create([
+        'role' => 'staff',
+    ]);
+
+    $branch = \App\Models\PickupLocation::query()->create([
+        'name' => 'Signed Promo Branch',
+        'address' => 'Addis Ababa',
+        'is_active' => true,
+    ]);
+
+    $staff->pickupLocations()->sync([$branch->id]);
+
+    $customer = Customer::query()->create([
+        'name' => 'Signed Promo Target',
+        'phone' => '251911330021',
+        'telegram_id' => '-1857773598',
+    ]);
+
+    $customer->orders()->create([
+        'pickup_date' => now()->toDateString(),
+        'pickup_location_id' => $branch->id,
+        'tracking_token' => Str::random(40),
+        'total_amount' => 250,
+    ]);
+
+    Http::fake([
+        'https://api.telegram.org/*/sendMessage' => Http::response([
+            'ok' => true,
+            'result' => ['message_id' => 2],
+        ], 200),
+    ]);
+
+    $this->actingAs($staff)
+        ->post(route('staff.sms-campaigns.send'), [
+            'platform' => 'telegram',
+            'message' => 'Hello {name}, signed promo test.',
+        ])
+        ->assertRedirect();
+
+    Http::assertSent(function (HttpRequest $request): bool {
+        if (! str_contains($request->url(), '/sendMessage')) {
+            return false;
+        }
+
+        $payload = $request->data();
+
+        return ($payload['chat_id'] ?? null) === '-1857773598'
+            && ($payload['text'] ?? null) === 'Hello Signed Promo Target, signed promo test.';
+    });
+});
+
 test('staff telegram promo campaign skips username-only telegram audience records', function () {
     $staff = User::factory()->create([
         'role' => 'staff',

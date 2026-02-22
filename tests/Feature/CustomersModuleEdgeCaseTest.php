@@ -150,6 +150,61 @@ test('customers telegram outreach sends inline link button payload', function ()
     });
 });
 
+test('customers telegram outreach supports signed telegram chat ids', function () {
+    $staff = User::factory()->create([
+        'role' => 'staff',
+    ]);
+
+    $branch = PickupLocation::query()->create([
+        'name' => 'Signed Chat Branch',
+        'address' => 'Addis Ababa',
+        'is_active' => true,
+    ]);
+
+    $staff->pickupLocations()->sync([$branch->id]);
+
+    $telegramCustomer = Customer::query()->create([
+        'name' => 'Signed Chat Customer',
+        'phone' => '251922220010',
+        'telegram_id' => '-1857773598',
+    ]);
+
+    $telegramCustomer->orders()->create([
+        'pickup_date' => now()->toDateString(),
+        'pickup_location_id' => $branch->id,
+        'tracking_token' => Str::random(40),
+        'total_amount' => 320,
+    ]);
+
+    Http::fake([
+        'https://api.telegram.org/*/sendMessage' => Http::response([
+            'ok' => true,
+            'result' => [
+                'message_id' => 111,
+            ],
+        ], 200),
+    ]);
+
+    $this->actingAs($staff)
+        ->post(route('staff.customers.sms'), [
+            'customer_ids' => [$telegramCustomer->id],
+            'platform' => 'telegram',
+            'message' => 'Hi {name}, signed chat id test.',
+        ])
+        ->assertRedirect();
+
+    Http::assertSent(function (HttpRequest $request): bool {
+        if (! str_contains($request->url(), '/sendMessage')) {
+            return false;
+        }
+
+        $payload = $request->data();
+
+        return ($payload['chat_id'] ?? null) === '-1857773598'
+            && ($payload['text'] ?? null) === 'Hi Signed Chat Customer, signed chat id test.';
+    });
+});
+
 test('customers telegram outreach skips username-only records without telegram id', function () {
     $staff = User::factory()->create([
         'role' => 'staff',

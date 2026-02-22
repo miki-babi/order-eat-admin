@@ -288,34 +288,29 @@ class CustomerController extends Controller
         return back()->with('success', "{$channelLabel} completed. Sent: {$sent}, Failed: {$failed}.");
     }
 
-    protected function telegramChatTarget(Customer $customer): ?int
+    protected function telegramChatTarget(Customer $customer): ?string
     {
         return $this->normalizeTelegramId($customer->telegram_id);
     }
 
-    protected function normalizeTelegramId(mixed $value): ?int
+    protected function normalizeTelegramId(mixed $value): ?string
     {
-        if (is_int($value) && $value > 0) {
-            return $value;
+        $normalized = match (true) {
+            is_int($value) => (string) $value,
+            is_string($value) => trim($value),
+            is_numeric($value) => trim((string) $value),
+            default => '',
+        };
+
+        if ($normalized === '') {
+            return null;
         }
 
-        if (is_string($value)) {
-            $trimmed = trim($value);
-
-            if ($trimmed !== '' && ctype_digit($trimmed)) {
-                $parsed = (int) $trimmed;
-
-                return $parsed > 0 ? $parsed : null;
-            }
+        if (preg_match('/^-?\d+$/', $normalized) !== 1) {
+            return null;
         }
 
-        if (is_numeric($value)) {
-            $parsed = (int) $value;
-
-            return $parsed > 0 ? $parsed : null;
-        }
-
-        return null;
+        return in_array($normalized, ['0', '-0'], true) ? null : $normalized;
     }
 
     /**
