@@ -260,13 +260,13 @@ class WebhookController extends Controller
         if ($launchPayload !== null) {
             return [
                 'text' => "Tap the button below to order.\nOr use this link: {$launchPayload['url']}",
-                'style' => 'primary',
                 'options' => [
                     'reply_markup' => [
                         'inline_keyboard' => [
                             [
                                 [
                                     'text' => $launchPayload['button_text'],
+                                    'style' => 'primary',
                                     'web_app' => [
                                         'url' => $launchPayload['url'],
                                     ],
@@ -640,6 +640,7 @@ class WebhookController extends Controller
                 [
                     [
                         'text' => 'Share Contact',
+                        'style' => 'primary',
                         'request_contact' => true,
                     ],
                 ],
