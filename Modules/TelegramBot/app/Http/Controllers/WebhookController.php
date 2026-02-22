@@ -266,7 +266,7 @@ class WebhookController extends Controller
                             [
                                 [
                                     'text' => $launchPayload['button_text'],
-                                    'style' => "blue",
+                                    'style' => "primary",
                                     'web_app' => [
                                         'url' => $launchPayload['url'],
                                     ],
