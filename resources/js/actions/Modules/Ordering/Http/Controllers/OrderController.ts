@@ -162,8 +162,89 @@ telegramMenuForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'
 telegramMenu.form = telegramMenuForm
 
 /**
+* @see \Modules\Ordering\Http\Controllers\OrderController::telegramOrders
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:56
+* @route '/telegram/orders'
+*/
+export const telegramOrders = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: telegramOrders.url(options),
+    method: 'get',
+})
+
+telegramOrders.definition = {
+    methods: ["get","head"],
+    url: '/telegram/orders',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \Modules\Ordering\Http\Controllers\OrderController::telegramOrders
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:56
+* @route '/telegram/orders'
+*/
+telegramOrders.url = (options?: RouteQueryOptions) => {
+    return telegramOrders.definition.url + queryParams(options)
+}
+
+/**
+* @see \Modules\Ordering\Http\Controllers\OrderController::telegramOrders
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:56
+* @route '/telegram/orders'
+*/
+telegramOrders.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: telegramOrders.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Modules\Ordering\Http\Controllers\OrderController::telegramOrders
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:56
+* @route '/telegram/orders'
+*/
+telegramOrders.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: telegramOrders.url(options),
+    method: 'head',
+})
+
+/**
+* @see \Modules\Ordering\Http\Controllers\OrderController::telegramOrders
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:56
+* @route '/telegram/orders'
+*/
+const telegramOrdersForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: telegramOrders.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Modules\Ordering\Http\Controllers\OrderController::telegramOrders
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:56
+* @route '/telegram/orders'
+*/
+telegramOrdersForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: telegramOrders.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Modules\Ordering\Http\Controllers\OrderController::telegramOrders
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:56
+* @route '/telegram/orders'
+*/
+telegramOrdersForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: telegramOrders.url({
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'HEAD',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'get',
+})
+
+telegramOrders.form = telegramOrdersForm
+
+/**
 * @see \Modules\Ordering\Http\Controllers\OrderController::store
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:126
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:139
 * @route '/orders'
 */
 export const store = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -178,7 +259,7 @@ store.definition = {
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::store
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:126
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:139
 * @route '/orders'
 */
 store.url = (options?: RouteQueryOptions) => {
@@ -187,7 +268,7 @@ store.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::store
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:126
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:139
 * @route '/orders'
 */
 store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -197,7 +278,7 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::store
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:126
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:139
 * @route '/orders'
 */
 const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -207,7 +288,7 @@ const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => 
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::store
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:126
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:139
 * @route '/orders'
 */
 storeForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -219,7 +300,7 @@ store.form = storeForm
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::confirmation
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:286
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:299
 * @route '/orders/{trackingToken}/confirmation'
 */
 export const confirmation = (args: { trackingToken: string | number } | [trackingToken: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -234,7 +315,7 @@ confirmation.definition = {
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::confirmation
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:286
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:299
 * @route '/orders/{trackingToken}/confirmation'
 */
 confirmation.url = (args: { trackingToken: string | number } | [trackingToken: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -261,7 +342,7 @@ confirmation.url = (args: { trackingToken: string | number } | [trackingToken: s
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::confirmation
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:286
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:299
 * @route '/orders/{trackingToken}/confirmation'
 */
 confirmation.get = (args: { trackingToken: string | number } | [trackingToken: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -271,7 +352,7 @@ confirmation.get = (args: { trackingToken: string | number } | [trackingToken: s
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::confirmation
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:286
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:299
 * @route '/orders/{trackingToken}/confirmation'
 */
 confirmation.head = (args: { trackingToken: string | number } | [trackingToken: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -281,7 +362,7 @@ confirmation.head = (args: { trackingToken: string | number } | [trackingToken: 
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::confirmation
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:286
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:299
 * @route '/orders/{trackingToken}/confirmation'
 */
 const confirmationForm = (args: { trackingToken: string | number } | [trackingToken: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -291,7 +372,7 @@ const confirmationForm = (args: { trackingToken: string | number } | [trackingTo
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::confirmation
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:286
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:299
 * @route '/orders/{trackingToken}/confirmation'
 */
 confirmationForm.get = (args: { trackingToken: string | number } | [trackingToken: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -301,7 +382,7 @@ confirmationForm.get = (args: { trackingToken: string | number } | [trackingToke
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::confirmation
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:286
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:299
 * @route '/orders/{trackingToken}/confirmation'
 */
 confirmationForm.head = (args: { trackingToken: string | number } | [trackingToken: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -318,7 +399,7 @@ confirmation.form = confirmationForm
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::track
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:298
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:311
 * @route '/orders/{trackingToken}/track'
 */
 export const track = (args: { trackingToken: string | number } | [trackingToken: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -333,7 +414,7 @@ track.definition = {
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::track
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:298
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:311
 * @route '/orders/{trackingToken}/track'
 */
 track.url = (args: { trackingToken: string | number } | [trackingToken: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -360,7 +441,7 @@ track.url = (args: { trackingToken: string | number } | [trackingToken: string |
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::track
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:298
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:311
 * @route '/orders/{trackingToken}/track'
 */
 track.get = (args: { trackingToken: string | number } | [trackingToken: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -370,7 +451,7 @@ track.get = (args: { trackingToken: string | number } | [trackingToken: string |
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::track
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:298
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:311
 * @route '/orders/{trackingToken}/track'
 */
 track.head = (args: { trackingToken: string | number } | [trackingToken: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -380,7 +461,7 @@ track.head = (args: { trackingToken: string | number } | [trackingToken: string 
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::track
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:298
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:311
 * @route '/orders/{trackingToken}/track'
 */
 const trackForm = (args: { trackingToken: string | number } | [trackingToken: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -390,7 +471,7 @@ const trackForm = (args: { trackingToken: string | number } | [trackingToken: st
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::track
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:298
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:311
 * @route '/orders/{trackingToken}/track'
 */
 trackForm.get = (args: { trackingToken: string | number } | [trackingToken: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -400,7 +481,7 @@ trackForm.get = (args: { trackingToken: string | number } | [trackingToken: stri
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::track
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:298
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:311
 * @route '/orders/{trackingToken}/track'
 */
 trackForm.head = (args: { trackingToken: string | number } | [trackingToken: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -417,7 +498,7 @@ track.form = trackForm
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::uploadReceipt
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:310
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:323
 * @route '/orders/{trackingToken}/receipt'
 */
 export const uploadReceipt = (args: { trackingToken: string | number } | [trackingToken: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -432,7 +513,7 @@ uploadReceipt.definition = {
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::uploadReceipt
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:310
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:323
 * @route '/orders/{trackingToken}/receipt'
 */
 uploadReceipt.url = (args: { trackingToken: string | number } | [trackingToken: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -459,7 +540,7 @@ uploadReceipt.url = (args: { trackingToken: string | number } | [trackingToken: 
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::uploadReceipt
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:310
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:323
 * @route '/orders/{trackingToken}/receipt'
 */
 uploadReceipt.post = (args: { trackingToken: string | number } | [trackingToken: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -469,7 +550,7 @@ uploadReceipt.post = (args: { trackingToken: string | number } | [trackingToken:
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::uploadReceipt
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:310
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:323
 * @route '/orders/{trackingToken}/receipt'
 */
 const uploadReceiptForm = (args: { trackingToken: string | number } | [trackingToken: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -479,7 +560,7 @@ const uploadReceiptForm = (args: { trackingToken: string | number } | [trackingT
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::uploadReceipt
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:310
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:323
 * @route '/orders/{trackingToken}/receipt'
 */
 uploadReceiptForm.post = (args: { trackingToken: string | number } | [trackingToken: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -489,6 +570,6 @@ uploadReceiptForm.post = (args: { trackingToken: string | number } | [trackingTo
 
 uploadReceipt.form = uploadReceiptForm
 
-const OrderController = { index, telegramMenu, store, confirmation, track, uploadReceipt }
+const OrderController = { index, telegramMenu, telegramOrders, store, confirmation, track, uploadReceipt }
 
 export default OrderController

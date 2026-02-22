@@ -55,8 +55,65 @@ identityForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> =
 
 identity.form = identityForm
 
+/**
+* @see \Modules\TelegramBot\Http\Controllers\MiniAppOrdersController::__invoke
+* @see Modules/TelegramBot/app/Http/Controllers/MiniAppOrdersController.php:17
+* @route '/api/telegram/miniapp/orders'
+*/
+export const orders = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+    url: orders.url(options),
+    method: 'post',
+})
+
+orders.definition = {
+    methods: ["post"],
+    url: '/api/telegram/miniapp/orders',
+} satisfies RouteDefinition<["post"]>
+
+/**
+* @see \Modules\TelegramBot\Http\Controllers\MiniAppOrdersController::__invoke
+* @see Modules/TelegramBot/app/Http/Controllers/MiniAppOrdersController.php:17
+* @route '/api/telegram/miniapp/orders'
+*/
+orders.url = (options?: RouteQueryOptions) => {
+    return orders.definition.url + queryParams(options)
+}
+
+/**
+* @see \Modules\TelegramBot\Http\Controllers\MiniAppOrdersController::__invoke
+* @see Modules/TelegramBot/app/Http/Controllers/MiniAppOrdersController.php:17
+* @route '/api/telegram/miniapp/orders'
+*/
+orders.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+    url: orders.url(options),
+    method: 'post',
+})
+
+/**
+* @see \Modules\TelegramBot\Http\Controllers\MiniAppOrdersController::__invoke
+* @see Modules/TelegramBot/app/Http/Controllers/MiniAppOrdersController.php:17
+* @route '/api/telegram/miniapp/orders'
+*/
+const ordersForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: orders.url(options),
+    method: 'post',
+})
+
+/**
+* @see \Modules\TelegramBot\Http\Controllers\MiniAppOrdersController::__invoke
+* @see Modules/TelegramBot/app/Http/Controllers/MiniAppOrdersController.php:17
+* @route '/api/telegram/miniapp/orders'
+*/
+ordersForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: orders.url(options),
+    method: 'post',
+})
+
+orders.form = ordersForm
+
 const miniapp = {
     identity: Object.assign(identity, identity),
+    orders: Object.assign(orders, orders),
 }
 
 export default miniapp

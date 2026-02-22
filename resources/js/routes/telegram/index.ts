@@ -80,8 +80,90 @@ menuForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 
 menu.form = menuForm
 
+/**
+* @see \Modules\Ordering\Http\Controllers\OrderController::orders
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:56
+* @route '/telegram/orders'
+*/
+export const orders = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: orders.url(options),
+    method: 'get',
+})
+
+orders.definition = {
+    methods: ["get","head"],
+    url: '/telegram/orders',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \Modules\Ordering\Http\Controllers\OrderController::orders
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:56
+* @route '/telegram/orders'
+*/
+orders.url = (options?: RouteQueryOptions) => {
+    return orders.definition.url + queryParams(options)
+}
+
+/**
+* @see \Modules\Ordering\Http\Controllers\OrderController::orders
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:56
+* @route '/telegram/orders'
+*/
+orders.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: orders.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Modules\Ordering\Http\Controllers\OrderController::orders
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:56
+* @route '/telegram/orders'
+*/
+orders.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: orders.url(options),
+    method: 'head',
+})
+
+/**
+* @see \Modules\Ordering\Http\Controllers\OrderController::orders
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:56
+* @route '/telegram/orders'
+*/
+const ordersForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: orders.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Modules\Ordering\Http\Controllers\OrderController::orders
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:56
+* @route '/telegram/orders'
+*/
+ordersForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: orders.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Modules\Ordering\Http\Controllers\OrderController::orders
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:56
+* @route '/telegram/orders'
+*/
+ordersForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: orders.url({
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'HEAD',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'get',
+})
+
+orders.form = ordersForm
+
 const telegram = {
     menu: Object.assign(menu, menu),
+    orders: Object.assign(orders, orders),
 }
 
 export default telegram
