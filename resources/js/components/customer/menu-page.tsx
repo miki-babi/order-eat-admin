@@ -743,7 +743,7 @@ export default function CustomerMenuPage({
                             setStep(2);
                             window.scrollTo({ top: 0, behavior: 'smooth' });
                         }}
-                        className="fixed bottom-24 right-6 z-[60] flex h-16 w-16 items-center justify-center rounded-full bg-[#212121] text-white shadow-[0_20px_50px_rgba(0,0,0,0.3)] ring-4 ring-white transition-all cursor-pointer hover:scale-110 active:scale-95 md:bottom-12 md:right-12"
+                        className={`fixed bottom-24 right-6 z-[60] flex h-16 w-16 items-center justify-center rounded-full bg-[#212121] text-white shadow-[0_20px_50px_rgba(0,0,0,0.3)] ring-4 ring-white transition-all duration-300 cursor-pointer hover:scale-110 active:scale-95 md:bottom-12 md:right-12 md:translate-y-0 md:opacity-100 md:pointer-events-auto ${hideBottomActions ? 'translate-y-[140%] opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}`}
                     >
                         <div className="relative">
                             <ShoppingCart className="size-7" />
