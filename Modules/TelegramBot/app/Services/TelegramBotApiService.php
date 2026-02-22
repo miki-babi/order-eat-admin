@@ -23,12 +23,18 @@ class TelegramBotApiService
         }
 
         try {
+            $payload = array_merge([
+                'chat_id' => (string) $chatId,
+                'text' => $text,
+            ], $options);
+
+            if (isset($payload['reply_markup']) && is_array($payload['reply_markup'])) {
+                $payload['reply_markup'] = json_encode($payload['reply_markup'], JSON_THROW_ON_ERROR);
+            }
+
             $response = Http::asForm()
                 ->timeout($this->timeoutSeconds())
-                ->post("https://api.telegram.org/bot{$token}/sendMessage", array_merge([
-                    'chat_id' => (string) $chatId,
-                    'text' => $text,
-                ], $options));
+                ->post("https://api.telegram.org/bot{$token}/sendMessage", $payload);
 
             if ($response->failed()) {
                 Log::warning('telegram.webhook.send_message_failed', [

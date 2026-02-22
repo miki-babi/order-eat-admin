@@ -295,5 +295,13 @@ return [
             'enabled' => true,
             'help_url' => null,
         ],
+        'telegram_bot_miniapp_launch' => [
+            'group' => 'integrations',
+            'name' => 'Telegram Miniapp Launch Button',
+            'description' => 'Inline button settings for launching the Telegram miniapp. Lock message = button label, help URL = custom miniapp URL.',
+            'enabled' => true,
+            'lock_message' => 'Order',
+            'help_url' => null,
+        ],
     ],
 ];

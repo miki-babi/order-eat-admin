@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { BarChart3, ClipboardList, Coffee, ConciergeBell, ExternalLink, KeyRound, MapPin, MessageSquareText, MonitorSmartphone, QrCode, Shield, Store, Users, UtensilsCrossed, Wallet } from 'lucide-react';
+import { BarChart3, ClipboardList, Coffee, ConciergeBell, KeyRound, MapPin, MessageSquareText, MonitorSmartphone, QrCode, Shield, Store, Users, UtensilsCrossed, Wallet } from 'lucide-react';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -20,11 +20,7 @@ const footerNavItems: NavItem[] = [
         href: '/',
         icon: Store,
     },
-    {
-        title: 'System Welcome',
-        href: '/welcome',
-        icon: ExternalLink,
-    },
+    
 ];
 
 export function AppSidebar() {

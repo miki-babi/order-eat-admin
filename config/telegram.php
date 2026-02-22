@@ -35,6 +35,28 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Miniapp URL Override
+    |--------------------------------------------------------------------------
+    |
+    | Optional absolute URL for Telegram WebApp button launch. When omitted,
+    | the app falls back to APP_URL with ?channel=telegram.
+    |
+    */
+    'miniapp_url' => env('TELEGRAM_MINIAPP_URL'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Miniapp Button Text
+    |--------------------------------------------------------------------------
+    |
+    | Default button text for Telegram inline WebApp launch buttons.
+    | System admin can override this from feature settings.
+    |
+    */
+    'miniapp_button_text' => env('TELEGRAM_MINIAPP_BUTTON_TEXT', 'Order'),
+
+    /*
+    |--------------------------------------------------------------------------
     | HTTP Timeout
     |--------------------------------------------------------------------------
     |
