@@ -313,7 +313,14 @@ class SmsTemplateController extends Controller
                     ];
                 }
 
-                $telegramBotApiService->sendMessage($chatTarget, $renderedMessage, $options);
+                $telegramBotApiService->sendMessage($chatTarget, $renderedMessage, $options, [
+                    'source' => 'staff.sms_campaign',
+                    'customer_id' => $customer->id,
+                    'customer_name' => $customer->name,
+                    'customer_telegram_id' => is_scalar($customer->telegram_id)
+                        ? (string) $customer->telegram_id
+                        : null,
+                ]);
                 $sent++;
                 continue;
             }

@@ -90,7 +90,10 @@ class WebhookController extends Controller
                 $customerIdentityService,
             );
 
-            $telegramBotApiService->sendMessage($chatId, $reply['text'], $reply['options']);
+            $telegramBotApiService->sendMessage($chatId, $reply['text'], $reply['options'], [
+                'source' => 'telegram.webhook.contact_reply',
+                'telegram_user_id' => $telegramUserId,
+            ]);
 
             if ($reply['contact_saved']) {
                 $this->sendMiniAppLaunchMessage(
@@ -122,7 +125,10 @@ class WebhookController extends Controller
             if ($reply !== null) {
                 $telegramBotApiService->sendMessage($chatId, $reply['text'], array_merge([
                     'disable_web_page_preview' => true,
-                ], $reply['options']));
+                ], $reply['options']), [
+                    'source' => 'telegram.webhook.command_reply',
+                    'telegram_user_id' => $telegramUserId,
+                ]);
             }
         }
 
@@ -699,7 +705,9 @@ class WebhookController extends Controller
 
         $telegramBotApiService->sendMessage($chatId, $menuReply['text'], array_merge([
             'disable_web_page_preview' => true,
-        ], $menuReply['options']));
+        ], $menuReply['options']), [
+            'source' => 'telegram.webhook.miniapp_launch',
+        ]);
     }
 
     /**

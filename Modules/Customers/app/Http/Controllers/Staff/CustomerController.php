@@ -261,7 +261,14 @@ class CustomerController extends Controller
                     ];
                 }
 
-                $telegramBotApiService->sendMessage($chatTarget, $message, $options);
+                $telegramBotApiService->sendMessage($chatTarget, $message, $options, [
+                    'source' => 'staff.customers_outreach',
+                    'customer_id' => $customer->id,
+                    'customer_name' => $customer->name,
+                    'customer_telegram_id' => is_scalar($customer->telegram_id)
+                        ? (string) $customer->telegram_id
+                        : null,
+                ]);
                 $sent++;
                 continue;
             }

@@ -12,10 +12,17 @@ class TelegramBotApiService
      * Send a plain-text message to a Telegram chat.
      *
      * @param  array<string, mixed>  $options
+     * @param  array<string, mixed>  $context
      */
-    public function sendMessage(int|string $chatId, string $text, array $options = []): void
+    public function sendMessage(
+        int|string $chatId,
+        string $text,
+        array $options = [],
+        array $context = [],
+    ): void
     {
         $token = $this->botToken();
+        $logContext = $this->buildLogContext($chatId, $context);
 
         if (! $token) {
             Log::warning('telegram.webhook.bot_token_missing');
@@ -28,11 +35,17 @@ class TelegramBotApiService
             $response = $this->postMessage($token, $payload);
 
             if ($this->isFailedTelegramResponse($response)) {
-                Log::warning('telegram.webhook.send_message_failed', [
-                    'chat_id' => (string) $chatId,
+                Log::warning('telegram.webhook.send_message_failed', array_merge($logContext, [
                     'status' => $response->status(),
                     'body' => $response->body(),
-                ]);
+                ]));
+
+                if ($this->isChatNotFoundResponse($response)) {
+                    Log::warning('telegram.webhook.chat_not_found', array_merge($logContext, [
+                        'status' => $response->status(),
+                        'description' => $this->responseDescription($response),
+                    ]));
+                }
 
                 $replyMarkup = $options['reply_markup'] ?? null;
 
@@ -47,19 +60,17 @@ class TelegramBotApiService
                     $fallbackResponse = $this->postMessage($token, $fallbackPayload);
 
                     if ($this->isFailedTelegramResponse($fallbackResponse)) {
-                        Log::warning('telegram.webhook.send_message_fallback_failed', [
-                            'chat_id' => (string) $chatId,
+                        Log::warning('telegram.webhook.send_message_fallback_failed', array_merge($logContext, [
                             'status' => $fallbackResponse->status(),
                             'body' => $fallbackResponse->body(),
-                        ]);
+                        ]));
                     }
                 }
             }
         } catch (\Throwable $exception) {
-            Log::warning('telegram.webhook.send_message_exception', [
-                'chat_id' => (string) $chatId,
+            Log::warning('telegram.webhook.send_message_exception', array_merge($logContext, [
                 'message' => $exception->getMessage(),
-            ]);
+            ]));
         }
     }
 
@@ -153,6 +164,54 @@ class TelegramBotApiService
         return is_array($json)
             && array_key_exists('ok', $json)
             && $json['ok'] !== true;
+    }
+
+    /**
+     * @param  array<string, mixed>  $context
+     * @return array<string, int|float|bool|string|null>
+     */
+    protected function buildLogContext(int|string $chatId, array $context): array
+    {
+        $normalized = [
+            'chat_id' => (string) $chatId,
+        ];
+
+        foreach ($context as $key => $value) {
+            if (! is_string($key) || $key === '') {
+                continue;
+            }
+
+            if (
+                is_int($value)
+                || is_float($value)
+                || is_bool($value)
+                || is_string($value)
+                || $value === null
+            ) {
+                $normalized[$key] = $value;
+            }
+        }
+
+        return $normalized;
+    }
+
+    protected function responseDescription(Response $response): string
+    {
+        $json = $response->json();
+
+        if (is_array($json) && is_string($json['description'] ?? null)) {
+            return (string) $json['description'];
+        }
+
+        return trim((string) $response->body());
+    }
+
+    protected function isChatNotFoundResponse(Response $response): bool
+    {
+        return str_contains(
+            strtolower($this->responseDescription($response)),
+            'chat not found',
+        );
     }
 
     protected function shouldRetryWithoutStyle(Response $response): bool

@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition } from './../../../wayfinder'
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::importMethod
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:654
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:661
 * @route '/staff/sms-contacts/import'
 */
 export const importMethod = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -16,7 +16,7 @@ importMethod.definition = {
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::importMethod
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:654
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:661
 * @route '/staff/sms-contacts/import'
 */
 importMethod.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ importMethod.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::importMethod
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:654
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:661
 * @route '/staff/sms-contacts/import'
 */
 importMethod.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -35,7 +35,7 @@ importMethod.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::importMethod
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:654
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:661
 * @route '/staff/sms-contacts/import'
 */
 const importMethodForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -45,7 +45,7 @@ const importMethodForm = (options?: RouteQueryOptions): RouteFormDefinition<'pos
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::importMethod
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:654
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:661
 * @route '/staff/sms-contacts/import'
 */
 importMethodForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
