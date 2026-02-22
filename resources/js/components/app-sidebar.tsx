@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { BarChart3, ClipboardList, Coffee, ConciergeBell, ExternalLink, KeyRound, MapPin, MessageSquareText, MonitorSmartphone, QrCode, Store, Users, UtensilsCrossed, Wallet } from 'lucide-react';
+import { BarChart3, ClipboardList, Coffee, ConciergeBell, ExternalLink, KeyRound, MapPin, MessageSquareText, MonitorSmartphone, QrCode, Shield, Store, Users, UtensilsCrossed, Wallet } from 'lucide-react';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -33,12 +33,14 @@ export function AppSidebar() {
             user?: {
                 permission_slugs?: string[];
                 is_admin?: boolean;
+                is_system_admin?: boolean;
             } | null;
         };
     }>().props;
 
     const permissionSlugs = auth?.user?.permission_slugs ?? [];
     const isAdmin = Boolean(auth?.user?.is_admin);
+    const isSystemAdmin = Boolean(auth?.user?.is_system_admin);
     const can = (permissionSlug: string): boolean => isAdmin || permissionSlugs.includes(permissionSlug);
 
     const mainNavItems: NavItem[] = [
@@ -78,9 +80,14 @@ export function AppSidebar() {
         ...(can('users.manage') || can('roles.manage') || can('permissions.manage')
             ? [{ title: 'Gatekeeper', href: '/staff/access-control', icon: KeyRound }]
             : []),
+        ...(isSystemAdmin
+            ? [{ title: 'System Admin', href: '/__system-admin/dashboard', icon: Shield }]
+            : []),
     ];
 
-    const homeHref = mainNavItems[0]?.href ?? '/';
+    const homeHref = isSystemAdmin
+        ? '/__system-admin/dashboard'
+        : mainNavItems[0]?.href ?? '/';
 
     return (
         <Sidebar collapsible="icon" variant="inset" className="bg-white/50 backdrop-blur-xl border-r border-zinc-100">

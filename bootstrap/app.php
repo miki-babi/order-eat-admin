@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Middleware\HandleAppearance;
+use App\Http\Middleware\EnsureFeatureEnabled;
 use App\Http\Middleware\EnsureUserHasPermission;
+use App\Http\Middleware\EnsureSystemAdmin;
 use App\Http\Middleware\EnsureStaffRole;
 use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Foundation\Application;
@@ -20,6 +22,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'staff' => EnsureStaffRole::class,
             'permission' => EnsureUserHasPermission::class,
+            'system_admin' => EnsureSystemAdmin::class,
+            'feature' => EnsureFeatureEnabled::class,
         ]);
 
         $middleware->web(append: [

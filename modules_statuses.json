@@ -1,0 +1,11 @@
+{
+    "Ordering": true,
+    "Operations": true,
+    "Menu": true,
+    "Customers": true,
+    "Messaging": true,
+    "AccessControl": true,
+    "Reporting": true,
+    "TelegramBot": true,
+    "SystemAdmin": true
+}

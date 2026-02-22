@@ -48,6 +48,7 @@ class HandleInertiaRequests extends Middleware
                         'permission_slugs' => $user->permissionSlugs(),
                         'pickup_location_ids' => $user->accessiblePickupLocationIds(),
                         'is_admin' => $user->isAdmin(),
+                        'is_system_admin' => $user->isSystemAdmin(),
                     ])
                     : null,
             ],

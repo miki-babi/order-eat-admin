@@ -15,6 +15,18 @@ class User extends Authenticatable
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, TwoFactorAuthenticatable;
 
+    public const SYSTEM_ADMIN_ROLE_SLUG = 'system_admin';
+
+    /**
+     * Dedicated permissions for hidden system-admin controls.
+     *
+     * @var array<int, string>
+     */
+    public const SYSTEM_ADMIN_PERMISSION_SLUGS = [
+        'system_admin.manage_features',
+        'system_admin.view_logs',
+    ];
+
     /**
      * Default permission catalog used for seeding and legacy compatibility.
      */
@@ -79,6 +91,16 @@ class User extends Authenticatable
             'slug' => 'branches.assign',
             'description' => 'Assign managers and staff to branches.',
         ],
+        [
+            'name' => 'Manage System Features',
+            'slug' => 'system_admin.manage_features',
+            'description' => 'Lock and unlock application features from system admin dashboard.',
+        ],
+        [
+            'name' => 'View System Logs',
+            'slug' => 'system_admin.view_logs',
+            'description' => 'View application logs and runtime activity from system admin dashboard.',
+        ],
     ];
 
     /**
@@ -91,6 +113,13 @@ class User extends Authenticatable
             'description' => 'Full access across all branches and features.',
             'is_system' => true,
             'permission_slugs' => ['*'],
+        ],
+        [
+            'name' => 'System Admin',
+            'slug' => self::SYSTEM_ADMIN_ROLE_SLUG,
+            'description' => 'Hidden role for platform-level feature lock controls and logs.',
+            'is_system' => true,
+            'permission_slugs' => self::SYSTEM_ADMIN_PERMISSION_SLUGS,
         ],
         [
             'name' => 'Branch Manager',
@@ -231,6 +260,14 @@ class User extends Authenticatable
     public function isAdmin(): bool
     {
         return $this->hasRole('admin');
+    }
+
+    /**
+     * Determine if the user has hidden system-admin access.
+     */
+    public function isSystemAdmin(): bool
+    {
+        return $this->hasRole(static::SYSTEM_ADMIN_ROLE_SLUG);
     }
 
     /**
@@ -481,6 +518,7 @@ class User extends Authenticatable
 
         return match (strtolower(trim($role))) {
             'admin' => 'admin',
+            'system_admin', 'system-admin', 'system admin' => self::SYSTEM_ADMIN_ROLE_SLUG,
             'manager', 'branch_manager', 'branch-manager', 'branch manager' => 'branch_manager',
             'staff', 'branch_staff', 'branch-staff', 'branch staff' => 'branch_staff',
             default => null,
@@ -511,6 +549,10 @@ class User extends Authenticatable
 
         if ($legacyRole === 'admin') {
             return static::allDefinedPermissionSlugs();
+        }
+
+        if ($legacyRole === static::SYSTEM_ADMIN_ROLE_SLUG) {
+            return static::SYSTEM_ADMIN_PERMISSION_SLUGS;
         }
 
         if (in_array($legacyRole, ['branch_manager', 'branch_staff'], true)) {

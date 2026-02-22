@@ -1,6 +1,6 @@
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { ArrowRight, CheckCircle2, Clock3, ExternalLink, MapPin, Search, ShoppingCart, Upload } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -31,6 +31,11 @@ type PageProps = {
     menuItems: MenuItem[];
     categories: string[];
     pickupLocations: PickupLocation[];
+    customerToken: string;
+    customerPrefill: {
+        name: string | null;
+        phone: string | null;
+    };
     filters: {
         search?: string | null;
         category?: string | null;
@@ -52,6 +57,7 @@ type SharedProps = {
 };
 
 type OrderForm = {
+    customer_token: string;
     name: string;
     phone: string;
     pickup_date: string;
@@ -59,6 +65,10 @@ type OrderForm = {
     channel: string;
     notify_when_ready: boolean;
     receipt: File | null;
+    items: {
+        menu_item_id: number;
+        quantity: number;
+    }[];
 };
 
 const steps = [
@@ -83,27 +93,160 @@ function currency(value: number): string {
     }).format(value);
 }
 
+function sanitizeCartPayload(raw: unknown, allowedMenuItemIds: Set<number>): Record<number, number> {
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
+        return {};
+    }
+
+    const sanitized: Record<number, number> = {};
+
+    Object.entries(raw).forEach(([rawItemId, rawQuantity]) => {
+        const itemId = Number(rawItemId);
+        const quantity = typeof rawQuantity === 'number' ? rawQuantity : Number(rawQuantity);
+
+        if (!Number.isInteger(itemId) || itemId < 1 || !allowedMenuItemIds.has(itemId)) {
+            return;
+        }
+
+        if (!Number.isInteger(quantity) || quantity < 1 || quantity > 100) {
+            return;
+        }
+
+        sanitized[itemId] = quantity;
+    });
+
+    return sanitized;
+}
+
+function loadPersistedCart(storageKey: string, allowedMenuItemIds: Set<number>): Record<number, number> {
+    if (typeof window === 'undefined') {
+        return {};
+    }
+
+    try {
+        const saved = window.localStorage.getItem(storageKey);
+
+        if (!saved) {
+            return {};
+        }
+
+        return sanitizeCartPayload(JSON.parse(saved), allowedMenuItemIds);
+    } catch {
+        // Ignore storage read failures and fall back to an empty cart.
+        return {};
+    }
+}
+
+function persistCart(storageKey: string, cart: Record<number, number>): void {
+    if (typeof window === 'undefined') {
+        return;
+    }
+
+    try {
+        if (Object.keys(cart).length === 0) {
+            window.localStorage.removeItem(storageKey);
+            return;
+        }
+
+        window.localStorage.setItem(storageKey, JSON.stringify(cart));
+    } catch {
+        // Ignore storage write failures to avoid blocking checkout.
+    }
+}
+
+function clearPersistedCart(storageKey: string): void {
+    if (typeof window === 'undefined') {
+        return;
+    }
+
+    try {
+        window.localStorage.removeItem(storageKey);
+    } catch {
+        // Ignore storage clear failures.
+    }
+}
+
+function sanitizeStepValue(raw: unknown): number {
+    const step = typeof raw === 'number' ? raw : Number(raw);
+
+    return Number.isInteger(step) && step >= 1 && step <= 4 ? step : 1;
+}
+
+function loadPersistedStep(storageKey: string): number {
+    if (typeof window === 'undefined') {
+        return 1;
+    }
+
+    try {
+        const saved = window.localStorage.getItem(storageKey);
+
+        if (!saved) {
+            return 1;
+        }
+
+        return sanitizeStepValue(JSON.parse(saved));
+    } catch {
+        return 1;
+    }
+}
+
+function persistStep(storageKey: string, step: number): void {
+    if (typeof window === 'undefined') {
+        return;
+    }
+
+    try {
+        window.localStorage.setItem(storageKey, JSON.stringify(sanitizeStepValue(step)));
+    } catch {
+        // Ignore storage write failures to avoid blocking checkout.
+    }
+}
+
+function clearPersistedStep(storageKey: string): void {
+    if (typeof window === 'undefined') {
+        return;
+    }
+
+    try {
+        window.localStorage.removeItem(storageKey);
+    } catch {
+        // Ignore storage clear failures.
+    }
+}
+
 export default function Menu({
     menuItems,
     categories,
     pickupLocations,
+    customerToken,
+    customerPrefill,
     filters,
 }: PageProps) {
     const { auth, flash } = usePage<SharedProps>().props;
     const channel = filters.channel ?? 'web';
-    const [step, setStep] = useState(1);
+    const cartStorageKey = `kds:customer:web-cart:${customerToken}`;
+    const stepStorageKey = `kds:customer:web-step:${customerToken}`;
+    const allowedMenuItemIds = useMemo(
+        () => new Set(menuItems.map((item) => item.id)),
+        [menuItems],
+    );
+    const [step, setStep] = useState(() => loadPersistedStep(stepStorageKey));
     const [search, setSearch] = useState(filters.search ?? '');
     const [activeCategory, setActiveCategory] = useState(filters.category ?? 'all');
-    const [cart, setCart] = useState<Record<number, number>>({});
+    const [cart, setCart] = useState<Record<number, number>>(
+        () => loadPersistedCart(cartStorageKey, allowedMenuItemIds),
+    );
 
     const form = useForm<OrderForm>({
-        name: auth?.user?.name ?? '',
-        phone: '',
+        customer_token: customerToken,
+        name: customerPrefill.name ?? auth?.user?.name ?? '',
+        phone: customerPrefill.phone ?? '',
         pickup_date: todayDate(),
         pickup_location_id: pickupLocations[0]?.id ?? '',
         channel,
         notify_when_ready: false,
         receipt: null,
+        items: [],
     });
 
     const menuById = useMemo(
@@ -151,6 +294,14 @@ export default function Menu({
 
     const cartCount = cartItems.reduce((carry, item) => carry + item.quantity, 0);
     const cartTotal = cartItems.reduce((carry, item) => carry + item.lineTotal, 0);
+
+    useEffect(() => {
+        persistCart(cartStorageKey, sanitizeCartPayload(cart, allowedMenuItemIds));
+    }, [cart, cartStorageKey, allowedMenuItemIds]);
+
+    useEffect(() => {
+        persistStep(stepStorageKey, step);
+    }, [step, stepStorageKey]);
 
     const updateItemQuantity = (itemId: number, nextQuantity: number) => {
         setCart((previous) => {
@@ -217,6 +368,10 @@ export default function Menu({
                 console.log('[Order Submit] upload progress', event?.percentage ?? 0);
             },
             onSuccess: () => {
+                clearPersistedCart(cartStorageKey);
+                clearPersistedStep(stepStorageKey);
+                setCart({});
+                setStep(1);
                 console.log('[Order Submit] success');
             },
             onError: (errors) => {

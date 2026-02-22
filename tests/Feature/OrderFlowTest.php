@@ -8,6 +8,7 @@ use App\Models\PickupLocation;
 use App\Models\SmsLog;
 use App\Models\SmsNotificationSetting;
 use App\Models\TableSession;
+use App\Models\CustomerToken;
 use App\Models\User;
 use Illuminate\Support\Str;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -38,6 +39,56 @@ test('public menu only returns items visible in requested channel', function () 
             ->where('filters.channel', 'web')
             ->has('menuItems', 1)
             ->where('menuItems.0.id', $webItem->id)
+        );
+});
+
+test('public menu pre-fills customer details from an existing token profile', function () {
+    $customer = Customer::query()->create([
+        'name' => 'Returning Customer',
+        'phone' => '251911234567',
+    ]);
+
+    $token = CustomerToken::generateToken();
+
+    CustomerToken::query()->create([
+        'customer_id' => $customer->id,
+        'token' => $token,
+        'first_seen_at' => now(),
+        'last_seen_at' => now(),
+    ]);
+
+    $this->get(route('home', ['customer_token' => $token]))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('customer/menu')
+            ->where('customerToken', $token)
+            ->where('customerPrefill.name', 'Returning Customer')
+            ->where('customerPrefill.phone', '251911234567')
+        );
+});
+
+test('public menu does not pre-fill placeholder token profile values', function () {
+    $customer = Customer::query()->create([
+        'name' => 'Guest',
+        'phone' => 'q1234567890abcdef123',
+    ]);
+
+    $token = CustomerToken::generateToken();
+
+    CustomerToken::query()->create([
+        'customer_id' => $customer->id,
+        'token' => $token,
+        'first_seen_at' => now(),
+        'last_seen_at' => now(),
+    ]);
+
+    $this->get(route('home', ['customer_token' => $token]))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('customer/menu')
+            ->where('customerToken', $token)
+            ->where('customerPrefill.name', null)
+            ->where('customerPrefill.phone', null)
         );
 });
 

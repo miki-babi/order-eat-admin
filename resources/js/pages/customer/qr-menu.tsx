@@ -1,6 +1,6 @@
 import { Head, Link, useForm } from '@inertiajs/react';
 import { CheckCircle2, QrCode, Search, ShoppingCart, Store, Table2 } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import InputError from '@/components/input-error';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -37,6 +37,7 @@ type TableSessionInfo = {
 type PageProps = {
     menuItems: MenuItem[];
     categories: string[];
+    customerToken: string;
     table: TableInfo;
     tableSession: TableSessionInfo;
     filters: {
@@ -52,6 +53,7 @@ type CartEntry = MenuItem & {
 };
 
 type QrOrderForm = {
+    customer_token: string;
     table_session_token: string;
 };
 
@@ -63,19 +65,101 @@ function currency(value: number): string {
     }).format(value);
 }
 
+function sanitizeCartPayload(raw: unknown, allowedMenuItemIds: Set<number>): Record<number, number> {
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
+        return {};
+    }
+
+    const sanitized: Record<number, number> = {};
+
+    Object.entries(raw).forEach(([rawItemId, rawQuantity]) => {
+        const itemId = Number(rawItemId);
+        const quantity = typeof rawQuantity === 'number' ? rawQuantity : Number(rawQuantity);
+
+        if (!Number.isInteger(itemId) || itemId < 1 || !allowedMenuItemIds.has(itemId)) {
+            return;
+        }
+
+        if (!Number.isInteger(quantity) || quantity < 1 || quantity > 100) {
+            return;
+        }
+
+        sanitized[itemId] = quantity;
+    });
+
+    return sanitized;
+}
+
+function loadPersistedCart(storageKey: string, allowedMenuItemIds: Set<number>): Record<number, number> {
+    if (typeof window === 'undefined') {
+        return {};
+    }
+
+    try {
+        const saved = window.localStorage.getItem(storageKey);
+
+        if (!saved) {
+            return {};
+        }
+
+        return sanitizeCartPayload(JSON.parse(saved), allowedMenuItemIds);
+    } catch {
+        // Ignore storage read failures and fall back to an empty cart.
+        return {};
+    }
+}
+
+function persistCart(storageKey: string, cart: Record<number, number>): void {
+    if (typeof window === 'undefined') {
+        return;
+    }
+
+    try {
+        if (Object.keys(cart).length === 0) {
+            window.localStorage.removeItem(storageKey);
+            return;
+        }
+
+        window.localStorage.setItem(storageKey, JSON.stringify(cart));
+    } catch {
+        // Ignore storage write failures to avoid blocking checkout.
+    }
+}
+
+function clearPersistedCart(storageKey: string): void {
+    if (typeof window === 'undefined') {
+        return;
+    }
+
+    try {
+        window.localStorage.removeItem(storageKey);
+    } catch {
+        // Ignore storage clear failures.
+    }
+}
+
 export default function QrMenu({
     menuItems,
     categories,
+    customerToken,
     table,
     tableSession,
     filters,
     staffRoute,
 }: PageProps) {
+    const cartStorageKey = `kds:customer:qr-cart:${table.qr_code}:${customerToken}`;
+    const allowedMenuItemIds = useMemo(
+        () => new Set(menuItems.map((item) => item.id)),
+        [menuItems],
+    );
     const [search, setSearch] = useState(filters.search ?? '');
     const [activeCategory, setActiveCategory] = useState(filters.category ?? 'all');
-    const [cart, setCart] = useState<Record<number, number>>({});
+    const [cart, setCart] = useState<Record<number, number>>(
+        () => loadPersistedCart(cartStorageKey, allowedMenuItemIds),
+    );
 
     const form = useForm<QrOrderForm>({
+        customer_token: customerToken,
         table_session_token: tableSession.token,
     });
 
@@ -125,6 +209,10 @@ export default function QrMenu({
     const cartCount = cartItems.reduce((carry, item) => carry + item.quantity, 0);
     const cartTotal = cartItems.reduce((carry, item) => carry + item.lineTotal, 0);
 
+    useEffect(() => {
+        persistCart(cartStorageKey, sanitizeCartPayload(cart, allowedMenuItemIds));
+    }, [cart, cartStorageKey, allowedMenuItemIds]);
+
     const updateItemQuantity = (itemId: number, nextQuantity: number) => {
         setCart((previous) => {
             const next = { ...previous };
@@ -152,6 +240,10 @@ export default function QrMenu({
 
         form.post(`/qr-menu/${table.qr_code}/orders?session=${encodeURIComponent(tableSession.token)}`, {
             preserveScroll: true,
+            onSuccess: () => {
+                clearPersistedCart(cartStorageKey);
+                setCart({});
+            },
             onError: (errors) => {
                 if (errors.table_session_token) {
                     window.location.reload();
