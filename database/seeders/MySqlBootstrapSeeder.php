@@ -66,14 +66,14 @@ class MySqlBootstrapSeeder extends Seeder
             'liya_telegram' => [
                 'name' => 'Liya Bekele',
                 'phone' => '251911000333',
-                'telegram_id' => 9101001,
+                'telegram_id' => '9101001',
                 'telegram_username' => 'liya_order',
                 'last_seen_channel' => Order::SOURCE_TELEGRAM,
             ],
             'yonas_telegram' => [
                 'name' => 'Yonas Alemu',
                 'phone' => '251911000444',
-                'telegram_id' => 9101002,
+                'telegram_id' => '9101002',
                 'telegram_username' => 'yonas_pickup',
                 'last_seen_channel' => Order::SOURCE_TELEGRAM,
             ],

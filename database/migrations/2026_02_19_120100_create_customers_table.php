@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('phone', 20)->unique();
-            $table->unsignedBigInteger('telegram_id')->nullable();
+            $table->string('telegram_id')->nullable();
             $table->string('telegram_username')->nullable();
             $table->timestamps();
         });

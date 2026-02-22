@@ -64,4 +64,26 @@ return [
     |
     */
     'http_timeout' => (int) env('TELEGRAM_HTTP_TIMEOUT', 10),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Webhook Payload Logging
+    |--------------------------------------------------------------------------
+    |
+    | Enable structured logging for incoming Telegram webhook payloads.
+    | Sensitive fields (phone, token, secret, hash, init_data) are masked.
+    |
+    */
+    'log_webhook_payload' => (bool) env('TELEGRAM_LOG_WEBHOOK_PAYLOAD', false),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Webhook Header Logging
+    |--------------------------------------------------------------------------
+    |
+    | Include incoming webhook headers in webhook payload logs.
+    | Sensitive fields are masked.
+    |
+    */
+    'log_webhook_headers' => (bool) env('TELEGRAM_LOG_WEBHOOK_HEADERS', false),
 ];

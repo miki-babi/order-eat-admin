@@ -14,6 +14,7 @@ type CustomerRow = {
     id: number;
     name: string;
     phone: string;
+    telegram_id: string | null;
     telegram_username: string | null;
     orders_count: number;
     total_spent: number;
@@ -40,6 +41,7 @@ type SelectedCustomer = {
     id: number;
     name: string;
     phone: string;
+    telegram_id: string | null;
     telegram_username: string | null;
     source_summary: {
         total: number;
@@ -299,7 +301,7 @@ export default function StaffCustomers({
                                         className="h-11 pl-10 rounded-xl border-zinc-200 focus:ring-[#F57C00] transition-all"
                                         value={searchForm.data.search}
                                         onChange={(event) => searchForm.setData('search', event.target.value)}
-                                        placeholder="Enter customer name or phone..."
+                                        placeholder="Enter name, phone, @username, or Telegram ID..."
                                     />
                                 </div>
                             </div>
@@ -369,6 +371,12 @@ export default function StaffCustomers({
                                                     <div>
                                                         <p className="font-bold text-[#212121]">{customer.name}</p>
                                                         <p className="text-xs font-medium text-zinc-500">{customer.phone}</p>
+                                                        {customer.telegram_username && (
+                                                            <p className="text-[11px] font-semibold text-sky-600">@{customer.telegram_username}</p>
+                                                        )}
+                                                        {customer.telegram_id && (
+                                                            <p className="text-[10px] font-semibold text-zinc-400">TG ID: {customer.telegram_id}</p>
+                                                        )}
                                                     </div>
                                                 </div>
                                             </td>
@@ -521,6 +529,9 @@ export default function StaffCustomers({
                                         <p className="mt-1 font-bold text-[#F57C00] opacity-80">{selectedCustomer.phone}</p>
                                         {selectedCustomer.telegram_username && (
                                             <p className="mt-1 text-xs font-semibold text-sky-200">@{selectedCustomer.telegram_username}</p>
+                                        )}
+                                        {selectedCustomer.telegram_id && (
+                                            <p className="mt-1 text-[11px] font-semibold text-zinc-300">TG ID: {selectedCustomer.telegram_id}</p>
                                         )}
                                     </div>
                                     <div className="text-right">

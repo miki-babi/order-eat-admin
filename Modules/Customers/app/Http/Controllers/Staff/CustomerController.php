@@ -39,7 +39,9 @@ class CustomerController extends Controller
                 $query->where(function ($builder) use ($search): void {
                     $builder
                         ->where('name', 'like', "%{$search}%")
-                        ->orWhere('phone', 'like', "%{$search}%");
+                        ->orWhere('phone', 'like', "%{$search}%")
+                        ->orWhere('telegram_username', 'like', "%{$search}%")
+                        ->orWhere('telegram_id', 'like', "%{$search}%");
                 });
             })
             ->orderByDesc('orders_count')
@@ -49,6 +51,9 @@ class CustomerController extends Controller
                 'id' => $customer->id,
                 'name' => $customer->name,
                 'phone' => $customer->phone,
+                'telegram_id' => is_string($customer->telegram_id) && trim($customer->telegram_id) !== ''
+                    ? $customer->telegram_id
+                    : null,
                 'telegram_username' => $customer->telegram_username,
                 'orders_count' => $customer->orders_count,
                 'total_spent' => (float) ($customer->orders_sum_total_amount ?? 0),
@@ -139,6 +144,9 @@ class CustomerController extends Controller
                     'id' => $selected->id,
                     'name' => $selected->name,
                     'phone' => $selected->phone,
+                    'telegram_id' => is_string($selected->telegram_id) && trim($selected->telegram_id) !== ''
+                        ? $selected->telegram_id
+                        : null,
                     'telegram_username' => $selected->telegram_username,
                     'source_summary' => $sourceSummary,
                     'top_branch' => $branchSummary->first(),

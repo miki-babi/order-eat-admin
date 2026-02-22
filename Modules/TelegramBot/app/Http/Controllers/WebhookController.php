@@ -11,6 +11,7 @@ use App\Services\FeatureToggleService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Modules\TelegramBot\Services\TelegramBotApiService;
 
@@ -27,7 +28,13 @@ class WebhookController extends Controller
         FeatureToggleService $featureToggleService,
         TelegramBotApiService $telegramBotApiService,
     ): JsonResponse {
+        $this->logIncomingWebhook($request);
+
         if (! $this->passesWebhookSecret($request)) {
+            Log::warning('telegram.webhook.invalid_secret', [
+                'ip' => $request->ip(),
+            ]);
+
             return response()->json([
                 'ok' => false,
                 'error' => 'invalid_secret',
@@ -37,6 +44,10 @@ class WebhookController extends Controller
         $messagePayload = $this->extractMessagePayload($request->json()->all());
 
         if ($messagePayload === null) {
+            Log::info('telegram.webhook.ignored_update_without_message', [
+                'ip' => $request->ip(),
+            ]);
+
             return response()->json([
                 'ok' => true,
                 'ignored' => true,
@@ -47,6 +58,12 @@ class WebhookController extends Controller
         $telegramUserId = $messagePayload['telegram_user_id'];
 
         if ($chatId === null || $telegramUserId === null) {
+            Log::info('telegram.webhook.ignored_update_without_chat_or_user', [
+                'ip' => $request->ip(),
+                'chat_id' => $chatId,
+                'telegram_user_id' => $telegramUserId,
+            ]);
+
             return response()->json([
                 'ok' => true,
                 'ignored' => true,
@@ -102,6 +119,99 @@ class WebhookController extends Controller
         return response()->json([
             'ok' => true,
         ]);
+    }
+
+    protected function logIncomingWebhook(Request $request): void
+    {
+        if (! (bool) config('telegram.log_webhook_payload', false)) {
+            return;
+        }
+
+        $rawPayload = $request->json()->all();
+
+        if (! is_array($rawPayload) || $rawPayload === []) {
+            $rawPayload = $request->all();
+        }
+
+        $payload = is_array($rawPayload) ? $this->sanitizeLogValue($rawPayload) : [];
+
+        $context = [
+            'ip' => $request->ip(),
+            'path' => $request->path(),
+            'update_id' => data_get($payload, 'update_id'),
+            'payload' => $payload,
+        ];
+
+        if ((bool) config('telegram.log_webhook_headers', false)) {
+            $context['headers'] = $this->sanitizeLogValue($request->headers->all());
+        }
+
+        Log::info('telegram.webhook.received', $context);
+    }
+
+    protected function sanitizeLogValue(mixed $value, ?string $key = null): mixed
+    {
+        if ($key !== null && $this->shouldMaskLogKey($key)) {
+            return $this->maskLogScalar($value);
+        }
+
+        if (! is_array($value)) {
+            return $value;
+        }
+
+        $sanitized = [];
+
+        foreach ($value as $childKey => $childValue) {
+            $sanitized[$childKey] = $this->sanitizeLogValue(
+                $childValue,
+                is_string($childKey) ? $childKey : null,
+            );
+        }
+
+        return $sanitized;
+    }
+
+    protected function shouldMaskLogKey(string $key): bool
+    {
+        $normalizedKey = strtolower($key);
+
+        foreach (['phone', 'token', 'secret', 'hash', 'init_data'] as $fragment) {
+            if (str_contains($normalizedKey, $fragment)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    protected function maskLogScalar(mixed $value): mixed
+    {
+        if (is_array($value)) {
+            return array_map(
+                fn (mixed $item): mixed => $this->maskLogScalar($item),
+                $value,
+            );
+        }
+
+        if ($value === null) {
+            return null;
+        }
+
+        $stringValue = trim((string) $value);
+
+        if ($stringValue === '') {
+            return '';
+        }
+
+        $length = strlen($stringValue);
+
+        if ($length <= 4) {
+            return str_repeat('*', $length);
+        }
+
+        return substr($stringValue, 0, 2)
+            .str_repeat('*', max(1, $length - 4))
+            .substr($stringValue, -2);
     }
 
     protected function passesWebhookSecret(Request $request): bool

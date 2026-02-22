@@ -6,6 +6,7 @@ use App\Models\Order;
 use App\Models\PickupLocation;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 test('telegram webhook rejects invalid secret token', function () {
     Config::set('telegram.validate_webhook_secret', true);
@@ -44,6 +45,70 @@ test('telegram webhook ignores updates without message payload', function () {
         ]);
 
     Http::assertNothingSent();
+});
+
+test('telegram webhook logs masked payload when payload logging is enabled', function () {
+    Config::set('telegram.webhook_secret', null);
+    Config::set('telegram.bot_token', 'test-bot-token');
+    Config::set('telegram.log_webhook_payload', true);
+    Config::set('telegram.log_webhook_headers', true);
+
+    Log::spy();
+
+    Http::fake([
+        'https://api.telegram.org/*' => Http::response(['ok' => true], 200),
+    ]);
+
+    $payload = [
+        'update_id' => 10020,
+        'message' => [
+            'message_id' => 20,
+            'date' => now()->timestamp,
+            'chat' => [
+                'id' => 99887790,
+                'type' => 'private',
+            ],
+            'from' => [
+                'id' => 55660077,
+                'is_bot' => false,
+                'first_name' => 'Masked',
+                'username' => 'masked_user',
+            ],
+            'contact' => [
+                'phone_number' => '+251911222333',
+                'first_name' => 'Masked',
+                'user_id' => 55660077,
+            ],
+        ],
+    ];
+
+    $this->postJson(
+        route('api.telegram.webhook'),
+        $payload,
+        [
+            'X-Telegram-Bot-Api-Secret-Token' => 'super-secret-token',
+        ],
+    )
+        ->assertOk()
+        ->assertJson([
+            'ok' => true,
+        ]);
+
+    Log::shouldHaveReceived('info')
+        ->withArgs(function (string $message, array $context): bool {
+            $loggedPhone = data_get($context, 'payload.message.contact.phone_number');
+            $loggedSecretHeader = data_get($context, 'headers.x-telegram-bot-api-secret-token.0');
+
+            return $message === 'telegram.webhook.received'
+                && data_get($context, 'payload.update_id') === 10020
+                && is_string($loggedPhone)
+                && $loggedPhone !== '+251911222333'
+                && str_contains($loggedPhone, '*')
+                && is_string($loggedSecretHeader)
+                && $loggedSecretHeader !== 'super-secret-token'
+                && str_contains($loggedSecretHeader, '*');
+        })
+        ->once();
 });
 
 test('telegram webhook creates telegram customer and sends start response', function () {
