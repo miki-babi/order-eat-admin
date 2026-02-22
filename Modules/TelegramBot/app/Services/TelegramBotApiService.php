@@ -36,7 +36,11 @@ class TelegramBotApiService
 
                 $replyMarkup = $options['reply_markup'] ?? null;
 
-                if (is_array($replyMarkup) && $this->containsStyleField($replyMarkup)) {
+                if (
+                    is_array($replyMarkup)
+                    && $this->containsStyleField($replyMarkup)
+                    && $this->shouldRetryWithoutStyle($response)
+                ) {
                     $fallbackOptions = $options;
                     $fallbackOptions['reply_markup'] = $this->stripStyleField($replyMarkup);
                     $fallbackPayload = $this->buildPayload($chatId, $text, $fallbackOptions);
@@ -149,6 +153,22 @@ class TelegramBotApiService
         return is_array($json)
             && array_key_exists('ok', $json)
             && $json['ok'] !== true;
+    }
+
+    protected function shouldRetryWithoutStyle(Response $response): bool
+    {
+        $json = $response->json();
+        $description = is_array($json) && is_string($json['description'] ?? null)
+            ? strtolower($json['description'])
+            : strtolower((string) $response->body());
+
+        if ($description === '') {
+            return false;
+        }
+
+        return str_contains($description, 'style')
+            || str_contains($description, 'reply markup')
+            || str_contains($description, 'inline keyboard');
     }
 
     protected function containsStyleField(array $value): bool
