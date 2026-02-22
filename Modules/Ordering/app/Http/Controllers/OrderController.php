@@ -73,9 +73,8 @@ class OrderController extends Controller
         $category = $request->input('category');
         $channel = $this->resolveMenuVisibilityChannel($request, $forcedChannel);
 
-        $menuItems = MenuItem::query()
+        $visibleItems = MenuItem::query()
             ->where('is_active', true)
-            ->visibleIn($channel)
             ->when($search !== '', function ($query) use ($search): void {
                 $query->where(function ($builder) use ($search): void {
                     $builder
@@ -88,6 +87,10 @@ class OrderController extends Controller
             ->orderBy('category')
             ->orderBy('name')
             ->get()
+            ->filter(fn (MenuItem $item): bool => $item->isVisibleInChannel($channel))
+            ->values();
+
+        $menuItems = $visibleItems
             ->map(fn (MenuItem $item) => [
                 'id' => $item->id,
                 'name' => $item->name,
@@ -97,13 +100,10 @@ class OrderController extends Controller
                 'image_url' => $this->toPublicAssetUrl($item->image_url),
             ]);
 
-        $categories = MenuItem::query()
-            ->where('is_active', true)
-            ->visibleIn($channel)
-            ->whereNotNull('category')
-            ->orderBy('category')
-            ->distinct()
+        $categories = $visibleItems
             ->pluck('category')
+            ->filter(fn (mixed $value): bool => is_string($value) && trim($value) !== '')
+            ->unique()
             ->values();
 
         $pickupLocations = PickupLocation::query()

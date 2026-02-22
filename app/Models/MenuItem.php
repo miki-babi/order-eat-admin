@@ -116,6 +116,15 @@ class MenuItem extends Model
         return $query->whereJsonContains('visibility_channels', self::normalizeVisibilityChannel($channel));
     }
 
+    public function isVisibleInChannel(string $channel): bool
+    {
+        $normalizedChannel = self::normalizeVisibilityChannel($channel);
+        $channels = is_array($this->visibility_channels) ? $this->visibility_channels : [];
+        $normalizedChannels = self::normalizeVisibilityChannels($channels);
+
+        return in_array($normalizedChannel, $normalizedChannels, true);
+    }
+
     /**
      * Get all order items that reference this menu item.
      */

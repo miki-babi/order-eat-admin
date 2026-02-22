@@ -75,6 +75,44 @@ test('menu item with order history is deactivated instead of deleted', function 
     expect($menuItem->is_active)->toBeFalse();
 });
 
+test('updating menu item visibility hides it from telegram menu when telegram channel is unchecked', function () {
+    $staff = User::factory()->create([
+        'role' => 'staff',
+    ]);
+
+    $menuItem = MenuItem::query()->create([
+        'name' => 'Visibility Toggle Item',
+        'description' => 'Visibility update test.',
+        'price' => 150,
+        'category' => 'Drinks',
+        'is_active' => true,
+        'visibility_channels' => ['web', 'telegram'],
+    ]);
+
+    $this->actingAs($staff)
+        ->put(route('staff.menu-items.update', $menuItem), [
+            'name' => 'Visibility Toggle Item',
+            'description' => 'Visibility update test.',
+            'price' => 150,
+            'category' => 'Drinks',
+            'is_active' => true,
+            'visibility_channels' => ['web'],
+        ])
+        ->assertRedirect();
+
+    $menuItem->refresh();
+
+    expect($menuItem->visibility_channels)->toBe(['web']);
+
+    $this->get(route('telegram.menu'))
+        ->assertOk()
+        ->assertInertia(fn (\Inertia\Testing\AssertableInertia $page) => $page
+            ->component('customer/telegram-menu')
+            ->where('filters.channel', 'telegram')
+            ->has('menuItems', 0)
+        );
+});
+
 test('menu management feature lock redirects non-get requests', function () {
     $staff = User::factory()->create([
         'role' => 'staff',

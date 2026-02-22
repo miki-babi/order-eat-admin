@@ -22,7 +22,7 @@ class StoreMenuItemRequest extends FormRequest
             'category' => ['nullable', 'string', 'max:50'],
             'image' => ['nullable', 'image', 'max:5120'],
             'is_active' => ['nullable', 'boolean'],
-            'visibility_channels' => ['required', 'array', 'min:1'],
+            'visibility_channels' => ['nullable', 'array'],
             'visibility_channels.*' => ['string', Rule::in(MenuItem::visibilityChannels())],
         ];
     }

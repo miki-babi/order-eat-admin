@@ -172,10 +172,6 @@ class MenuItemController extends Controller
      */
     protected function normalizeVisibilityChannels(?array $channels): array
     {
-        $normalized = MenuItem::normalizeVisibilityChannels($channels ?? []);
-
-        return $normalized !== []
-            ? $normalized
-            : MenuItem::visibilityChannels();
+        return MenuItem::normalizeVisibilityChannels($channels ?? []);
     }
 }
