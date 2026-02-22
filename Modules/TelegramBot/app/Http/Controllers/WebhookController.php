@@ -364,6 +364,7 @@ class WebhookController extends Controller
                         [
                             [
                                 'text' => $buttonText,
+                                'style' => 'primary',
                                 'web_app' => [
                                     'url' => $ordersUrl,
                                 ],
@@ -498,6 +499,7 @@ class WebhookController extends Controller
                     [
                         [
                             'text' => $launchPayload['button_text'],
+                            'style' => 'primary',
                             'web_app' => [
                                 'url' => $launchPayload['url'],
                             ],
