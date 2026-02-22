@@ -5,6 +5,7 @@ namespace Modules\Messaging\Http\Controllers\Staff;
 use App\Http\Controllers\Controller;
 use Modules\Messaging\Http\Requests\Staff\ImportCustomerContactsRequest;
 use Modules\Messaging\Http\Requests\Staff\PreviewPromoAudienceRequest;
+use Modules\Messaging\Http\Requests\Staff\SendPromoCampaignRequest;
 use Modules\Messaging\Http\Requests\Staff\StoreSmsPhoneListRequest;
 use Modules\Messaging\Http\Requests\Staff\UpdateSmsNotificationSettingRequest;
 use App\Models\Customer;
@@ -13,10 +14,12 @@ use App\Models\PickupLocation;
 use App\Models\SmsNotificationSetting;
 use App\Models\SmsPhoneList;
 use App\Models\SmsTemplate;
+use App\Models\User;
 use App\Support\BranchAccess;
 use App\Services\SmsEthiopiaService;
 use App\Services\SmsNotificationService;
 use App\Services\SmsTemplateService;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -27,6 +30,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
+use Modules\TelegramBot\Services\TelegramBotApiService;
 
 
 
@@ -161,7 +165,213 @@ class SmsTemplateController extends Controller
         /** @var \App\Models\User $user */
         $user = $request->user();
         $validated = $request->validated();
+        $rangeError = $this->promoRangeValidationMessage($validated);
 
+        if ($rangeError !== null) {
+            return response()->json([
+                'message' => $rangeError,
+            ], 422);
+        }
+
+        $audienceQuery = $this->promoAudienceQuery($user, $validated);
+
+        $now = now();
+        $totalMatching = (clone $audienceQuery)->count();
+        $highValueCount = (clone $audienceQuery)->where('total_spent', '>=', 2000)->count();
+        $dormantCount = (clone $audienceQuery)
+            ->whereNotNull('last_order_at')
+            ->where('last_order_at', '<', now()->subDays(90))
+            ->count();
+
+        $sampleRows = (clone $audienceQuery)
+            ->orderByDesc('orders_count')
+            ->orderByDesc('total_spent')
+            ->limit(20)
+            ->get()
+            ->map(function ($row) use ($now): array {
+                $lastOrderAt = $row->last_order_at ? Carbon::parse((string) $row->last_order_at) : null;
+
+                return [
+                    'id' => (int) $row->id,
+                    'name' => (string) $row->name,
+                    'phone' => (string) $row->phone,
+                    'telegram_username' => $row->telegram_username ? (string) $row->telegram_username : null,
+                    'orders_count' => (int) $row->orders_count,
+                    'total_spent' => (float) ($row->total_spent ?? 0),
+                    'average_order_value' => (float) ($row->average_order_value ?? 0),
+                    'last_order_at' => $lastOrderAt?->toDateTimeString(),
+                    'recency_days' => $lastOrderAt?->diffInDays($now),
+                ];
+            })
+            ->values();
+
+        return response()->json([
+            'summary' => [
+                'matched_customers' => $totalMatching,
+                'high_value_customers' => $highValueCount,
+                'dormant_customers' => $dormantCount,
+                'average_orders_per_customer' => round((float) ((clone $audienceQuery)->avg('orders_count') ?? 0), 2),
+                'average_total_spent' => round((float) ((clone $audienceQuery)->avg('total_spent') ?? 0), 2),
+            ],
+            'sample' => $sampleRows,
+        ]);
+    }
+
+    /**
+     * Send a promo campaign to the currently targeted audience.
+     */
+    public function sendCampaign(
+        SendPromoCampaignRequest $request,
+        SmsTemplateService $smsTemplateService,
+        SmsEthiopiaService $smsService,
+        TelegramBotApiService $telegramBotApiService,
+    ): RedirectResponse {
+        /** @var \App\Models\User $user */
+        $user = $request->user();
+        $validated = $request->validated();
+
+        $rangeError = $this->promoRangeValidationMessage($validated);
+
+        if ($rangeError !== null) {
+            return back()->withErrors([
+                'message' => $rangeError,
+            ]);
+        }
+
+        $audienceRows = (clone $this->promoAudienceQuery($user, $validated))
+            ->orderByDesc('orders_count')
+            ->orderByDesc('total_spent')
+            ->get();
+
+        if ($audienceRows->isEmpty()) {
+            return back()->with('error', 'No customers matched the selected promo filters.');
+        }
+
+        $customerIds = $audienceRows
+            ->pluck('id')
+            ->map(fn ($id) => (int) $id)
+            ->filter(fn (int $id) => $id > 0)
+            ->unique()
+            ->values()
+            ->all();
+
+        /** @var \Illuminate\Support\Collection<int, \App\Models\Customer> $customers */
+        $customers = Customer::query()
+            ->whereIn('id', $customerIds)
+            ->get()
+            ->keyBy('id');
+
+        $platform = (string) $validated['platform'];
+        $buttonText = is_string($validated['telegram_button_text'] ?? null)
+            ? trim($validated['telegram_button_text'])
+            : '';
+        $buttonUrl = is_string($validated['telegram_button_url'] ?? null)
+            ? trim($validated['telegram_button_url'])
+            : '';
+
+        $sent = 0;
+        $failed = 0;
+
+        foreach ($audienceRows as $row) {
+            $customer = $customers->get((int) $row->id);
+
+            if (! $customer instanceof Customer) {
+                $failed++;
+                continue;
+            }
+
+            $latestOrderQuery = $customer->orders()->with(['pickupLocation', 'items.menuItem'])->latest();
+            BranchAccess::scopeQuery($latestOrderQuery, $user);
+            $latestOrder = $latestOrderQuery->first();
+
+            $renderedMessage = $smsTemplateService->render(
+                (string) $validated['message'],
+                $smsTemplateService->variablesForCustomer($customer, $latestOrder),
+            );
+
+            if ($platform === 'telegram') {
+                $chatTarget = $this->telegramChatTarget($customer);
+
+                if ($chatTarget === null) {
+                    $failed++;
+                    continue;
+                }
+
+                $options = [];
+
+                if ($buttonText !== '' && $buttonUrl !== '') {
+                    $options['reply_markup'] = [
+                        'inline_keyboard' => [
+                            [
+                                [
+                                    'text' => $buttonText,
+                                    'url' => $buttonUrl,
+                                    'style' => 'primary',
+                                ],
+                            ],
+                        ],
+                    ];
+                }
+
+                $telegramBotApiService->sendMessage($chatTarget, $renderedMessage, $options);
+                $sent++;
+                continue;
+            }
+
+            $phone = is_string($customer->phone) ? trim($customer->phone) : '';
+
+            if ($phone === '') {
+                $failed++;
+                continue;
+            }
+
+            $result = $smsService->send($phone, $renderedMessage, $customer);
+
+            if ($result->status === 'sent') {
+                $sent++;
+            } else {
+                $failed++;
+            }
+        }
+
+        $savedTemplateLabel = null;
+
+        if ($request->boolean('save_template')) {
+            $templateLabel = is_string($validated['template_label'] ?? null)
+                ? trim($validated['template_label'])
+                : '';
+
+            if ($templateLabel === '') {
+                $templateLabel = 'Promo Campaign '.now()->format('Y-m-d H:i');
+            }
+
+            $template = SmsTemplate::query()->create([
+                'key' => $this->nextPromoTemplateKey(),
+                'label' => $templateLabel,
+                'body' => (string) $validated['message'],
+                'is_active' => true,
+            ]);
+
+            $savedTemplateLabel = $template->label;
+        }
+
+        $channelLabel = $platform === 'telegram' ? 'Telegram' : 'SMS';
+        $message = "{$channelLabel} promo sent. Sent: {$sent}, Failed: {$failed}, Audience: ".count($customerIds).'.';
+
+        if ($savedTemplateLabel !== null) {
+            $message .= " Template saved as \"{$savedTemplateLabel}\".";
+        }
+
+        return back()->with('success', $message);
+    }
+
+    /**
+     * Validate promo range filters.
+     *
+     * @param  array<string, mixed>  $validated
+     */
+    protected function promoRangeValidationMessage(array $validated): ?string
+    {
         $ordersMin = isset($validated['orders_min']) ? (int) $validated['orders_min'] : null;
         $ordersMax = isset($validated['orders_max']) ? (int) $validated['orders_max'] : null;
         $recencyMinDays = isset($validated['recency_min_days']) ? (int) $validated['recency_min_days'] : null;
@@ -172,29 +382,39 @@ class SmsTemplateController extends Controller
         $avgOrderValueMax = isset($validated['avg_order_value_max']) ? (float) $validated['avg_order_value_max'] : null;
 
         if ($ordersMin !== null && $ordersMax !== null && $ordersMin > $ordersMax) {
-            return response()->json([
-                'message' => 'Order range is invalid. Min orders cannot be greater than max orders.',
-            ], 422);
+            return 'Order range is invalid. Min orders cannot be greater than max orders.';
         }
 
         if ($recencyMinDays !== null && $recencyMaxDays !== null && $recencyMinDays > $recencyMaxDays) {
-            return response()->json([
-                'message' => 'Recency window is invalid. Min days cannot be greater than max days.',
-            ], 422);
+            return 'Recency window is invalid. Min days cannot be greater than max days.';
         }
 
         if ($totalSpentMin !== null && $totalSpentMax !== null && $totalSpentMin > $totalSpentMax) {
-            return response()->json([
-                'message' => 'Total spend range is invalid. Min spend cannot be greater than max spend.',
-            ], 422);
+            return 'Total spend range is invalid. Min spend cannot be greater than max spend.';
         }
 
         if ($avgOrderValueMin !== null && $avgOrderValueMax !== null && $avgOrderValueMin > $avgOrderValueMax) {
-            return response()->json([
-                'message' => 'Average order value range is invalid. Min AOV cannot be greater than max AOV.',
-            ], 422);
+            return 'Average order value range is invalid. Min AOV cannot be greater than max AOV.';
         }
 
+        return null;
+    }
+
+    /**
+     * Build promo audience query using targeting filters.
+     *
+     * @param  array<string, mixed>  $validated
+     */
+    protected function promoAudienceQuery(User $user, array $validated): QueryBuilder
+    {
+        $ordersMin = isset($validated['orders_min']) ? (int) $validated['orders_min'] : null;
+        $ordersMax = isset($validated['orders_max']) ? (int) $validated['orders_max'] : null;
+        $recencyMinDays = isset($validated['recency_min_days']) ? (int) $validated['recency_min_days'] : null;
+        $recencyMaxDays = isset($validated['recency_max_days']) ? (int) $validated['recency_max_days'] : null;
+        $totalSpentMin = isset($validated['total_spent_min']) ? (float) $validated['total_spent_min'] : null;
+        $totalSpentMax = isset($validated['total_spent_max']) ? (float) $validated['total_spent_max'] : null;
+        $avgOrderValueMin = isset($validated['avg_order_value_min']) ? (float) $validated['avg_order_value_min'] : null;
+        $avgOrderValueMax = isset($validated['avg_order_value_max']) ? (float) $validated['avg_order_value_max'] : null;
         $platform = (string) $validated['platform'];
         $search = trim((string) ($validated['search'] ?? ''));
 
@@ -302,7 +522,7 @@ class SmsTemplateController extends Controller
                 });
             });
 
-        $audienceQuery = DB::query()
+        return DB::query()
             ->fromSub($baseAudienceQuery, 'audience')
             ->when($ordersMin !== null, fn ($query) => $query->where('orders_count', '>=', $ordersMin))
             ->when($ordersMax !== null, fn ($query) => $query->where('orders_count', '<=', $ordersMax))
@@ -310,47 +530,60 @@ class SmsTemplateController extends Controller
             ->when($totalSpentMax !== null, fn ($query) => $query->where('total_spent', '<=', $totalSpentMax))
             ->when($avgOrderValueMin !== null, fn ($query) => $query->where('average_order_value', '>=', $avgOrderValueMin))
             ->when($avgOrderValueMax !== null, fn ($query) => $query->where('average_order_value', '<=', $avgOrderValueMax));
+    }
 
-        $now = now();
-        $totalMatching = (clone $audienceQuery)->count();
-        $highValueCount = (clone $audienceQuery)->where('total_spent', '>=', 2000)->count();
-        $dormantCount = (clone $audienceQuery)
-            ->whereNotNull('last_order_at')
-            ->where('last_order_at', '<', now()->subDays(90))
-            ->count();
+    protected function telegramChatTarget(Customer $customer): int|string|null
+    {
+        $telegramId = $this->normalizeTelegramId($customer->telegram_id);
 
-        $sampleRows = (clone $audienceQuery)
-            ->orderByDesc('orders_count')
-            ->orderByDesc('total_spent')
-            ->limit(20)
-            ->get()
-            ->map(function ($row) use ($now): array {
-                $lastOrderAt = $row->last_order_at ? Carbon::parse((string) $row->last_order_at) : null;
+        if ($telegramId !== null) {
+            return $telegramId;
+        }
 
-                return [
-                    'id' => (int) $row->id,
-                    'name' => (string) $row->name,
-                    'phone' => (string) $row->phone,
-                    'telegram_username' => $row->telegram_username ? (string) $row->telegram_username : null,
-                    'orders_count' => (int) $row->orders_count,
-                    'total_spent' => (float) ($row->total_spent ?? 0),
-                    'average_order_value' => (float) ($row->average_order_value ?? 0),
-                    'last_order_at' => $lastOrderAt?->toDateTimeString(),
-                    'recency_days' => $lastOrderAt?->diffInDays($now),
-                ];
-            })
-            ->values();
+        $username = is_string($customer->telegram_username)
+            ? ltrim(trim($customer->telegram_username), '@')
+            : '';
 
-        return response()->json([
-            'summary' => [
-                'matched_customers' => $totalMatching,
-                'high_value_customers' => $highValueCount,
-                'dormant_customers' => $dormantCount,
-                'average_orders_per_customer' => round((float) ((clone $audienceQuery)->avg('orders_count') ?? 0), 2),
-                'average_total_spent' => round((float) ((clone $audienceQuery)->avg('total_spent') ?? 0), 2),
-            ],
-            'sample' => $sampleRows,
-        ]);
+        return $username !== '' ? '@'.$username : null;
+    }
+
+    protected function normalizeTelegramId(mixed $value): ?int
+    {
+        if (is_int($value) && $value > 0) {
+            return $value;
+        }
+
+        if (is_string($value)) {
+            $trimmed = trim($value);
+
+            if ($trimmed !== '' && ctype_digit($trimmed)) {
+                $parsed = (int) $trimmed;
+
+                return $parsed > 0 ? $parsed : null;
+            }
+        }
+
+        if (is_numeric($value)) {
+            $parsed = (int) $value;
+
+            return $parsed > 0 ? $parsed : null;
+        }
+
+        return null;
+    }
+
+    protected function nextPromoTemplateKey(): string
+    {
+        $baseKey = 'promo_'.now()->format('Ymd_His');
+        $candidate = $baseKey;
+        $suffix = 1;
+
+        while (SmsTemplate::query()->where('key', $candidate)->exists()) {
+            $candidate = "{$baseKey}_{$suffix}";
+            $suffix++;
+        }
+
+        return $candidate;
     }
 
     /**

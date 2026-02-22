@@ -8,6 +8,8 @@ use App\Models\SmsNotificationSetting;
 use App\Models\SmsPhoneList;
 use App\Models\SmsTemplate;
 use App\Models\User;
+use Illuminate\Http\Client\Request as HttpRequest;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
 
@@ -42,6 +44,94 @@ test('staff can update sms template body', function () {
         ->assertRedirect();
 
     expect($template->fresh()?->body)->toBe('Hi {name}, template updated.');
+});
+
+test('staff can send telegram promo campaign and save template from wizard action', function () {
+    $staff = User::factory()->create([
+        'role' => 'staff',
+    ]);
+
+    $branch = \App\Models\PickupLocation::query()->create([
+        'name' => 'Promo Branch',
+        'address' => 'Addis Ababa',
+        'is_active' => true,
+    ]);
+
+    $staff->pickupLocations()->sync([$branch->id]);
+
+    $customer = Customer::query()->create([
+        'name' => 'Promo Target',
+        'phone' => '251911330001',
+        'telegram_id' => 77889911,
+    ]);
+
+    $customer->orders()->create([
+        'pickup_date' => now()->toDateString(),
+        'pickup_location_id' => $branch->id,
+        'tracking_token' => Str::random(40),
+        'total_amount' => 250,
+    ]);
+
+    Http::fake([
+        'https://api.telegram.org/*/sendMessage' => Http::response([
+            'ok' => true,
+            'result' => ['message_id' => 1],
+        ], 200),
+    ]);
+
+    $this->actingAs($staff)
+        ->post(route('staff.sms-campaigns.send'), [
+            'platform' => 'telegram',
+            'message' => 'Hello {name}, enjoy this promo.',
+            'save_template' => true,
+            'template_label' => 'Wizard Promo Template',
+            'telegram_button_text' => 'Open Offer',
+            'telegram_button_url' => 'https://example.com/offer',
+        ])
+        ->assertRedirect();
+
+    expect(SmsTemplate::query()->where('label', 'Wizard Promo Template')->exists())->toBeTrue();
+
+    Http::assertSent(function (HttpRequest $request): bool {
+        if (! str_contains($request->url(), '/sendMessage')) {
+            return false;
+        }
+
+        $payload = $request->data();
+        $markup = is_string($payload['reply_markup'] ?? null)
+            ? json_decode($payload['reply_markup'], true)
+            : null;
+
+        return ($payload['chat_id'] ?? null) === '77889911'
+            && ($payload['text'] ?? null) === 'Hello Promo Target, enjoy this promo.'
+            && (($markup['inline_keyboard'][0][0]['text'] ?? null) === 'Open Offer')
+            && (($markup['inline_keyboard'][0][0]['url'] ?? null) === 'https://example.com/offer');
+    });
+});
+
+test('sms campaign send validates telegram button fields and sms length rules', function () {
+    $staff = User::factory()->create([
+        'role' => 'staff',
+    ]);
+
+    $this->actingAs($staff)
+        ->from(route('staff.sms-templates.index'))
+        ->post(route('staff.sms-campaigns.send'), [
+            'platform' => 'telegram',
+            'message' => 'Promo message',
+            'telegram_button_url' => 'https://example.com/offer',
+        ])
+        ->assertRedirect(route('staff.sms-templates.index'))
+        ->assertSessionHasErrors(['telegram_button_text']);
+
+    $this->actingAs($staff)
+        ->from(route('staff.sms-templates.index'))
+        ->post(route('staff.sms-campaigns.send'), [
+            'platform' => 'sms',
+            'message' => str_repeat('A', 481),
+        ])
+        ->assertRedirect(route('staff.sms-templates.index'))
+        ->assertSessionHasErrors(['message']);
 });
 
 test('staff can toggle sms notification setting', function () {

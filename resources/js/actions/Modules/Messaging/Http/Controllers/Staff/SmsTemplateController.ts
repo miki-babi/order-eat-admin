@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../../../../wayfinder'
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::index
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:38
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:42
 * @route '/staff/sms-templates'
 */
 export const index = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ index.definition = {
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::index
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:38
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:42
 * @route '/staff/sms-templates'
 */
 index.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ index.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::index
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:38
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:42
 * @route '/staff/sms-templates'
 */
 index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -35,7 +35,7 @@ index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::index
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:38
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:42
 * @route '/staff/sms-templates'
 */
 index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -45,7 +45,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::index
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:38
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:42
 * @route '/staff/sms-templates'
 */
 const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -55,7 +55,7 @@ const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => (
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::index
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:38
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:42
 * @route '/staff/sms-templates'
 */
 indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -65,7 +65,7 @@ indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::index
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:38
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:42
 * @route '/staff/sms-templates'
 */
 indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -82,7 +82,7 @@ index.form = indexForm
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::update
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:359
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:592
 * @route '/staff/sms-templates/{smsTemplate}'
 */
 export const update = (args: { smsTemplate: number | { id: number } } | [smsTemplate: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -97,7 +97,7 @@ update.definition = {
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::update
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:359
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:592
 * @route '/staff/sms-templates/{smsTemplate}'
 */
 update.url = (args: { smsTemplate: number | { id: number } } | [smsTemplate: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -130,7 +130,7 @@ update.url = (args: { smsTemplate: number | { id: number } } | [smsTemplate: num
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::update
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:359
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:592
 * @route '/staff/sms-templates/{smsTemplate}'
 */
 update.put = (args: { smsTemplate: number | { id: number } } | [smsTemplate: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -140,7 +140,7 @@ update.put = (args: { smsTemplate: number | { id: number } } | [smsTemplate: num
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::update
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:359
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:592
 * @route '/staff/sms-templates/{smsTemplate}'
 */
 const updateForm = (args: { smsTemplate: number | { id: number } } | [smsTemplate: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -155,7 +155,7 @@ const updateForm = (args: { smsTemplate: number | { id: number } } | [smsTemplat
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::update
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:359
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:592
 * @route '/staff/sms-templates/{smsTemplate}'
 */
 updateForm.put = (args: { smsTemplate: number | { id: number } } | [smsTemplate: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -172,7 +172,7 @@ update.form = updateForm
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::updateNotificationSetting
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:379
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:612
 * @route '/staff/sms-notification-settings/{smsNotificationSetting}'
 */
 export const updateNotificationSetting = (args: { smsNotificationSetting: number | { id: number } } | [smsNotificationSetting: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -187,7 +187,7 @@ updateNotificationSetting.definition = {
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::updateNotificationSetting
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:379
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:612
 * @route '/staff/sms-notification-settings/{smsNotificationSetting}'
 */
 updateNotificationSetting.url = (args: { smsNotificationSetting: number | { id: number } } | [smsNotificationSetting: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -220,7 +220,7 @@ updateNotificationSetting.url = (args: { smsNotificationSetting: number | { id: 
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::updateNotificationSetting
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:379
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:612
 * @route '/staff/sms-notification-settings/{smsNotificationSetting}'
 */
 updateNotificationSetting.put = (args: { smsNotificationSetting: number | { id: number } } | [smsNotificationSetting: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -230,7 +230,7 @@ updateNotificationSetting.put = (args: { smsNotificationSetting: number | { id: 
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::updateNotificationSetting
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:379
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:612
 * @route '/staff/sms-notification-settings/{smsNotificationSetting}'
 */
 const updateNotificationSettingForm = (args: { smsNotificationSetting: number | { id: number } } | [smsNotificationSetting: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -245,7 +245,7 @@ const updateNotificationSettingForm = (args: { smsNotificationSetting: number | 
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::updateNotificationSetting
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:379
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:612
 * @route '/staff/sms-notification-settings/{smsNotificationSetting}'
 */
 updateNotificationSettingForm.put = (args: { smsNotificationSetting: number | { id: number } } | [smsNotificationSetting: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -262,7 +262,7 @@ updateNotificationSetting.form = updateNotificationSettingForm
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::storePhoneList
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:395
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:628
 * @route '/staff/sms-phone-lists'
 */
 export const storePhoneList = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -277,7 +277,7 @@ storePhoneList.definition = {
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::storePhoneList
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:395
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:628
 * @route '/staff/sms-phone-lists'
 */
 storePhoneList.url = (options?: RouteQueryOptions) => {
@@ -286,7 +286,7 @@ storePhoneList.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::storePhoneList
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:395
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:628
 * @route '/staff/sms-phone-lists'
 */
 storePhoneList.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -296,7 +296,7 @@ storePhoneList.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => 
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::storePhoneList
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:395
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:628
 * @route '/staff/sms-phone-lists'
 */
 const storePhoneListForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -306,7 +306,7 @@ const storePhoneListForm = (options?: RouteQueryOptions): RouteFormDefinition<'p
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::storePhoneList
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:395
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:628
 * @route '/staff/sms-phone-lists'
 */
 storePhoneListForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -318,7 +318,7 @@ storePhoneList.form = storePhoneListForm
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::destroyPhoneList
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:423
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:656
 * @route '/staff/sms-phone-lists/{smsPhoneList}'
 */
 export const destroyPhoneList = (args: { smsPhoneList: number | { id: number } } | [smsPhoneList: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -333,7 +333,7 @@ destroyPhoneList.definition = {
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::destroyPhoneList
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:423
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:656
 * @route '/staff/sms-phone-lists/{smsPhoneList}'
 */
 destroyPhoneList.url = (args: { smsPhoneList: number | { id: number } } | [smsPhoneList: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -366,7 +366,7 @@ destroyPhoneList.url = (args: { smsPhoneList: number | { id: number } } | [smsPh
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::destroyPhoneList
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:423
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:656
 * @route '/staff/sms-phone-lists/{smsPhoneList}'
 */
 destroyPhoneList.delete = (args: { smsPhoneList: number | { id: number } } | [smsPhoneList: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -376,7 +376,7 @@ destroyPhoneList.delete = (args: { smsPhoneList: number | { id: number } } | [sm
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::destroyPhoneList
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:423
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:656
 * @route '/staff/sms-phone-lists/{smsPhoneList}'
 */
 const destroyPhoneListForm = (args: { smsPhoneList: number | { id: number } } | [smsPhoneList: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -391,7 +391,7 @@ const destroyPhoneListForm = (args: { smsPhoneList: number | { id: number } } | 
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::destroyPhoneList
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:423
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:656
 * @route '/staff/sms-phone-lists/{smsPhoneList}'
 */
 destroyPhoneListForm.delete = (args: { smsPhoneList: number | { id: number } } | [smsPhoneList: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -408,7 +408,7 @@ destroyPhoneList.form = destroyPhoneListForm
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::importContacts
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:433
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:666
 * @route '/staff/sms-contacts/import'
 */
 export const importContacts = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -423,7 +423,7 @@ importContacts.definition = {
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::importContacts
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:433
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:666
 * @route '/staff/sms-contacts/import'
 */
 importContacts.url = (options?: RouteQueryOptions) => {
@@ -432,7 +432,7 @@ importContacts.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::importContacts
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:433
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:666
 * @route '/staff/sms-contacts/import'
 */
 importContacts.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -442,7 +442,7 @@ importContacts.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => 
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::importContacts
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:433
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:666
 * @route '/staff/sms-contacts/import'
 */
 const importContactsForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -452,7 +452,7 @@ const importContactsForm = (options?: RouteQueryOptions): RouteFormDefinition<'p
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::importContacts
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:433
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:666
 * @route '/staff/sms-contacts/import'
 */
 importContactsForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -464,7 +464,7 @@ importContacts.form = importContactsForm
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::previewAudience
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:159
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:163
 * @route '/staff/sms-campaigns/preview-audience'
 */
 export const previewAudience = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -479,7 +479,7 @@ previewAudience.definition = {
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::previewAudience
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:159
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:163
 * @route '/staff/sms-campaigns/preview-audience'
 */
 previewAudience.url = (options?: RouteQueryOptions) => {
@@ -488,7 +488,7 @@ previewAudience.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::previewAudience
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:159
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:163
 * @route '/staff/sms-campaigns/preview-audience'
 */
 previewAudience.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -498,7 +498,7 @@ previewAudience.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => (
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::previewAudience
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:159
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:163
 * @route '/staff/sms-campaigns/preview-audience'
 */
 previewAudience.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -508,7 +508,7 @@ previewAudience.head = (options?: RouteQueryOptions): RouteDefinition<'head'> =>
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::previewAudience
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:159
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:163
 * @route '/staff/sms-campaigns/preview-audience'
 */
 const previewAudienceForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -518,7 +518,7 @@ const previewAudienceForm = (options?: RouteQueryOptions): RouteFormDefinition<'
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::previewAudience
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:159
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:163
 * @route '/staff/sms-campaigns/preview-audience'
 */
 previewAudienceForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -528,7 +528,7 @@ previewAudienceForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'ge
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::previewAudience
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:159
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:163
 * @route '/staff/sms-campaigns/preview-audience'
 */
 previewAudienceForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -543,6 +543,62 @@ previewAudienceForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'g
 
 previewAudience.form = previewAudienceForm
 
-const SmsTemplateController = { index, update, updateNotificationSetting, storePhoneList, destroyPhoneList, importContacts, previewAudience }
+/**
+* @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::sendCampaign
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:223
+* @route '/staff/sms-campaigns/send'
+*/
+export const sendCampaign = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+    url: sendCampaign.url(options),
+    method: 'post',
+})
+
+sendCampaign.definition = {
+    methods: ["post"],
+    url: '/staff/sms-campaigns/send',
+} satisfies RouteDefinition<["post"]>
+
+/**
+* @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::sendCampaign
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:223
+* @route '/staff/sms-campaigns/send'
+*/
+sendCampaign.url = (options?: RouteQueryOptions) => {
+    return sendCampaign.definition.url + queryParams(options)
+}
+
+/**
+* @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::sendCampaign
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:223
+* @route '/staff/sms-campaigns/send'
+*/
+sendCampaign.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+    url: sendCampaign.url(options),
+    method: 'post',
+})
+
+/**
+* @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::sendCampaign
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:223
+* @route '/staff/sms-campaigns/send'
+*/
+const sendCampaignForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: sendCampaign.url(options),
+    method: 'post',
+})
+
+/**
+* @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::sendCampaign
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:223
+* @route '/staff/sms-campaigns/send'
+*/
+sendCampaignForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: sendCampaign.url(options),
+    method: 'post',
+})
+
+sendCampaign.form = sendCampaignForm
+
+const SmsTemplateController = { index, update, updateNotificationSetting, storePhoneList, destroyPhoneList, importContacts, previewAudience, sendCampaign }
 
 export default SmsTemplateController

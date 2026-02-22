@@ -93,6 +93,10 @@ type PromoWizardData = {
     include_menu_item_ids: number[];
     exclude_menu_item_ids: number[];
     message: string;
+    telegram_button_text: string;
+    telegram_button_url: string;
+    save_template: boolean;
+    template_label: string;
 };
 
 type PromoAudiencePreviewSummary = {
@@ -198,7 +202,7 @@ export default function SmsTemplates({
     const [contactsFileInputKey, setContactsFileInputKey] = useState(0);
     const [promoWizardOpen, setPromoWizardOpen] = useState(false);
     const [promoStepIndex, setPromoStepIndex] = useState(0);
-    const [promoDraftNotice, setPromoDraftNotice] = useState<string | null>(null);
+    const [promoSubmitMode, setPromoSubmitMode] = useState<'send' | 'save_send' | null>(null);
     const [audiencePreview, setAudiencePreview] = useState<PromoAudiencePreview | null>(null);
     const [audiencePreviewLoading, setAudiencePreviewLoading] = useState(false);
     const [audiencePreviewError, setAudiencePreviewError] = useState<string | null>(null);
@@ -237,6 +241,10 @@ export default function SmsTemplates({
         include_menu_item_ids: [],
         exclude_menu_item_ids: [],
         message: '',
+        telegram_button_text: '',
+        telegram_button_url: '',
+        save_template: false,
+        template_label: '',
     });
 
     const whitelistEntries = phoneLists.filter((entry) => entry.list_type === 'whitelist');
@@ -244,6 +252,10 @@ export default function SmsTemplates({
 
     const isSmsPlatform = promoForm.data.platform === 'sms';
     const promoMessageLimit = isSmsPlatform ? 480 : 2000;
+    const hasPartialTelegramButton =
+        promoForm.data.platform === 'telegram' &&
+        ((promoForm.data.telegram_button_text.trim() === '') !==
+            (promoForm.data.telegram_button_url.trim() === ''));
     const isLastPromoStep = promoStepIndex === promoSteps.length - 1;
     const selectedBranchLabels = branches
         .filter((branch) => promoForm.data.branch_ids.includes(branch.id))
@@ -376,6 +388,7 @@ export default function SmsTemplates({
     const closePromoWizard = () => {
         setPromoWizardOpen(false);
         setPromoStepIndex(0);
+        setPromoSubmitMode(null);
     };
 
     const goToPreviousPromoStep = () => {
@@ -396,6 +409,11 @@ export default function SmsTemplates({
 
         if (platform === 'sms' && promoForm.data.message.length > 480) {
             promoForm.setData('message', promoForm.data.message.slice(0, 480));
+        }
+
+        if (platform === 'sms') {
+            promoForm.setData('telegram_button_text', '');
+            promoForm.setData('telegram_button_url', '');
         }
     };
 
@@ -527,23 +545,43 @@ export default function SmsTemplates({
             : 'Any average order value';
 
     const canMoveToNextPromoStep = promoStepIndex === 1 ? promoForm.data.platform !== '' : true;
-    const canSavePromoDraft =
+    const canSendPromoCampaign =
         promoForm.data.platform !== '' &&
         promoForm.data.message.trim().length > 0 &&
-        (audiencePreview?.summary.matched_customers ?? 0) > 0;
+        (audiencePreview?.summary.matched_customers ?? 0) > 0 &&
+        !hasPartialTelegramButton;
 
-    const savePromoDraft = () => {
-        if (!canSavePromoDraft) {
+    const sendPromoCampaign = (saveTemplate: boolean) => {
+        if (!canSendPromoCampaign) {
             return;
         }
 
-        const platformLabel = promoForm.data.platform === 'sms' ? 'SMS' : 'Telegram';
-        setPromoDraftNotice(
-            `Promo campaign draft prepared for ${platformLabel}. Latest audience preview: ${
-                audiencePreview?.summary.matched_customers ?? 0
-            } customers.`,
-        );
-        closePromoWizard();
+        setPromoSubmitMode(saveTemplate ? 'save_send' : 'send');
+        promoForm.transform((data) => ({
+            ...data,
+            save_template: saveTemplate,
+        }));
+
+        promoForm.post('/staff/sms-campaigns/send', {
+            preserveScroll: true,
+            onSuccess: () => {
+                promoForm.reset();
+                promoForm.clearErrors();
+                setAudiencePreview(null);
+                setAudiencePreviewError(null);
+                closePromoWizard();
+            },
+            onError: () => {
+                setPromoStepIndex(3);
+            },
+            onFinish: () => {
+                setPromoSubmitMode(null);
+                promoForm.transform((data) => ({
+                    ...data,
+                    save_template: false,
+                }));
+            },
+        });
     };
 
     return (
@@ -665,12 +703,6 @@ export default function SmsTemplates({
                         </div>
                     </div>
                 </div>
-
-                {promoDraftNotice ? (
-                    <div className="rounded-2xl border-none bg-amber-50 px-6 py-4 text-sm font-black text-amber-800 shadow-sm ring-1 ring-amber-200">
-                        {promoDraftNotice}
-                    </div>
-                ) : null}
 
                 <Dialog
                     open={selectedPlaceholder !== null}
@@ -1238,6 +1270,78 @@ export default function SmsTemplates({
                                         }
                                     />
 
+                                    {promoForm.data.platform === 'telegram' ? (
+                                        <div className="grid gap-3 md:grid-cols-2">
+                                            <div className="space-y-1.5">
+                                                <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]" htmlFor="promo-telegram-button-text">
+                                                    Telegram Button Text
+                                                </Label>
+                                                <Input
+                                                    id="promo-telegram-button-text"
+                                                    className="h-11 rounded-xl border-zinc-200 focus:ring-[#F57C00]"
+                                                    value={promoForm.data.telegram_button_text}
+                                                    maxLength={64}
+                                                    onChange={(event) => promoForm.setData('telegram_button_text', event.target.value)}
+                                                    placeholder="Open Offer"
+                                                />
+                                            </div>
+                                            <div className="space-y-1.5">
+                                                <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]" htmlFor="promo-telegram-button-url">
+                                                    Telegram Button URL
+                                                </Label>
+                                                <Input
+                                                    id="promo-telegram-button-url"
+                                                    type="url"
+                                                    className="h-11 rounded-xl border-zinc-200 focus:ring-[#F57C00]"
+                                                    value={promoForm.data.telegram_button_url}
+                                                    onChange={(event) => promoForm.setData('telegram_button_url', event.target.value)}
+                                                    placeholder="https://example.com/promo"
+                                                />
+                                            </div>
+                                            <p className={`text-[10px] font-black uppercase tracking-widest md:col-span-2 ${
+                                                hasPartialTelegramButton ? 'text-rose-500' : 'text-zinc-400'
+                                            }`}>
+                                                {hasPartialTelegramButton
+                                                    ? 'Provide both Telegram button text and URL, or leave both empty.'
+                                                    : 'Optional: recipients will receive a primary inline URL button.'}
+                                            </p>
+                                        </div>
+                                    ) : null}
+
+                                    <div className="space-y-1.5">
+                                        <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]" htmlFor="promo-template-label">
+                                            Template Label (used for Save Template + Send)
+                                        </Label>
+                                        <Input
+                                            id="promo-template-label"
+                                            className="h-11 rounded-xl border-zinc-200 focus:ring-[#F57C00]"
+                                            value={promoForm.data.template_label}
+                                            maxLength={255}
+                                            onChange={(event) => promoForm.setData('template_label', event.target.value)}
+                                            placeholder="Promo Campaign - Weekend Offer"
+                                        />
+                                    </div>
+
+                                    {(promoForm.errors.message ||
+                                        promoForm.errors.telegram_button_text ||
+                                        promoForm.errors.telegram_button_url ||
+                                        promoForm.errors.template_label) ? (
+                                        <div className="space-y-1 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2">
+                                            {promoForm.errors.message ? (
+                                                <p className="text-[11px] font-bold text-rose-700">{promoForm.errors.message}</p>
+                                            ) : null}
+                                            {promoForm.errors.telegram_button_text ? (
+                                                <p className="text-[11px] font-bold text-rose-700">{promoForm.errors.telegram_button_text}</p>
+                                            ) : null}
+                                            {promoForm.errors.telegram_button_url ? (
+                                                <p className="text-[11px] font-bold text-rose-700">{promoForm.errors.telegram_button_url}</p>
+                                            ) : null}
+                                            {promoForm.errors.template_label ? (
+                                                <p className="text-[11px] font-bold text-rose-700">{promoForm.errors.template_label}</p>
+                                            ) : null}
+                                        </div>
+                                    ) : null}
+
                                     <div className="rounded-2xl border border-zinc-200 bg-white p-4">
                                         <p className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">Campaign Summary</p>
                                         <div className="mt-3 grid gap-3 md:grid-cols-2">
@@ -1317,18 +1421,30 @@ export default function SmsTemplates({
                             </Button>
 
                             {isLastPromoStep ? (
-                                <div className="space-y-1 text-right">
-                                    <Button
-                                        type="button"
-                                        className="h-11 rounded-xl bg-[#212121] px-8 font-black uppercase tracking-widest hover:bg-[#F57C00]"
-                                        disabled={!canSavePromoDraft}
-                                        onClick={savePromoDraft}
-                                    >
-                                        Save Promo Draft
-                                    </Button>
-                                    {!canSavePromoDraft ? (
+                                <div className="space-y-2 text-right">
+                                    <div className="flex flex-wrap justify-end gap-2">
+                                        <Button
+                                            type="button"
+                                            className="h-11 rounded-xl bg-[#F57C00] px-7 font-black uppercase tracking-widest hover:bg-[#E65100]"
+                                            disabled={!canSendPromoCampaign || promoForm.processing}
+                                            onClick={() => sendPromoCampaign(false)}
+                                        >
+                                            {promoForm.processing && promoSubmitMode === 'send' ? 'Sending...' : 'Send Promo'}
+                                        </Button>
+                                        <Button
+                                            type="button"
+                                            className="h-11 rounded-xl bg-[#212121] px-7 font-black uppercase tracking-widest hover:bg-[#F57C00]"
+                                            disabled={!canSendPromoCampaign || promoForm.processing}
+                                            onClick={() => sendPromoCampaign(true)}
+                                        >
+                                            {promoForm.processing && promoSubmitMode === 'save_send'
+                                                ? 'Saving + Sending...'
+                                                : 'Save Template + Send'}
+                                        </Button>
+                                    </div>
+                                    {!canSendPromoCampaign ? (
                                         <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400">
-                                            Preview and message are required before saving.
+                                            Preview and message are required before sending.
                                         </p>
                                     ) : null}
                                 </div>

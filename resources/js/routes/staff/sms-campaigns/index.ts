@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition } from './../../../wayfinder'
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::previewAudience
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:159
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:163
 * @route '/staff/sms-campaigns/preview-audience'
 */
 export const previewAudience = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ previewAudience.definition = {
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::previewAudience
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:159
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:163
 * @route '/staff/sms-campaigns/preview-audience'
 */
 previewAudience.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ previewAudience.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::previewAudience
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:159
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:163
 * @route '/staff/sms-campaigns/preview-audience'
 */
 previewAudience.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -35,7 +35,7 @@ previewAudience.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => (
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::previewAudience
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:159
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:163
 * @route '/staff/sms-campaigns/preview-audience'
 */
 previewAudience.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -45,7 +45,7 @@ previewAudience.head = (options?: RouteQueryOptions): RouteDefinition<'head'> =>
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::previewAudience
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:159
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:163
 * @route '/staff/sms-campaigns/preview-audience'
 */
 const previewAudienceForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -55,7 +55,7 @@ const previewAudienceForm = (options?: RouteQueryOptions): RouteFormDefinition<'
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::previewAudience
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:159
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:163
 * @route '/staff/sms-campaigns/preview-audience'
 */
 previewAudienceForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -65,7 +65,7 @@ previewAudienceForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'ge
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::previewAudience
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:159
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:163
 * @route '/staff/sms-campaigns/preview-audience'
 */
 previewAudienceForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -80,8 +80,65 @@ previewAudienceForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'g
 
 previewAudience.form = previewAudienceForm
 
+/**
+* @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::send
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:223
+* @route '/staff/sms-campaigns/send'
+*/
+export const send = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+    url: send.url(options),
+    method: 'post',
+})
+
+send.definition = {
+    methods: ["post"],
+    url: '/staff/sms-campaigns/send',
+} satisfies RouteDefinition<["post"]>
+
+/**
+* @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::send
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:223
+* @route '/staff/sms-campaigns/send'
+*/
+send.url = (options?: RouteQueryOptions) => {
+    return send.definition.url + queryParams(options)
+}
+
+/**
+* @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::send
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:223
+* @route '/staff/sms-campaigns/send'
+*/
+send.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+    url: send.url(options),
+    method: 'post',
+})
+
+/**
+* @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::send
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:223
+* @route '/staff/sms-campaigns/send'
+*/
+const sendForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: send.url(options),
+    method: 'post',
+})
+
+/**
+* @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::send
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:223
+* @route '/staff/sms-campaigns/send'
+*/
+sendForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: send.url(options),
+    method: 'post',
+})
+
+send.form = sendForm
+
 const smsCampaigns = {
     previewAudience: Object.assign(previewAudience, previewAudience),
+    send: Object.assign(send, send),
 }
 
 export default smsCampaigns
