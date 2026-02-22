@@ -764,6 +764,56 @@ test('telegram webhook opens active orders miniapp on /track command', function 
     });
 });
 
+test('telegram webhook returns telegram user id on /id command', function () {
+    Config::set('telegram.webhook_secret', null);
+    Config::set('telegram.bot_token', 'test-bot-token');
+
+    Customer::query()->create([
+        'name' => 'Id Command Customer',
+        'phone' => '251911000404',
+        'telegram_id' => 909003,
+        'telegram_username' => 'id_command_user',
+    ]);
+
+    Http::fake([
+        'https://api.telegram.org/*' => Http::response(['ok' => true], 200),
+    ]);
+
+    $payload = [
+        'update_id' => 100121,
+        'message' => [
+            'message_id' => 130,
+            'date' => now()->timestamp,
+            'chat' => [
+                'id' => 701100230,
+                'type' => 'private',
+            ],
+            'from' => [
+                'id' => 909003,
+                'is_bot' => false,
+                'first_name' => 'Id',
+                'username' => 'id_command_user',
+            ],
+            'text' => '/id',
+        ],
+    ];
+
+    $this->postJson(route('api.telegram.webhook'), $payload)
+        ->assertOk()
+        ->assertJson([
+            'ok' => true,
+        ]);
+
+    Http::assertSent(function ($request): bool {
+        $data = $request->data();
+
+        return is_array($data)
+            && str_contains($request->url(), '/sendMessage')
+            && (string) ($data['chat_id'] ?? '') === '701100230'
+            && (string) ($data['text'] ?? '') === 'Your Telegram user ID: 909003';
+    });
+});
+
 test('telegram webhook opens history miniapp on /history command', function () {
     Config::set('telegram.webhook_secret', null);
     Config::set('telegram.bot_token', 'test-bot-token');

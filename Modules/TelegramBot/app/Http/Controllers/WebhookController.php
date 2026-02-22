@@ -120,7 +120,12 @@ class WebhookController extends Controller
         }
 
         if (is_string($incomingMessage) && $incomingMessage !== '') {
-            $reply = $this->buildReply($incomingMessage, $customer, $featureToggleService);
+            $reply = $this->buildReply(
+                $incomingMessage,
+                $customer,
+                $featureToggleService,
+                $telegramUserId,
+            );
 
             if ($reply !== null) {
                 $telegramBotApiService->sendMessage($chatId, $reply['text'], array_merge([
@@ -338,6 +343,7 @@ class WebhookController extends Controller
         string $message,
         Customer $customer,
         FeatureToggleService $featureToggleService,
+        int $telegramUserId,
     ): ?array {
         if ($message === self::TRACK_ID_HINT_TRIGGER) {
             return [
@@ -373,6 +379,13 @@ class WebhookController extends Controller
             return $this->menuReply($featureToggleService);
         }
 
+        if ($this->matchesCommand($message, 'id')) {
+            return [
+                'text' => "Your Telegram user ID: {$telegramUserId}",
+                'options' => [],
+            ];
+        }
+
         if (preg_match('/^\/track(?:@[\w_]+)?\s+(\d{1,20})$/i', $message, $matches) === 1) {
             return [
                 'text' => $this->trackReply($customer, (int) $matches[1]),
@@ -400,6 +413,7 @@ class WebhookController extends Controller
             'cmd:start' => '/start',
             'cmd:help' => '/help',
             'cmd:menu' => '/menu',
+            'cmd:id' => '/id',
             'cmd:track' => '/track',
             'cmd:history' => '/history',
             'cmd:track_id_hint' => self::TRACK_ID_HINT_TRIGGER,
@@ -451,6 +465,13 @@ class WebhookController extends Controller
                             'callback_data' => 'cmd:track_id_hint',
                         ],
                     ],
+                    [
+                        [
+                            'text' => '/id',
+                            'style' => 'primary',
+                            'callback_data' => 'cmd:id',
+                        ],
+                    ],
                 ],
             ],
         ];
@@ -473,7 +494,7 @@ class WebhookController extends Controller
 
     protected function helpReply(): string
     {
-        return "Available commands:\n/menu\n/track\n/history\n/track <order_id>";
+        return "Available commands:\n/menu\n/id\n/track\n/history\n/track <order_id>";
     }
 
     /**
