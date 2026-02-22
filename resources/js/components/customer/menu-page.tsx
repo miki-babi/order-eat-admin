@@ -457,9 +457,6 @@ export default function CustomerMenuPage({
                 if (delta > 6 && hasScrolledEnough) {
                     if (step === 1) {
                         setHideTopChrome(true);
-                    }
-
-                    if (step < 4) {
                         setHideBottomActions(true);
                     }
                 } else if (delta < -6 || currentY < 32) {
@@ -469,9 +466,6 @@ export default function CustomerMenuPage({
 
                 if (step !== 1) {
                     setHideTopChrome(false);
-                }
-
-                if (step >= 4) {
                     setHideBottomActions(false);
                 }
 
