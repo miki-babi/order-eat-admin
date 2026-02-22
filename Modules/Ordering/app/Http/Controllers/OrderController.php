@@ -30,11 +30,36 @@ class OrderController extends Controller
      */
     public function index(Request $request, CustomerIdentityService $customerIdentityService): Response
     {
+        return $this->renderMenuPage(
+            request: $request,
+            customerIdentityService: $customerIdentityService,
+            pageComponent: 'customer/menu',
+        );
+    }
+
+    /**
+     * Show the Telegram miniapp ordering page.
+     */
+    public function telegramMenu(Request $request, CustomerIdentityService $customerIdentityService): Response
+    {
+        return $this->renderMenuPage(
+            request: $request,
+            customerIdentityService: $customerIdentityService,
+            pageComponent: 'customer/telegram-menu',
+            forcedChannel: MenuItem::CHANNEL_TELEGRAM,
+        );
+    }
+
+    protected function renderMenuPage(
+        Request $request,
+        CustomerIdentityService $customerIdentityService,
+        string $pageComponent,
+        ?string $forcedChannel = null,
+    ): Response {
         $search = trim((string) $request->input('search', ''));
         $category = $request->input('category');
-        $channel = MenuItem::normalizeVisibilityChannel(
-            is_string($request->input('channel')) ? $request->input('channel') : null,
-        );
+        $requestedChannel = is_string($request->input('channel')) ? $request->input('channel') : null;
+        $channel = $forcedChannel ?? MenuItem::normalizeVisibilityChannel($requestedChannel);
 
         $menuItems = MenuItem::query()
             ->where('is_active', true)
@@ -78,7 +103,7 @@ class OrderController extends Controller
         $customerPrefill = $customerIdentityService->resolvePrefillFromToken($customerToken);
         $customerIdentityService->queueClientTokenCookie($customerToken);
 
-        return Inertia::render('customer/menu', [
+        return Inertia::render($pageComponent, [
             'menuItems' => $menuItems,
             'categories' => $categories,
             'pickupLocations' => $pickupLocations,

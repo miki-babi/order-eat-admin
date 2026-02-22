@@ -156,7 +156,7 @@ test('telegram webhook sends inline miniapp launch when customer already has a p
             && str_contains((string) ($data['text'] ?? ''), 'Welcome')
             && is_array($decodedMarkup)
             && data_get($decodedMarkup, 'inline_keyboard.0.0.text') === 'Order'
-            && data_get($decodedMarkup, 'inline_keyboard.0.0.web_app.url') === 'https://example.test/?channel=telegram';
+            && data_get($decodedMarkup, 'inline_keyboard.0.0.web_app.url') === 'https://example.test/telegram/menu';
     });
 });
 
@@ -250,7 +250,7 @@ test('telegram webhook stores phone number when contact is shared', function () 
             && str_contains((string) ($data['text'] ?? ''), 'Tap the button below to order.')
             && is_array($decodedMarkup)
             && data_get($decodedMarkup, 'inline_keyboard.0.0.text') === 'Order'
-            && data_get($decodedMarkup, 'inline_keyboard.0.0.web_app.url') === 'https://example.test/?channel=telegram';
+            && data_get($decodedMarkup, 'inline_keyboard.0.0.web_app.url') === 'https://example.test/telegram/menu';
     });
 });
 

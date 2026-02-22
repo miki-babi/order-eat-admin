@@ -519,7 +519,7 @@ class WebhookController extends Controller
             return null;
         }
 
-        return "{$baseUrl}/?channel=telegram";
+        return "{$baseUrl}/telegram/menu";
     }
 
     protected function normalizeButtonText(mixed $value): ?string

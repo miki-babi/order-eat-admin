@@ -11,6 +11,9 @@ use Modules\Ordering\Http\Controllers\Staff\WaiterBoardController;
 Route::get('/', [OrderController::class, 'index'])
     ->middleware('feature:customer_menu_browsing')
     ->name('home');
+Route::get('/telegram/menu', [OrderController::class, 'telegramMenu'])
+    ->middleware('feature:customer_menu_browsing')
+    ->name('telegram.menu');
 Route::get('/qr-menu/{diningTable:qr_code}', [QrMenuController::class, 'show'])
     ->middleware('feature:customer_qr_menu')
     ->name('qr-menu.show');
