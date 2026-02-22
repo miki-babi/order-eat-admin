@@ -1,6 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import { ArrowRight, ExternalLink, LoaderCircle, MapPin, Package, RefreshCw, ShoppingBag } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 
 type Scope = 'active' | 'history';
@@ -132,6 +132,8 @@ export default function TelegramOrdersPage({ scope }: PageProps) {
     const [refreshKey, setRefreshKey] = useState(0);
     const [activeCount, setActiveCount] = useState(0);
     const [historyCount, setHistoryCount] = useState(0);
+    const [hideTopChrome, setHideTopChrome] = useState(false);
+    const lastScrollY = useRef(0);
 
     const title = scope === 'history' ? 'Telegram Order History' : 'Active Telegram Orders';
 
@@ -142,6 +144,55 @@ export default function TelegramOrdersPage({ scope }: PageProps) {
                 : 'Orders currently pending, preparing, or ready for pickup.',
         [scope],
     );
+
+    useEffect(() => {
+        if (typeof window === 'undefined') {
+            return;
+        }
+
+        let ticking = false;
+
+        const handleScroll = () => {
+            if (ticking) {
+                return;
+            }
+
+            ticking = true;
+
+            window.requestAnimationFrame(() => {
+                const currentY = window.scrollY || 0;
+                const isDesktop = window.matchMedia('(min-width: 768px)').matches;
+
+                if (isDesktop) {
+                    setHideTopChrome(false);
+                    lastScrollY.current = currentY;
+                    ticking = false;
+                    return;
+                }
+
+                const delta = currentY - lastScrollY.current;
+                const hasScrolledEnough = currentY > 72;
+
+                if (delta > 6 && hasScrolledEnough) {
+                    setHideTopChrome(true);
+                } else if (delta < -6 || currentY < 24) {
+                    setHideTopChrome(false);
+                }
+
+                lastScrollY.current = currentY;
+                ticking = false;
+            });
+        };
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        window.addEventListener('resize', handleScroll);
+        handleScroll();
+
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+            window.removeEventListener('resize', handleScroll);
+        };
+    }, []);
 
     useEffect(() => {
         let isDisposed = false;
@@ -245,7 +296,7 @@ export default function TelegramOrdersPage({ scope }: PageProps) {
             <Head title={title} />
             <div className="min-h-screen bg-[#FAFAFA] text-[#212121]">
                 <main className="mx-auto w-full max-w-4xl px-4 py-8 md:px-8">
-                    <div className="mb-8 rounded-3xl bg-white p-6 shadow-lg ring-1 ring-zinc-100">
+                    <div className={`sticky top-0 z-40 mb-6 rounded-3xl bg-white/95 p-6 shadow-lg ring-1 ring-zinc-100 backdrop-blur transition-all duration-300 md:relative md:top-0 md:mb-8 md:bg-white md:backdrop-blur-none md:translate-y-0 md:opacity-100 md:pointer-events-auto ${hideTopChrome ? '-translate-y-[120%] opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}`}>
                         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                             <div>
                                 <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#9E9E9E]">Telegram Miniapp</p>

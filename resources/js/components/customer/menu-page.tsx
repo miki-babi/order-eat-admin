@@ -350,6 +350,7 @@ export default function CustomerMenuPage({
     const [search, setSearch] = useState(filters.search ?? '');
     const [activeCategory, setActiveCategory] = useState(filters.category ?? 'all');
     const [hideTopChrome, setHideTopChrome] = useState(false);
+    const [hideBottomActions, setHideBottomActions] = useState(false);
     const hasSyncedTelegramIdentity = useRef(false);
     const lastScrollY = useRef(0);
     const [cart, setCart] = useState<Record<number, number>>(
@@ -440,13 +441,38 @@ export default function CustomerMenuPage({
 
             window.requestAnimationFrame(() => {
                 const currentY = window.scrollY || 0;
+                const isDesktop = window.matchMedia('(min-width: 768px)').matches;
+
+                if (isDesktop) {
+                    setHideTopChrome(false);
+                    setHideBottomActions(false);
+                    lastScrollY.current = currentY;
+                    ticking = false;
+                    return;
+                }
+
                 const delta = currentY - lastScrollY.current;
                 const hasScrolledEnough = currentY > 96;
 
-                if (delta > 6 && hasScrolledEnough && step === 1) {
-                    setHideTopChrome(true);
-                } else if (delta < -6 || currentY < 32 || step !== 1) {
+                if (delta > 6 && hasScrolledEnough) {
+                    if (step === 1) {
+                        setHideTopChrome(true);
+                    }
+
+                    if (step < 4) {
+                        setHideBottomActions(true);
+                    }
+                } else if (delta < -6 || currentY < 32) {
                     setHideTopChrome(false);
+                    setHideBottomActions(false);
+                }
+
+                if (step !== 1) {
+                    setHideTopChrome(false);
+                }
+
+                if (step >= 4) {
+                    setHideBottomActions(false);
                 }
 
                 lastScrollY.current = currentY;
@@ -455,9 +481,12 @@ export default function CustomerMenuPage({
         };
 
         window.addEventListener('scroll', onScroll, { passive: true });
+        window.addEventListener('resize', onScroll);
+        onScroll();
 
         return () => {
             window.removeEventListener('scroll', onScroll);
+            window.removeEventListener('resize', onScroll);
         };
     }, [step]);
 
@@ -727,7 +756,7 @@ export default function CustomerMenuPage({
 
                 <main className="mx-auto w-full max-w-7xl px-4 py-8 md:px-8 pb-32 md:pb-12">
                     {/* Material Step Tracker */}
-                    <div className={`sticky top-[0px] z-40 mb-6 overflow-hidden rounded-2xl bg-white p-1.5 shadow-lg ring-1 ring-zinc-100 transition-all duration-300 md:relative md:top-0 md:bg-white md:p-1 md:shadow-md ${hideTopChrome ? '-translate-y-[130%] opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}`}>
+                    <div className={`sticky top-[0px] z-40 mb-6 overflow-hidden rounded-2xl bg-white p-1.5 shadow-lg ring-1 ring-zinc-100 transition-all duration-300 md:relative md:top-0 md:bg-white md:p-1 md:shadow-md md:translate-y-0 md:opacity-100 md:pointer-events-auto ${hideTopChrome ? '-translate-y-[130%] opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}`}>
                         <div className="flex flex-row items-center gap-1">
                             {steps.map((label, index) => {
                                 const isActive = step === index + 1;
@@ -763,7 +792,7 @@ export default function CustomerMenuPage({
                         
                     </div>
 
-                    <div className={`sticky top-[64px] z-30 mb-10 overflow-hidden rounded-2xl bg-white p-1.5 shadow-lg ring-1 ring-zinc-100 transition-all duration-300 md:relative md:top-0 md:bg-white md:p-1 md:shadow-md ${step === 1 ? 'block' : 'hidden'} ${hideTopChrome ? '-translate-y-[160%] opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}`}>
+                    <div className={`sticky top-[64px] z-30 mb-10 overflow-hidden rounded-2xl bg-white p-1.5 shadow-lg ring-1 ring-zinc-100 transition-all duration-300 md:relative md:top-0 md:bg-white md:p-1 md:shadow-md md:translate-y-0 md:opacity-100 md:pointer-events-auto ${step === 1 ? 'block' : 'hidden'} ${hideTopChrome ? '-translate-y-[160%] opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}`}>
 
                     <div className=" flex flex-wrap gap-3 p-2 transition-all duration-300">
                                             <button
@@ -1183,7 +1212,7 @@ export default function CustomerMenuPage({
                             )}
 
                             {/* Navigation Bar (Floating on Mobile, Inline on Desktop) */}
-                            <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/90 p-4 shadow-[0_-8px_30px_rgb(0,0,0,0.12)] backdrop-blur-xl ring-1 ring-zinc-200/50 md:relative md:bottom-auto md:left-auto md:right-auto md:z-0 md:w-full md:max-w-none md:translate-x-0 md:bg-transparent md:p-0 md:pt-12 md:shadow-none md:ring-0 md:backdrop-blur-none">
+                            <div className={`fixed bottom-0 left-0 right-0 z-50 bg-white/90 p-4 shadow-[0_-8px_30px_rgb(0,0,0,0.12)] backdrop-blur-xl ring-1 ring-zinc-200/50 transition-all duration-300 md:relative md:bottom-auto md:left-auto md:right-auto md:z-0 md:w-full md:max-w-none md:translate-x-0 md:translate-y-0 md:opacity-100 md:pointer-events-auto md:bg-transparent md:p-0 md:pt-12 md:shadow-none md:ring-0 md:backdrop-blur-none ${hideBottomActions ? 'translate-y-[120%] opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}`}>
                                 <div className="flex w-full items-center justify-between gap-4">
                                     <Button
                                         type="button"

@@ -12,7 +12,7 @@ import {
     ShoppingBag,
     Upload
 } from 'lucide-react';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 
@@ -99,8 +99,59 @@ export default function Tracking({ order }: { order: Order }) {
         receipt: null,
     });
     const isRefreshing = useRef(false);
+    const lastScrollY = useRef(0);
+    const [hideTopChrome, setHideTopChrome] = useState(false);
     const activeStageIndex = Math.max(orderStages.findIndex((stage) => stage.key === order.order_status), 0);
     const showReceiptUploadSection = order.receipt_status !== 'approved';
+
+    useEffect(() => {
+        if (typeof window === 'undefined') {
+            return;
+        }
+
+        let ticking = false;
+
+        const handleScroll = () => {
+            if (ticking) {
+                return;
+            }
+
+            ticking = true;
+
+            window.requestAnimationFrame(() => {
+                const currentY = window.scrollY || 0;
+                const isDesktop = window.matchMedia('(min-width: 768px)').matches;
+
+                if (isDesktop) {
+                    setHideTopChrome(false);
+                    lastScrollY.current = currentY;
+                    ticking = false;
+                    return;
+                }
+
+                const delta = currentY - lastScrollY.current;
+                const hasScrolledEnough = currentY > 72;
+
+                if (delta > 6 && hasScrolledEnough) {
+                    setHideTopChrome(true);
+                } else if (delta < -6 || currentY < 24) {
+                    setHideTopChrome(false);
+                }
+
+                lastScrollY.current = currentY;
+                ticking = false;
+            });
+        };
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        window.addEventListener('resize', handleScroll);
+        handleScroll();
+
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+            window.removeEventListener('resize', handleScroll);
+        };
+    }, []);
 
     useEffect(() => {
         const intervalId = window.setInterval(() => {
@@ -137,7 +188,7 @@ export default function Tracking({ order }: { order: Order }) {
             <Head title={`Track Order #${order.id} - Cafe`} />
             <div className="min-h-screen bg-[#FAFAFA] text-[#212121] selection:bg-[#F57C00]/20 pb-20">
                 {/* Slim Navigation Header */}
-                <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/80 backdrop-blur-md">
+                <header className={`sticky top-0 z-50 border-b border-zinc-100 bg-white/80 backdrop-blur-md transition-all duration-300 md:translate-y-0 md:opacity-100 md:pointer-events-auto ${hideTopChrome ? '-translate-y-[120%] opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}`}>
                     <div className="mx-auto flex h-16 max-w-4xl items-center justify-between px-4">
                         <Link href={menuHref} className="flex items-center gap-2 group">
                             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#212121] transition-transform group-hover:rotate-12">
