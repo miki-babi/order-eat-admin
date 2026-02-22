@@ -561,6 +561,73 @@ test('telegram webhook uses admin miniapp button settings', function () {
     });
 });
 
+test('telegram webhook rewrites same-origin miniapp launch url to dedicated telegram menu route', function () {
+    Config::set('telegram.webhook_secret', null);
+    Config::set('telegram.bot_token', 'test-bot-token');
+    Config::set('app.url', 'https://example.test');
+
+    FeatureToggle::query()->updateOrCreate(
+        ['feature_key' => 'telegram_bot_miniapp_launch'],
+        [
+            'name' => 'Telegram Miniapp Launch Button',
+            'description' => 'Inline launch controls',
+            'is_enabled' => true,
+            'lock_message' => 'Order',
+            'help_url' => 'https://example.test/',
+        ],
+    );
+
+    Customer::query()->create([
+        'name' => 'Same Origin Launch User',
+        'phone' => '251911121212',
+        'telegram_id' => 88991234,
+        'telegram_username' => 'same_origin_launch',
+    ]);
+
+    Http::fake([
+        'https://api.telegram.org/*' => Http::response(['ok' => true], 200),
+    ]);
+
+    $payload = [
+        'update_id' => 100051,
+        'message' => [
+            'message_id' => 51,
+            'date' => now()->timestamp,
+            'chat' => [
+                'id' => 44001123,
+                'type' => 'private',
+            ],
+            'from' => [
+                'id' => 88991234,
+                'is_bot' => false,
+                'first_name' => 'Origin',
+                'last_name' => 'User',
+                'username' => 'same_origin_launch',
+            ],
+            'text' => '/start',
+        ],
+    ];
+
+    $this->postJson(route('api.telegram.webhook'), $payload)
+        ->assertOk()
+        ->assertJson([
+            'ok' => true,
+        ]);
+
+    Http::assertSent(function ($request): bool {
+        $data = $request->data();
+        $replyMarkup = is_array($data) ? ($data['reply_markup'] ?? null) : null;
+        $decodedMarkup = is_string($replyMarkup) ? json_decode($replyMarkup, true) : null;
+
+        return is_array($data)
+            && str_contains($request->url(), '/sendMessage')
+            && (string) ($data['chat_id'] ?? '') === '44001123'
+            && is_array($decodedMarkup)
+            && data_get($decodedMarkup, 'inline_keyboard.0.0.text') === 'Order'
+            && data_get($decodedMarkup, 'inline_keyboard.0.0.web_app.url') === 'https://example.test/telegram/menu';
+    });
+});
+
 test('telegram webhook replies with tracking details for customer order id', function () {
     Config::set('telegram.webhook_secret', null);
     Config::set('telegram.bot_token', 'test-bot-token');

@@ -778,7 +778,7 @@ class WebhookController extends Controller
         $customUrl = $this->normalizeAbsoluteUrl($feature?->help_url);
 
         if ($customUrl !== null) {
-            return $customUrl;
+            return $this->enforceTelegramMiniAppUrl($customUrl);
         }
 
         $configuredFeature = config('feature-locks.features.'.self::MINIAPP_LAUNCH_FEATURE_KEY, []);
@@ -787,13 +787,13 @@ class WebhookController extends Controller
             : null;
 
         if ($configuredUrl !== null) {
-            return $configuredUrl;
+            return $this->enforceTelegramMiniAppUrl($configuredUrl);
         }
 
         $telegramConfiguredUrl = $this->normalizeAbsoluteUrl(config('telegram.miniapp_url'));
 
         if ($telegramConfiguredUrl !== null) {
-            return $telegramConfiguredUrl;
+            return $this->enforceTelegramMiniAppUrl($telegramConfiguredUrl);
         }
 
         return $this->fallbackMenuUrl();
@@ -834,6 +834,32 @@ class WebhookController extends Controller
         }
 
         return $url;
+    }
+
+    protected function enforceTelegramMiniAppUrl(string $url): string
+    {
+        $fallbackTelegramUrl = $this->fallbackMenuUrl();
+
+        if ($fallbackTelegramUrl !== null && $this->isSameOriginUrl($url, $fallbackTelegramUrl)) {
+            return $fallbackTelegramUrl;
+        }
+
+        return $url;
+    }
+
+    protected function isSameOriginUrl(string $left, string $right): bool
+    {
+        $leftParts = parse_url($left);
+        $rightParts = parse_url($right);
+
+        if (! is_array($leftParts) || ! is_array($rightParts)) {
+            return false;
+        }
+
+        $leftHost = strtolower((string) ($leftParts['host'] ?? ''));
+        $rightHost = strtolower((string) ($rightParts['host'] ?? ''));
+
+        return $leftHost !== '' && $leftHost === $rightHost;
     }
 
     protected function miniAppFeatureOverride(): ?FeatureToggle
