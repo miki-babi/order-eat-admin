@@ -349,7 +349,9 @@ export default function CustomerMenuPage({
     const [step, setStep] = useState(() => loadPersistedStep(stepStorageKey));
     const [search, setSearch] = useState(filters.search ?? '');
     const [activeCategory, setActiveCategory] = useState(filters.category ?? 'all');
+    const [hideTopChrome, setHideTopChrome] = useState(false);
     const hasSyncedTelegramIdentity = useRef(false);
+    const lastScrollY = useRef(0);
     const [cart, setCart] = useState<Record<number, number>>(
         () => loadPersistedCart(cartStorageKey, allowedMenuItemIds),
     );
@@ -421,6 +423,43 @@ export default function CustomerMenuPage({
     useEffect(() => {
         persistStep(stepStorageKey, step);
     }, [step, stepStorageKey]);
+
+    useEffect(() => {
+        if (typeof window === 'undefined') {
+            return;
+        }
+
+        let ticking = false;
+
+        const onScroll = () => {
+            if (ticking) {
+                return;
+            }
+
+            ticking = true;
+
+            window.requestAnimationFrame(() => {
+                const currentY = window.scrollY || 0;
+                const delta = currentY - lastScrollY.current;
+                const hasScrolledEnough = currentY > 96;
+
+                if (delta > 6 && hasScrolledEnough && step === 1) {
+                    setHideTopChrome(true);
+                } else if (delta < -6 || currentY < 32 || step !== 1) {
+                    setHideTopChrome(false);
+                }
+
+                lastScrollY.current = currentY;
+                ticking = false;
+            });
+        };
+
+        window.addEventListener('scroll', onScroll, { passive: true });
+
+        return () => {
+            window.removeEventListener('scroll', onScroll);
+        };
+    }, [step]);
 
     useEffect(() => {
         if (channel !== 'telegram') {
@@ -688,7 +727,7 @@ export default function CustomerMenuPage({
 
                 <main className="mx-auto w-full max-w-7xl px-4 py-8 md:px-8 pb-32 md:pb-12">
                     {/* Material Step Tracker */}
-                    <div className="sticky top-[0px] z-40 mb-10 overflow-hidden rounded-2xl bg-white p-1.5 shadow-lg ring-1 ring-zinc-100 md:relative md:top-0 md:bg-white md:p-1 md:shadow-md">
+                    <div className={`sticky top-[0px] z-40 mb-6 overflow-hidden rounded-2xl bg-white p-1.5 shadow-lg ring-1 ring-zinc-100 transition-all duration-300 md:relative md:top-0 md:bg-white md:p-1 md:shadow-md ${hideTopChrome ? '-translate-y-[130%] opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}`}>
                         <div className="flex flex-row items-center gap-1">
                             {steps.map((label, index) => {
                                 const isActive = step === index + 1;
@@ -724,7 +763,7 @@ export default function CustomerMenuPage({
                         
                     </div>
 
-                    <div className={`sticky top-[0px] z-40 mb-10 overflow-hidden rounded-2xl bg-white p-1.5 shadow-lg ring-1 ring-zinc-100 md:relative md:top-0 md:bg-white md:p-1 md:shadow-md ${step === 1 ? 'block' : 'hidden'}`}>
+                    <div className={`sticky top-[64px] z-30 mb-10 overflow-hidden rounded-2xl bg-white p-1.5 shadow-lg ring-1 ring-zinc-100 transition-all duration-300 md:relative md:top-0 md:bg-white md:p-1 md:shadow-md ${step === 1 ? 'block' : 'hidden'} ${hideTopChrome ? '-translate-y-[160%] opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}`}>
 
                     <div className=" flex flex-wrap gap-3 p-2 transition-all duration-300">
                                             <button

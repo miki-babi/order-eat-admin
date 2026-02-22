@@ -1,6 +1,6 @@
 import { Head, Link, useForm } from '@inertiajs/react';
 import { CheckCircle2, QrCode, Search, ShoppingCart, Store, Table2 } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import InputError from '@/components/input-error';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -154,6 +154,8 @@ export default function QrMenu({
     );
     const [search, setSearch] = useState(filters.search ?? '');
     const [activeCategory, setActiveCategory] = useState(filters.category ?? 'all');
+    const [hideTopChrome, setHideTopChrome] = useState(false);
+    const lastScrollY = useRef(0);
     const [cart, setCart] = useState<Record<number, number>>(
         () => loadPersistedCart(cartStorageKey, allowedMenuItemIds),
     );
@@ -213,6 +215,55 @@ export default function QrMenu({
         persistCart(cartStorageKey, sanitizeCartPayload(cart, allowedMenuItemIds));
     }, [cart, cartStorageKey, allowedMenuItemIds]);
 
+    useEffect(() => {
+        if (typeof window === 'undefined') {
+            return;
+        }
+
+        let ticking = false;
+
+        const handleScroll = () => {
+            if (ticking) {
+                return;
+            }
+
+            ticking = true;
+
+            window.requestAnimationFrame(() => {
+                const currentY = window.scrollY || 0;
+                const isDesktop = window.matchMedia('(min-width: 768px)').matches;
+
+                if (isDesktop) {
+                    setHideTopChrome(false);
+                    lastScrollY.current = currentY;
+                    ticking = false;
+                    return;
+                }
+
+                const delta = currentY - lastScrollY.current;
+                const hasScrolledEnough = currentY > 96;
+
+                if (delta > 6 && hasScrolledEnough) {
+                    setHideTopChrome(true);
+                } else if (delta < -6 || currentY < 32) {
+                    setHideTopChrome(false);
+                }
+
+                lastScrollY.current = currentY;
+                ticking = false;
+            });
+        };
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        window.addEventListener('resize', handleScroll);
+        handleScroll();
+
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+            window.removeEventListener('resize', handleScroll);
+        };
+    }, []);
+
     const updateItemQuantity = (itemId: number, nextQuantity: number) => {
         setCart((previous) => {
             const next = { ...previous };
@@ -257,7 +308,7 @@ export default function QrMenu({
             <Head title={`QR Menu • ${table.name}`} />
             <div className="min-h-screen bg-[#FAFAFA] text-[#212121]">
                 <main className="mx-auto w-full max-w-7xl px-4 py-8 md:px-8">
-                    <div className="mb-8 rounded-3xl bg-white p-6 shadow-sm ring-1 ring-zinc-200">
+                    <div className={`sticky top-0 z-40 mb-6 rounded-3xl bg-white p-6 shadow-sm ring-1 ring-zinc-200 transition-all duration-300 md:relative md:top-0 md:translate-y-0 md:opacity-100 md:pointer-events-auto ${hideTopChrome ? '-translate-y-[120%] opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}`}>
                         <div className="flex flex-wrap items-start justify-between gap-4">
                             <div>
                                 <p className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">Table QR Order</p>
@@ -295,38 +346,40 @@ export default function QrMenu({
 
                     <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
                         <section className="space-y-6">
-                            <div className="space-y-4">
-                                <div className="relative">
-                                    <Search className="absolute top-1/2 left-4 size-4 -translate-y-1/2 text-zinc-400" />
-                                    <Input
-                                        className="h-12 rounded-2xl border-zinc-200 pl-10 focus:ring-[#F57C00]"
-                                        value={search}
-                                        onChange={(event) => setSearch(event.target.value)}
-                                        placeholder="Search menu items"
-                                    />
-                                </div>
-                                <div className="flex flex-wrap gap-2">
-                                    <Button
-                                        type="button"
-                                        size="sm"
-                                        className={activeCategory === 'all' ? 'bg-[#F57C00] hover:bg-[#E65100]' : ''}
-                                        variant={activeCategory === 'all' ? 'default' : 'outline'}
-                                        onClick={() => setActiveCategory('all')}
-                                    >
-                                        All
-                                    </Button>
-                                    {categories.map((category) => (
+                            <div className={`sticky top-4 z-30 rounded-2xl bg-white/95 p-3 shadow-sm ring-1 ring-zinc-200 transition-all duration-300 backdrop-blur md:relative md:top-0 md:bg-transparent md:p-0 md:shadow-none md:ring-0 md:translate-y-0 md:opacity-100 md:pointer-events-auto ${hideTopChrome ? '-translate-y-[120%] opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}`}>
+                                <div className="space-y-4">
+                                    <div className="relative">
+                                        <Search className="absolute top-1/2 left-4 size-4 -translate-y-1/2 text-zinc-400" />
+                                        <Input
+                                            className="h-12 rounded-2xl border-zinc-200 pl-10 focus:ring-[#F57C00]"
+                                            value={search}
+                                            onChange={(event) => setSearch(event.target.value)}
+                                            placeholder="Search menu items"
+                                        />
+                                    </div>
+                                    <div className="flex flex-wrap gap-2">
                                         <Button
-                                            key={category}
                                             type="button"
                                             size="sm"
-                                            className={activeCategory === category ? 'bg-[#F57C00] hover:bg-[#E65100]' : ''}
-                                            variant={activeCategory === category ? 'default' : 'outline'}
-                                            onClick={() => setActiveCategory(category)}
+                                            className={activeCategory === 'all' ? 'bg-[#F57C00] hover:bg-[#E65100]' : ''}
+                                            variant={activeCategory === 'all' ? 'default' : 'outline'}
+                                            onClick={() => setActiveCategory('all')}
                                         >
-                                            {category}
+                                            All
                                         </Button>
-                                    ))}
+                                        {categories.map((category) => (
+                                            <Button
+                                                key={category}
+                                                type="button"
+                                                size="sm"
+                                                className={activeCategory === category ? 'bg-[#F57C00] hover:bg-[#E65100]' : ''}
+                                                variant={activeCategory === category ? 'default' : 'outline'}
+                                                onClick={() => setActiveCategory(category)}
+                                            >
+                                                {category}
+                                            </Button>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
 
