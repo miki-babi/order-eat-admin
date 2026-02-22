@@ -466,11 +466,9 @@ class SmsTemplateController extends Controller
             ->withAvg(['orders as average_order_value' => $scopedOrders], 'total_amount')
             ->withMax(['orders as last_order_at' => $scopedOrders], 'created_at')
             ->when($platform === 'telegram', function ($query): void {
-                $query->where(function ($builder): void {
-                    $builder
-                        ->whereNotNull('customers.telegram_username')
-                        ->orWhereNotNull('customers.telegram_id');
-                });
+                $query
+                    ->whereNotNull('customers.telegram_id')
+                    ->where('customers.telegram_id', '!=', '');
             })
             ->when($search !== '', function ($query) use ($search): void {
                 $query->where(function ($builder) use ($search): void {
@@ -532,19 +530,9 @@ class SmsTemplateController extends Controller
             ->when($avgOrderValueMax !== null, fn ($query) => $query->where('average_order_value', '<=', $avgOrderValueMax));
     }
 
-    protected function telegramChatTarget(Customer $customer): int|string|null
+    protected function telegramChatTarget(Customer $customer): ?int
     {
-        $telegramId = $this->normalizeTelegramId($customer->telegram_id);
-
-        if ($telegramId !== null) {
-            return $telegramId;
-        }
-
-        $username = is_string($customer->telegram_username)
-            ? ltrim(trim($customer->telegram_username), '@')
-            : '';
-
-        return $username !== '' ? '@'.$username : null;
+        return $this->normalizeTelegramId($customer->telegram_id);
     }
 
     protected function normalizeTelegramId(mixed $value): ?int

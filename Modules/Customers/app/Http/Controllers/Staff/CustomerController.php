@@ -281,19 +281,9 @@ class CustomerController extends Controller
         return back()->with('success', "{$channelLabel} completed. Sent: {$sent}, Failed: {$failed}.");
     }
 
-    protected function telegramChatTarget(Customer $customer): int|string|null
+    protected function telegramChatTarget(Customer $customer): ?int
     {
-        $telegramId = $this->normalizeTelegramId($customer->telegram_id);
-
-        if ($telegramId !== null) {
-            return $telegramId;
-        }
-
-        $username = is_string($customer->telegram_username)
-            ? ltrim(trim($customer->telegram_username), '@')
-            : '';
-
-        return $username !== '' ? '@'.$username : null;
+        return $this->normalizeTelegramId($customer->telegram_id);
     }
 
     protected function normalizeTelegramId(mixed $value): ?int

@@ -150,6 +150,53 @@ test('customers telegram outreach sends inline link button payload', function ()
     });
 });
 
+test('customers telegram outreach skips username-only records without telegram id', function () {
+    $staff = User::factory()->create([
+        'role' => 'staff',
+    ]);
+
+    $branch = PickupLocation::query()->create([
+        'name' => 'Username Only Branch',
+        'address' => 'Addis Ababa',
+        'is_active' => true,
+    ]);
+
+    $staff->pickupLocations()->sync([$branch->id]);
+
+    $customer = Customer::query()->create([
+        'name' => 'Username Only Customer',
+        'phone' => '251922220099',
+        'telegram_username' => 'username_only_customer',
+    ]);
+
+    $customer->orders()->create([
+        'pickup_date' => now()->toDateString(),
+        'pickup_location_id' => $branch->id,
+        'tracking_token' => Str::random(40),
+        'total_amount' => 250,
+    ]);
+
+    Http::fake([
+        'https://api.telegram.org/*/sendMessage' => Http::response([
+            'ok' => true,
+            'result' => [
+                'message_id' => 102,
+            ],
+        ], 200),
+    ]);
+
+    $this->actingAs($staff)
+        ->post(route('staff.customers.sms'), [
+            'customer_ids' => [$customer->id],
+            'platform' => 'telegram',
+            'message' => 'Hi {name}, this should be skipped.',
+        ])
+        ->assertRedirect()
+        ->assertSessionHas('success', 'Telegram completed. Sent: 0, Failed: 1.');
+
+    Http::assertNothingSent();
+});
+
 test('customers telegram outreach validates inline button text and url pairing', function () {
     $staff = User::factory()->create([
         'role' => 'staff',

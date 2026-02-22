@@ -29,6 +29,7 @@ class TelegramBotApiService
 
             if ($this->isFailedTelegramResponse($response)) {
                 Log::warning('telegram.webhook.send_message_failed', [
+                    'chat_id' => (string) $chatId,
                     'status' => $response->status(),
                     'body' => $response->body(),
                 ]);
@@ -43,6 +44,7 @@ class TelegramBotApiService
 
                     if ($this->isFailedTelegramResponse($fallbackResponse)) {
                         Log::warning('telegram.webhook.send_message_fallback_failed', [
+                            'chat_id' => (string) $chatId,
                             'status' => $fallbackResponse->status(),
                             'body' => $fallbackResponse->body(),
                         ]);
@@ -51,6 +53,7 @@ class TelegramBotApiService
             }
         } catch (\Throwable $exception) {
             Log::warning('telegram.webhook.send_message_exception', [
+                'chat_id' => (string) $chatId,
                 'message' => $exception->getMessage(),
             ]);
         }
