@@ -47,6 +47,116 @@ test('telegram webhook ignores updates without message payload', function () {
     Http::assertNothingSent();
 });
 
+test('telegram webhook sends inline command shortcuts for unknown message', function () {
+    Config::set('telegram.webhook_secret', null);
+    Config::set('telegram.bot_token', 'test-bot-token');
+
+    Http::fake([
+        'https://api.telegram.org/*' => Http::response(['ok' => true], 200),
+    ]);
+
+    $payload = [
+        'update_id' => 99001,
+        'message' => [
+            'message_id' => 21,
+            'date' => now()->timestamp,
+            'chat' => [
+                'id' => 11220011,
+                'type' => 'private',
+            ],
+            'from' => [
+                'id' => 11220011,
+                'is_bot' => false,
+                'first_name' => 'Unknown',
+                'username' => 'unknown_guest',
+            ],
+            'text' => '/what',
+        ],
+    ];
+
+    $this->postJson(route('api.telegram.webhook'), $payload)
+        ->assertOk()
+        ->assertJson([
+            'ok' => true,
+        ]);
+
+    Http::assertSent(function ($request): bool {
+        $data = $request->data();
+        $replyMarkup = is_array($data) ? ($data['reply_markup'] ?? null) : null;
+        $decodedMarkup = is_string($replyMarkup) ? json_decode($replyMarkup, true) : null;
+
+        return is_array($data)
+            && str_contains($request->url(), '/sendMessage')
+            && (string) ($data['text'] ?? '') === 'Choose a command:'
+            && data_get($decodedMarkup, 'inline_keyboard.0.0.text') === '/start'
+            && data_get($decodedMarkup, 'inline_keyboard.0.0.style') === 'primary'
+            && data_get($decodedMarkup, 'inline_keyboard.2.1.text') === '/track <123>';
+    });
+});
+
+test('telegram webhook handles inline callback command buttons', function () {
+    Config::set('telegram.webhook_secret', null);
+    Config::set('telegram.bot_token', 'test-bot-token');
+    Config::set('app.url', 'https://example.test');
+
+    Customer::query()->create([
+        'name' => 'Callback Command User',
+        'phone' => '251911000303',
+        'telegram_id' => 77007700,
+        'telegram_username' => 'callback_command_user',
+    ]);
+
+    Http::fake([
+        'https://api.telegram.org/*' => Http::response(['ok' => true], 200),
+    ]);
+
+    $payload = [
+        'update_id' => 99002,
+        'callback_query' => [
+            'id' => 'callback-query-1',
+            'from' => [
+                'id' => 77007700,
+                'is_bot' => false,
+                'first_name' => 'Callback',
+                'username' => 'callback_command_user',
+            ],
+            'message' => [
+                'message_id' => 88,
+                'chat' => [
+                    'id' => 44556677,
+                    'type' => 'private',
+                ],
+            ],
+            'data' => 'cmd:history',
+        ],
+    ];
+
+    $this->postJson(route('api.telegram.webhook'), $payload)
+        ->assertOk()
+        ->assertJson([
+            'ok' => true,
+        ]);
+
+    Http::assertSent(function ($request): bool {
+        $data = $request->data();
+
+        return is_array($data)
+            && str_contains($request->url(), '/answerCallbackQuery')
+            && (string) ($data['callback_query_id'] ?? '') === 'callback-query-1';
+    });
+
+    Http::assertSent(function ($request): bool {
+        $data = $request->data();
+        $replyMarkup = is_array($data) ? ($data['reply_markup'] ?? null) : null;
+        $decodedMarkup = is_string($replyMarkup) ? json_decode($replyMarkup, true) : null;
+
+        return is_array($data)
+            && str_contains($request->url(), '/sendMessage')
+            && str_contains((string) ($data['text'] ?? ''), 'order history')
+            && data_get($decodedMarkup, 'inline_keyboard.0.0.text') === 'Order History';
+    });
+});
+
 test('telegram webhook logs masked payload when payload logging is enabled', function () {
     Config::set('telegram.webhook_secret', null);
     Config::set('telegram.bot_token', 'test-bot-token');
@@ -451,7 +561,7 @@ test('telegram webhook uses admin miniapp button settings', function () {
     });
 });
 
-test('telegram webhook replies with tracking details for customer order', function () {
+test('telegram webhook replies with tracking details for customer order id', function () {
     Config::set('telegram.webhook_secret', null);
     Config::set('telegram.bot_token', 'test-bot-token');
     Config::set('app.url', 'https://example.test');
@@ -512,7 +622,7 @@ test('telegram webhook replies with tracking details for customer order', functi
                 'first_name' => 'Tedi',
                 'username' => 'tedi_guest',
             ],
-            'text' => '/track '.$order->tracking_token,
+            'text' => '/track '.$order->id,
         ],
     ];
 

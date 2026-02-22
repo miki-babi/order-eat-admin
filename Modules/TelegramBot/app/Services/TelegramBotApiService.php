@@ -56,6 +56,43 @@ class TelegramBotApiService
         }
     }
 
+    /**
+     * Acknowledge an inline keyboard callback query.
+     *
+     * @param  array<string, mixed>  $options
+     */
+    public function answerCallbackQuery(string $callbackQueryId, array $options = []): void
+    {
+        $token = $this->botToken();
+
+        if (! $token) {
+            Log::warning('telegram.webhook.bot_token_missing');
+
+            return;
+        }
+
+        try {
+            $payload = array_merge([
+                'callback_query_id' => $callbackQueryId,
+            ], $options);
+
+            $response = Http::asForm()
+                ->timeout($this->timeoutSeconds())
+                ->post("https://api.telegram.org/bot{$token}/answerCallbackQuery", $payload);
+
+            if ($this->isFailedTelegramResponse($response)) {
+                Log::warning('telegram.webhook.answer_callback_query_failed', [
+                    'status' => $response->status(),
+                    'body' => $response->body(),
+                ]);
+            }
+        } catch (\Throwable $exception) {
+            Log::warning('telegram.webhook.answer_callback_query_exception', [
+                'message' => $exception->getMessage(),
+            ]);
+        }
+    }
+
     protected function botToken(): ?string
     {
         $token = trim((string) config('telegram.bot_token', ''));

@@ -18,6 +18,7 @@ use Modules\TelegramBot\Services\TelegramBotApiService;
 class WebhookController extends Controller
 {
     private const MINIAPP_LAUNCH_FEATURE_KEY = 'telegram_bot_miniapp_launch';
+    private const TRACK_ID_HINT_TRIGGER = '__track_id_hint__';
 
     /**
      * Accept Telegram webhook updates and handle basic bot commands.
@@ -104,16 +105,32 @@ class WebhookController extends Controller
             ]);
         }
 
-        $text = $messagePayload['text'];
+        $incomingMessage = null;
 
-        if ($text !== null && trim($text) !== '') {
-            $reply = $this->buildReply(trim($text), $customer, $featureToggleService);
+        if (
+            is_string($messagePayload['callback_data'])
+            && trim($messagePayload['callback_data']) !== ''
+        ) {
+            $incomingMessage = $this->normalizeCallbackDataToCommand(trim($messagePayload['callback_data']));
+        } elseif (is_string($messagePayload['text']) && trim($messagePayload['text']) !== '') {
+            $incomingMessage = trim($messagePayload['text']);
+        }
+
+        if (is_string($incomingMessage) && $incomingMessage !== '') {
+            $reply = $this->buildReply($incomingMessage, $customer, $featureToggleService);
 
             if ($reply !== null) {
                 $telegramBotApiService->sendMessage($chatId, $reply['text'], array_merge([
                     'disable_web_page_preview' => true,
                 ], $reply['options']));
             }
+        }
+
+        if (
+            is_string($messagePayload['callback_query_id'])
+            && trim($messagePayload['callback_query_id']) !== ''
+        ) {
+            $telegramBotApiService->answerCallbackQuery(trim($messagePayload['callback_query_id']));
         }
 
         return response()->json([
@@ -239,6 +256,8 @@ class WebhookController extends Controller
      *     telegram_username: string|null,
      *     display_name: string,
      *     text: string|null,
+     *     callback_data: string|null,
+     *     callback_query_id: string|null,
      *     contact_phone: string|null,
      *     contact_user_id: int|null
      * }|null
@@ -246,19 +265,39 @@ class WebhookController extends Controller
     protected function extractMessagePayload(array $update): ?array
     {
         $message = $update['message'] ?? $update['edited_message'] ?? null;
+        $callbackQuery = $update['callback_query'] ?? null;
 
-        if (! is_array($message)) {
+        if (! is_array($message) && ! is_array($callbackQuery)) {
             return null;
         }
 
-        $chatId = data_get($message, 'chat.id');
-        $fromId = data_get($message, 'from.id');
-        $username = data_get($message, 'from.username');
-        $firstName = trim((string) data_get($message, 'from.first_name', ''));
-        $lastName = trim((string) data_get($message, 'from.last_name', ''));
+        $chatId = is_array($message)
+            ? data_get($message, 'chat.id')
+            : data_get($callbackQuery, 'message.chat.id');
+        $fromId = is_array($message)
+            ? data_get($message, 'from.id')
+            : data_get($callbackQuery, 'from.id');
+        $username = is_array($message)
+            ? data_get($message, 'from.username')
+            : data_get($callbackQuery, 'from.username');
+        $firstName = is_array($message)
+            ? trim((string) data_get($message, 'from.first_name', ''))
+            : trim((string) data_get($callbackQuery, 'from.first_name', ''));
+        $lastName = is_array($message)
+            ? trim((string) data_get($message, 'from.last_name', ''))
+            : trim((string) data_get($callbackQuery, 'from.last_name', ''));
         $displayName = trim($firstName.' '.$lastName);
-        $contactPhone = data_get($message, 'contact.phone_number');
-        $contactUserId = data_get($message, 'contact.user_id');
+        $text = is_array($message) && is_string(data_get($message, 'text'))
+            ? (string) data_get($message, 'text')
+            : null;
+        $callbackData = is_array($callbackQuery) && is_string(data_get($callbackQuery, 'data'))
+            ? trim((string) data_get($callbackQuery, 'data'))
+            : null;
+        $callbackQueryId = is_array($callbackQuery) && is_string(data_get($callbackQuery, 'id'))
+            ? trim((string) data_get($callbackQuery, 'id'))
+            : null;
+        $contactPhone = is_array($message) ? data_get($message, 'contact.phone_number') : null;
+        $contactUserId = is_array($message) ? data_get($message, 'contact.user_id') : null;
 
         if ($displayName === '') {
             $displayName = is_string($username) && trim($username) !== ''
@@ -271,7 +310,9 @@ class WebhookController extends Controller
             'telegram_user_id' => is_int($fromId) ? $fromId : null,
             'telegram_username' => is_string($username) ? $username : null,
             'display_name' => $displayName,
-            'text' => is_string(data_get($message, 'text')) ? (string) data_get($message, 'text') : null,
+            'text' => $text,
+            'callback_data' => $callbackData,
+            'callback_query_id' => $callbackQueryId,
             'contact_phone' => is_string($contactPhone) && trim($contactPhone) !== '' ? trim($contactPhone) : null,
             'contact_user_id' => is_int($contactUserId)
                 ? $contactUserId
@@ -292,6 +333,13 @@ class WebhookController extends Controller
         Customer $customer,
         FeatureToggleService $featureToggleService,
     ): ?array {
+        if ($message === self::TRACK_ID_HINT_TRIGGER) {
+            return [
+                'text' => 'Use /track <order_id> for one order, for example: /track 123',
+                'options' => $this->commandShortcutsReplyOptions(),
+            ];
+        }
+
         if ($this->matchesCommand($message, 'start')) {
             if ($this->hasSavedPhone($customer)) {
                 return [
@@ -319,9 +367,9 @@ class WebhookController extends Controller
             return $this->menuReply($featureToggleService);
         }
 
-        if (preg_match('/^\/track(?:@[\w_]+)?\s+([A-Za-z0-9]{20,100})$/i', $message, $matches) === 1) {
+        if (preg_match('/^\/track(?:@[\w_]+)?\s+(\d{1,20})$/i', $message, $matches) === 1) {
             return [
-                'text' => $this->trackReply($customer, $matches[1]),
+                'text' => $this->trackReply($customer, (int) $matches[1]),
                 'options' => [],
             ];
         }
@@ -335,8 +383,70 @@ class WebhookController extends Controller
         }
 
         return [
-            'text' => "I can help with:\n/start\n/help\n/menu\n/track\n/history\n/track <tracking_token>",
-            'options' => [],
+            'text' => 'Choose a command:',
+            'options' => $this->commandShortcutsReplyOptions(),
+        ];
+    }
+
+    protected function normalizeCallbackDataToCommand(string $callbackData): ?string
+    {
+        return match ($callbackData) {
+            'cmd:start' => '/start',
+            'cmd:help' => '/help',
+            'cmd:menu' => '/menu',
+            'cmd:track' => '/track',
+            'cmd:history' => '/history',
+            'cmd:track_id_hint' => self::TRACK_ID_HINT_TRIGGER,
+            default => null,
+        };
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    protected function commandShortcutsReplyOptions(): array
+    {
+        return [
+            'reply_markup' => [
+                'inline_keyboard' => [
+                    [
+                        [
+                            'text' => '/start',
+                            'style' => 'primary',
+                            'callback_data' => 'cmd:start',
+                        ],
+                        [
+                            'text' => '/help',
+                            'style' => 'primary',
+                            'callback_data' => 'cmd:help',
+                        ],
+                    ],
+                    [
+                        [
+                            'text' => '/menu',
+                            'style' => 'primary',
+                            'callback_data' => 'cmd:menu',
+                        ],
+                        [
+                            'text' => '/track',
+                            'style' => 'primary',
+                            'callback_data' => 'cmd:track',
+                        ],
+                    ],
+                    [
+                        [
+                            'text' => '/history',
+                            'style' => 'primary',
+                            'callback_data' => 'cmd:history',
+                        ],
+                        [
+                            'text' => '/track <123>',
+                            'style' => 'primary',
+                            'callback_data' => 'cmd:track_id_hint',
+                        ],
+                    ],
+                ],
+            ],
         ];
     }
 
@@ -347,17 +457,17 @@ class WebhookController extends Controller
 
     protected function startReply(): string
     {
-        return "Welcome to our cafe bot.\nUse /menu to order, /track for active orders, /history for your Telegram history, or /track <tracking_token> for one order.";
+        return "Welcome to our cafe bot.\nUse /menu to order, /track for active orders, /history for your Telegram history, or /track <order_id> for one order.";
     }
 
     protected function startReplyWithContactRequest(): string
     {
-        return "Welcome to our cafe bot.\nPlease share your phone number so we can send order updates.\nUse /menu to order, /track for active orders, /history for your Telegram history, or /track <tracking_token> for one order.";
+        return "Welcome to our cafe bot.\nPlease share your phone number so we can send order updates.\nUse /menu to order, /track for active orders, /history for your Telegram history, or /track <order_id> for one order.";
     }
 
     protected function helpReply(): string
     {
-        return "Available commands:\n/menu\n/track\n/history\n/track <tracking_token>";
+        return "Available commands:\n/menu\n/track\n/history\n/track <order_id>";
     }
 
     /**
@@ -403,16 +513,16 @@ class WebhookController extends Controller
         ];
     }
 
-    protected function trackReply(Customer $customer, string $trackingToken): string
+    protected function trackReply(Customer $customer, int $orderId): string
     {
         $order = Order::query()
             ->with('pickupLocation')
             ->where('customer_id', $customer->id)
-            ->where('tracking_token', $trackingToken)
+            ->where('id', $orderId)
             ->first();
 
         if (! $order) {
-            return 'Order not found for your account. Please check the tracking token.';
+            return 'Order not found for your account. Please check the order ID.';
         }
 
         $status = Str::of((string) $order->order_status)->replace('_', ' ')->title();
