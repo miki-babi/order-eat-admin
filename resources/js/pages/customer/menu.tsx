@@ -106,6 +106,41 @@ function telegramWebApp(): TelegramWebApp | null {
     return telegram?.WebApp ?? null;
 }
 
+function telegramInitDataFromLocation(): string | null {
+    if (typeof window === 'undefined') {
+        return null;
+    }
+
+    const extractFrom = (raw: string): string | null => {
+        const trimmed = raw.trim().replace(/^[?#]/, '');
+
+        if (trimmed === '') {
+            return null;
+        }
+
+        const params = new URLSearchParams(trimmed);
+        const value = params.get('tgWebAppData');
+
+        if (typeof value !== 'string') {
+            return null;
+        }
+
+        const normalized = value.trim();
+
+        return normalized === '' ? null : normalized;
+    };
+
+    return extractFrom(window.location.search) ?? extractFrom(window.location.hash);
+}
+
+function isTelegramMiniAppContext(defaultChannel: string): boolean {
+    if (defaultChannel === 'telegram') {
+        return true;
+    }
+
+    return telegramWebApp() !== null || telegramInitDataFromLocation() !== null;
+}
+
 function normalizeTelegramId(value: unknown): number | null {
     if (typeof value === 'number' && Number.isInteger(value) && value > 0) {
         return value;
@@ -299,7 +334,9 @@ export default function Menu({
     filters,
 }: PageProps) {
     const { auth, flash } = usePage<SharedProps>().props;
-    const channel = filters.channel ?? 'web';
+    const channel = isTelegramMiniAppContext(filters.channel ?? 'web')
+        ? 'telegram'
+        : (filters.channel ?? 'web');
     const cartStorageKey = `kds:customer:web-cart:${customerToken}`;
     const stepStorageKey = `kds:customer:web-step:${customerToken}`;
     const allowedMenuItemIds = useMemo(
@@ -391,34 +428,8 @@ export default function Menu({
         let abortController: AbortController | null = null;
         let injectedScript: HTMLScriptElement | null = null;
 
-        const syncFromWebApp = (webApp: TelegramWebApp) => {
-            if (isDisposed) {
-                return;
-            }
-
-            webApp.ready?.();
-            webApp.expand?.();
-
-            const user = webApp.initDataUnsafe?.user;
-            const telegramId = normalizeTelegramId(user?.id);
-            const telegramUsername = normalizeTelegramUsername(user?.username);
-            const displayName = telegramDisplayName(user);
-
-            if (telegramId !== null) {
-                form.setData((current) => ({
-                    ...current,
-                    telegram_id: telegramId,
-                    telegram_username: telegramUsername ?? current.telegram_username,
-                }));
-            }
-
-            if (displayName && form.data.name.trim() === '') {
-                form.setData('name', displayName);
-            }
-
-            const initData = typeof webApp.initData === 'string' ? webApp.initData.trim() : '';
-
-            if (initData === '' || hasSyncedTelegramIdentity.current) {
+        const syncFromInitData = (initData: string) => {
+            if (initData === '' || hasSyncedTelegramIdentity.current || isDisposed) {
                 return;
             }
 
@@ -459,6 +470,7 @@ export default function Menu({
 
                     form.setData((current) => ({
                         ...current,
+                        channel: 'telegram',
                         customer_token:
                             typeof payload.customer?.customer_token === 'string' && payload.customer.customer_token !== ''
                                 ? payload.customer.customer_token
@@ -486,11 +498,50 @@ export default function Menu({
                 });
         };
 
+        const syncFromWebApp = (webApp: TelegramWebApp) => {
+            if (isDisposed) {
+                return;
+            }
+
+            webApp.ready?.();
+            webApp.expand?.();
+
+            const user = webApp.initDataUnsafe?.user;
+            const telegramId = normalizeTelegramId(user?.id);
+            const telegramUsername = normalizeTelegramUsername(user?.username);
+            const displayName = telegramDisplayName(user);
+
+            if (telegramId !== null) {
+                form.setData((current) => ({
+                    ...current,
+                    channel: 'telegram',
+                    telegram_id: telegramId,
+                    telegram_username: telegramUsername ?? current.telegram_username,
+                }));
+            }
+
+            if (displayName && form.data.name.trim() === '') {
+                form.setData('name', displayName);
+            }
+
+            const initDataFromWebApp = typeof webApp.initData === 'string' ? webApp.initData.trim() : '';
+            const initData = initDataFromWebApp !== ''
+                ? initDataFromWebApp
+                : (telegramInitDataFromLocation() ?? '');
+
+            syncFromInitData(initData);
+        };
+
         const existingWebApp = telegramWebApp();
+        const locationInitData = telegramInitDataFromLocation();
 
         if (existingWebApp) {
             syncFromWebApp(existingWebApp);
         } else if (typeof document !== 'undefined') {
+            if (locationInitData !== null) {
+                syncFromInitData(locationInitData);
+            }
+
             injectedScript = document.createElement('script');
             injectedScript.src = 'https://telegram.org/js/telegram-web-app.js';
             injectedScript.async = true;
