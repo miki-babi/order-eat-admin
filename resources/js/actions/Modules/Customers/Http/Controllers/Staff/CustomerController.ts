@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition } from './../../../../../../wayfinder'
 /**
 * @see \Modules\Customers\Http\Controllers\Staff\CustomerController::index
-* @see Modules/Customers/app/Http/Controllers/Staff/CustomerController.php:26
+* @see Modules/Customers/app/Http/Controllers/Staff/CustomerController.php:27
 * @route '/staff/customers'
 */
 export const index = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ index.definition = {
 
 /**
 * @see \Modules\Customers\Http\Controllers\Staff\CustomerController::index
-* @see Modules/Customers/app/Http/Controllers/Staff/CustomerController.php:26
+* @see Modules/Customers/app/Http/Controllers/Staff/CustomerController.php:27
 * @route '/staff/customers'
 */
 index.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ index.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \Modules\Customers\Http\Controllers\Staff\CustomerController::index
-* @see Modules/Customers/app/Http/Controllers/Staff/CustomerController.php:26
+* @see Modules/Customers/app/Http/Controllers/Staff/CustomerController.php:27
 * @route '/staff/customers'
 */
 index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -35,7 +35,7 @@ index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \Modules\Customers\Http\Controllers\Staff\CustomerController::index
-* @see Modules/Customers/app/Http/Controllers/Staff/CustomerController.php:26
+* @see Modules/Customers/app/Http/Controllers/Staff/CustomerController.php:27
 * @route '/staff/customers'
 */
 index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -45,7 +45,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \Modules\Customers\Http\Controllers\Staff\CustomerController::index
-* @see Modules/Customers/app/Http/Controllers/Staff/CustomerController.php:26
+* @see Modules/Customers/app/Http/Controllers/Staff/CustomerController.php:27
 * @route '/staff/customers'
 */
 const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -55,7 +55,7 @@ const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => (
 
 /**
 * @see \Modules\Customers\Http\Controllers\Staff\CustomerController::index
-* @see Modules/Customers/app/Http/Controllers/Staff/CustomerController.php:26
+* @see Modules/Customers/app/Http/Controllers/Staff/CustomerController.php:27
 * @route '/staff/customers'
 */
 indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -65,7 +65,7 @@ indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 
 /**
 * @see \Modules\Customers\Http\Controllers\Staff\CustomerController::index
-* @see Modules/Customers/app/Http/Controllers/Staff/CustomerController.php:26
+* @see Modules/Customers/app/Http/Controllers/Staff/CustomerController.php:27
 * @route '/staff/customers'
 */
 indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -82,7 +82,7 @@ index.form = indexForm
 
 /**
 * @see \Modules\Customers\Http\Controllers\Staff\CustomerController::sendSms
-* @see Modules/Customers/app/Http/Controllers/Staff/CustomerController.php:201
+* @see Modules/Customers/app/Http/Controllers/Staff/CustomerController.php:202
 * @route '/staff/customers/sms'
 */
 export const sendSms = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -97,7 +97,7 @@ sendSms.definition = {
 
 /**
 * @see \Modules\Customers\Http\Controllers\Staff\CustomerController::sendSms
-* @see Modules/Customers/app/Http/Controllers/Staff/CustomerController.php:201
+* @see Modules/Customers/app/Http/Controllers/Staff/CustomerController.php:202
 * @route '/staff/customers/sms'
 */
 sendSms.url = (options?: RouteQueryOptions) => {
@@ -106,7 +106,7 @@ sendSms.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \Modules\Customers\Http\Controllers\Staff\CustomerController::sendSms
-* @see Modules/Customers/app/Http/Controllers/Staff/CustomerController.php:201
+* @see Modules/Customers/app/Http/Controllers/Staff/CustomerController.php:202
 * @route '/staff/customers/sms'
 */
 sendSms.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -116,7 +116,7 @@ sendSms.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \Modules\Customers\Http\Controllers\Staff\CustomerController::sendSms
-* @see Modules/Customers/app/Http/Controllers/Staff/CustomerController.php:201
+* @see Modules/Customers/app/Http/Controllers/Staff/CustomerController.php:202
 * @route '/staff/customers/sms'
 */
 const sendSmsForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -126,7 +126,7 @@ const sendSmsForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> =
 
 /**
 * @see \Modules\Customers\Http\Controllers\Staff\CustomerController::sendSms
-* @see Modules/Customers/app/Http/Controllers/Staff/CustomerController.php:201
+* @see Modules/Customers/app/Http/Controllers/Staff/CustomerController.php:202
 * @route '/staff/customers/sms'
 */
 sendSmsForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({

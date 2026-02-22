@@ -7,6 +7,8 @@ use App\Models\PickupLocation;
 use App\Models\Role;
 use App\Models\SmsLog;
 use App\Models\User;
+use Illuminate\Http\Client\Request as HttpRequest;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
 test('customers sms sends only to customers in accessible branches', function () {
@@ -79,6 +81,111 @@ test('customers sms validates customer list and message length', function () {
         ->assertSessionHasErrors(['customer_ids', 'message']);
 
     expect(SmsLog::query()->count())->toBe(0);
+});
+
+test('customers telegram outreach sends inline link button payload', function () {
+    $staff = User::factory()->create([
+        'role' => 'staff',
+    ]);
+
+    $branch = PickupLocation::query()->create([
+        'name' => 'Telegram Branch',
+        'address' => 'Addis Ababa',
+        'is_active' => true,
+    ]);
+
+    $staff->pickupLocations()->sync([$branch->id]);
+
+    $telegramCustomer = Customer::query()->create([
+        'name' => 'Telegram Customer',
+        'phone' => '251922220001',
+        'telegram_id' => 987650123,
+        'telegram_username' => 'tg_customer',
+    ]);
+
+    $telegramCustomer->orders()->create([
+        'pickup_date' => now()->toDateString(),
+        'pickup_location_id' => $branch->id,
+        'tracking_token' => Str::random(40),
+        'total_amount' => 320,
+    ]);
+
+    Http::fake([
+        'https://api.telegram.org/*/sendMessage' => Http::response([
+            'ok' => true,
+            'result' => [
+                'message_id' => 101,
+            ],
+        ], 200),
+    ]);
+
+    $this->actingAs($staff)
+        ->post(route('staff.customers.sms'), [
+            'customer_ids' => [$telegramCustomer->id],
+            'platform' => 'telegram',
+            'message' => 'Hi {name}, claim your special deal.',
+            'telegram_button_text' => 'Open Promo',
+            'telegram_button_url' => 'https://example.com/promo',
+        ])
+        ->assertRedirect();
+
+    expect(SmsLog::query()->count())->toBe(0);
+
+    Http::assertSent(function (HttpRequest $request) use ($telegramCustomer): bool {
+        if (! str_contains($request->url(), '/sendMessage')) {
+            return false;
+        }
+
+        $payload = $request->data();
+        $replyMarkup = is_string($payload['reply_markup'] ?? null)
+            ? json_decode($payload['reply_markup'], true)
+            : null;
+
+        return ($payload['chat_id'] ?? null) === (string) $telegramCustomer->telegram_id
+            && ($payload['text'] ?? null) === 'Hi Telegram Customer, claim your special deal.'
+            && is_array($replyMarkup)
+            && (($replyMarkup['inline_keyboard'][0][0]['text'] ?? null) === 'Open Promo')
+            && (($replyMarkup['inline_keyboard'][0][0]['url'] ?? null) === 'https://example.com/promo')
+            && (($replyMarkup['inline_keyboard'][0][0]['style'] ?? null) === 'primary');
+    });
+});
+
+test('customers telegram outreach validates inline button text and url pairing', function () {
+    $staff = User::factory()->create([
+        'role' => 'staff',
+    ]);
+
+    $branch = PickupLocation::query()->create([
+        'name' => 'Validation Branch',
+        'address' => 'Addis Ababa',
+        'is_active' => true,
+    ]);
+
+    $staff->pickupLocations()->sync([$branch->id]);
+
+    $customer = Customer::query()->create([
+        'name' => 'Validation Customer',
+        'phone' => '251922220009',
+        'telegram_id' => 11223344,
+    ]);
+
+    $customer->orders()->create([
+        'pickup_date' => now()->toDateString(),
+        'pickup_location_id' => $branch->id,
+        'tracking_token' => Str::random(40),
+        'total_amount' => 210,
+    ]);
+
+    $this->actingAs($staff)
+        ->from(route('staff.customers.index'))
+        ->post(route('staff.customers.sms'), [
+            'customer_ids' => [$customer->id],
+            'platform' => 'telegram',
+            'message' => 'Promo for Telegram only.',
+            'telegram_button_url' => 'https://example.com/offer',
+        ])
+        ->assertRedirect(route('staff.customers.index'))
+        ->assertSessionHasErrors(['telegram_button_text']);
 });
 
 test('customers sms endpoint returns lock payload for json requests when feature is disabled', function () {

@@ -17,6 +17,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Inertia\Inertia;
 use Inertia\Response;
+use Modules\TelegramBot\Services\TelegramBotApiService;
 
 class CustomerController extends Controller
 {
@@ -196,17 +197,27 @@ class CustomerController extends Controller
     }
 
     /**
-     * Send SMS messages to selected customers.
+     * Send SMS or Telegram outreach messages to selected customers.
      */
     public function sendSms(
         SendCustomerSmsRequest $request,
         SmsEthiopiaService $smsService,
         SmsTemplateService $smsTemplateService,
+        TelegramBotApiService $telegramBotApiService,
     ): RedirectResponse
     {
         /** @var \App\Models\User $user */
         $user = $request->user();
         $validated = $request->validated();
+        $platform = is_string($validated['platform'] ?? null) && $validated['platform'] === 'telegram'
+            ? 'telegram'
+            : 'sms';
+        $telegramButtonText = is_string($validated['telegram_button_text'] ?? null)
+            ? trim($validated['telegram_button_text'])
+            : '';
+        $telegramButtonUrl = is_string($validated['telegram_button_url'] ?? null)
+            ? trim($validated['telegram_button_url'])
+            : '';
 
         $customers = Customer::query()
             ->whereHas('orders', fn ($query) => BranchAccess::scopeQuery($query, $user))
@@ -225,16 +236,89 @@ class CustomerController extends Controller
                 $validated['message'],
                 $smsTemplateService->variablesForCustomer($customer, $latestOrder),
             );
+
+            if ($platform === 'telegram') {
+                $chatTarget = $this->telegramChatTarget($customer);
+
+                if ($chatTarget === null) {
+                    $failed++;
+                    continue;
+                }
+
+                $options = [];
+
+                if ($telegramButtonText !== '' && $telegramButtonUrl !== '') {
+                    $options['reply_markup'] = [
+                        'inline_keyboard' => [
+                            [
+                                [
+                                    'text' => $telegramButtonText,
+                                    'url' => $telegramButtonUrl,
+                                    'style' => 'primary',
+                                ],
+                            ],
+                        ],
+                    ];
+                }
+
+                $telegramBotApiService->sendMessage($chatTarget, $message, $options);
+                $sent++;
+                continue;
+            }
+
             $result = $smsService->send($customer->phone, $message, $customer);
 
-            if ($result->status === 'sent') {
-                $sent++;
-            } else {
+            if ($result->status !== 'sent') {
                 $failed++;
+                continue;
+            }
+
+            $sent++;
+        }
+
+        $channelLabel = $platform === 'telegram' ? 'Telegram' : 'SMS';
+
+        return back()->with('success', "{$channelLabel} completed. Sent: {$sent}, Failed: {$failed}.");
+    }
+
+    protected function telegramChatTarget(Customer $customer): int|string|null
+    {
+        $telegramId = $this->normalizeTelegramId($customer->telegram_id);
+
+        if ($telegramId !== null) {
+            return $telegramId;
+        }
+
+        $username = is_string($customer->telegram_username)
+            ? ltrim(trim($customer->telegram_username), '@')
+            : '';
+
+        return $username !== '' ? '@'.$username : null;
+    }
+
+    protected function normalizeTelegramId(mixed $value): ?int
+    {
+        if (is_int($value) && $value > 0) {
+            return $value;
+        }
+
+        if (is_string($value)) {
+            $trimmed = trim($value);
+
+            if ($trimmed !== '' && ctype_digit($trimmed)) {
+                $parsed = (int) $trimmed;
+
+                return $parsed > 0 ? $parsed : null;
             }
         }
 
-        return back()->with('success', "SMS completed. Sent: {$sent}, Failed: {$failed}.");
+        if (is_numeric($value)) {
+            $parsed = (int) $value;
+
+            return $parsed > 0 ? $parsed : null;
+        }
+
+        return null;
     }
 
     /**

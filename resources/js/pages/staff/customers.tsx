@@ -107,6 +107,8 @@ type SmsPlaceholder = {
     description: string;
 };
 
+type OutreachPlatform = 'sms' | 'telegram';
+
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Customers',
@@ -171,8 +173,17 @@ export default function StaffCustomers({
 
     const smsForm = useForm({
         customer_ids: [] as number[],
+        platform: 'sms' as OutreachPlatform,
         message: '',
+        telegram_button_text: '',
+        telegram_button_url: '',
     });
+    const isTelegramPlatform = smsForm.data.platform === 'telegram';
+    const messageLimit = isTelegramPlatform ? 2000 : 480;
+    const hasPartialTelegramButton =
+        isTelegramPlatform &&
+        ((smsForm.data.telegram_button_text.trim() === '') !==
+            (smsForm.data.telegram_button_url.trim() === ''));
 
     const isAllOnPageSelected = useMemo(() => {
         if (customers.data.length === 0) {
@@ -221,7 +232,7 @@ export default function StaffCustomers({
         smsForm.post('/staff/customers/sms', {
             preserveScroll: true,
             onSuccess: () => {
-                smsForm.reset('message');
+                smsForm.reset('message', 'telegram_button_text', 'telegram_button_url');
             },
         });
     };
@@ -455,10 +466,42 @@ export default function StaffCustomers({
 
                             {/* Message Composer Column */}
                             <div className="lg:col-span-8 space-y-4">
+                                <div className="flex items-center justify-between gap-3">
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">Delivery Channel</Label>
+                                    <div className="inline-flex rounded-xl border border-zinc-200 bg-white p-1">
+                                        <button
+                                            type="button"
+                                            className={`rounded-lg px-4 py-1.5 text-xs font-black transition-colors ${
+                                                smsForm.data.platform === 'sms'
+                                                    ? 'bg-[#212121] text-white'
+                                                    : 'text-zinc-600 hover:bg-zinc-50'
+                                            }`}
+                                            onClick={() => {
+                                                smsForm.setData('platform', 'sms');
+                                                smsForm.setData('telegram_button_text', '');
+                                                smsForm.setData('telegram_button_url', '');
+                                            }}
+                                        >
+                                            SMS
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className={`rounded-lg px-4 py-1.5 text-xs font-black transition-colors ${
+                                                smsForm.data.platform === 'telegram'
+                                                    ? 'bg-[#212121] text-white'
+                                                    : 'text-zinc-600 hover:bg-zinc-50'
+                                            }`}
+                                            onClick={() => smsForm.setData('platform', 'telegram')}
+                                        >
+                                            Telegram
+                                        </button>
+                                    </div>
+                                </div>
+
                                 <div className="flex items-center justify-between">
                                     <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">Compose Message</Label>
-                                    <span className={`text-[10px] font-black tracking-widest ${smsForm.data.message.length > 400 ? 'text-rose-500' : 'text-zinc-400'}`}>
-                                        {smsForm.data.message.length}/480 Characters
+                                    <span className={`text-[10px] font-black tracking-widest ${smsForm.data.message.length > Math.floor(messageLimit * 0.85) ? 'text-rose-500' : 'text-zinc-400'}`}>
+                                        {smsForm.data.message.length}/{messageLimit} Characters
                                     </span>
                                 </div>
 
@@ -467,14 +510,70 @@ export default function StaffCustomers({
                                         id="message"
                                         className="min-h-[160px] w-full rounded-2xl border border-zinc-200 bg-white p-4 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#F57C00]/20 transition-all placeholder:text-zinc-300"
                                         value={smsForm.data.message}
-                                        maxLength={480}
+                                        maxLength={messageLimit}
                                         onChange={(event) => smsForm.setData('message', event.target.value)}
-                                        placeholder="Enter your promotional or notification message here..."
+                                        placeholder={
+                                            isTelegramPlatform
+                                                ? 'Enter your Telegram outreach message. Optional inline button fields are below.'
+                                                : 'Enter your promotional or notification SMS here...'
+                                        }
                                     />
                                     <div className="absolute bottom-4 right-4 flex h-10 w-10 items-center justify-center rounded-full bg-zinc-50 text-[10px] font-black text-zinc-400 ring-1 ring-zinc-200">
                                         {selectedIds.length}
                                     </div>
                                 </div>
+
+                                {isTelegramPlatform && (
+                                    <div className="grid gap-3 md:grid-cols-2">
+                                        <div className="space-y-1.5">
+                                            <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]" htmlFor="telegram_button_text">
+                                                Inline Button Text
+                                            </Label>
+                                            <Input
+                                                id="telegram_button_text"
+                                                className="h-11 rounded-xl border-zinc-200 focus:ring-[#F57C00]"
+                                                value={smsForm.data.telegram_button_text}
+                                                maxLength={64}
+                                                onChange={(event) => smsForm.setData('telegram_button_text', event.target.value)}
+                                                placeholder="Open Offer"
+                                            />
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]" htmlFor="telegram_button_url">
+                                                Inline Button URL
+                                            </Label>
+                                            <Input
+                                                id="telegram_button_url"
+                                                type="url"
+                                                className="h-11 rounded-xl border-zinc-200 focus:ring-[#F57C00]"
+                                                value={smsForm.data.telegram_button_url}
+                                                onChange={(event) => smsForm.setData('telegram_button_url', event.target.value)}
+                                                placeholder="https://example.com/promo"
+                                            />
+                                        </div>
+                                        <p className={`text-[10px] font-bold uppercase tracking-widest md:col-span-2 ${
+                                            hasPartialTelegramButton ? 'text-rose-500' : 'text-zinc-400'
+                                        }`}>
+                                            {hasPartialTelegramButton
+                                                ? 'Provide both button text and URL, or leave both empty.'
+                                                : 'If provided, Telegram recipients will receive a primary inline button.'}
+                                        </p>
+                                    </div>
+                                )}
+
+                                {(smsForm.errors.message || smsForm.errors.telegram_button_text || smsForm.errors.telegram_button_url) && (
+                                    <div className="space-y-1 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2">
+                                        {smsForm.errors.message ? (
+                                            <p className="text-[11px] font-bold text-rose-700">{smsForm.errors.message}</p>
+                                        ) : null}
+                                        {smsForm.errors.telegram_button_text ? (
+                                            <p className="text-[11px] font-bold text-rose-700">{smsForm.errors.telegram_button_text}</p>
+                                        ) : null}
+                                        {smsForm.errors.telegram_button_url ? (
+                                            <p className="text-[11px] font-bold text-rose-700">{smsForm.errors.telegram_button_url}</p>
+                                        ) : null}
+                                    </div>
+                                )}
 
                                 <div className="flex flex-wrap items-start justify-between gap-4">
                                     <div className="flex-1 space-y-1">
@@ -491,10 +590,17 @@ export default function StaffCustomers({
                                     </div>
                                     <Button
                                         type="submit"
-                                        disabled={smsForm.processing || selectedIds.length === 0 || !smsForm.data.message}
+                                        disabled={
+                                            smsForm.processing ||
+                                            selectedIds.length === 0 ||
+                                            smsForm.data.message.trim() === '' ||
+                                            hasPartialTelegramButton
+                                        }
                                         className="h-12 px-10 rounded-xl bg-[#212121] font-black shadow-lg shadow-zinc-200 hover:bg-[#F57C00] transition-colors"
                                     >
-                                        {smsForm.processing ? 'Delivering...' : `Send to ${selectedIds.length} Recipients`}
+                                        {smsForm.processing
+                                            ? 'Delivering...'
+                                            : `Send ${isTelegramPlatform ? 'Telegram' : 'SMS'} to ${selectedIds.length} Recipients`}
                                     </Button>
                                 </div>
                             </div>
