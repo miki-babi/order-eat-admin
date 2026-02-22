@@ -60,6 +60,30 @@ const orderStages = [
 ] as const;
 const ORDER_REFRESH_INTERVAL_MS = 10000;
 
+function isTelegramContext(): boolean {
+    if (typeof window === 'undefined') {
+        return false;
+    }
+
+    const telegram = (window as Window & { Telegram?: { WebApp?: unknown } }).Telegram;
+
+    if (telegram?.WebApp) {
+        return true;
+    }
+
+    const hasInitData = (raw: string): boolean => {
+        const normalized = raw.trim().replace(/^[?#]/, '');
+
+        if (normalized === '') {
+            return false;
+        }
+
+        return new URLSearchParams(normalized).has('tgWebAppData');
+    };
+
+    return hasInitData(window.location.search) || hasInitData(window.location.hash);
+}
+
 function currency(value: number): string {
     return new Intl.NumberFormat('en-ET', {
         style: 'currency',
@@ -70,6 +94,7 @@ function currency(value: number): string {
 
 export default function Tracking({ order }: { order: Order }) {
     const { flash } = usePage<SharedProps>().props;
+    const menuHref = isTelegramContext() ? '/telegram/menu' : '/';
     const form = useForm<{ receipt: File | null }>({
         receipt: null,
     });
@@ -114,7 +139,7 @@ export default function Tracking({ order }: { order: Order }) {
                 {/* Slim Navigation Header */}
                 <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/80 backdrop-blur-md">
                     <div className="mx-auto flex h-16 max-w-4xl items-center justify-between px-4">
-                        <Link href="/" className="flex items-center gap-2 group">
+                        <Link href={menuHref} className="flex items-center gap-2 group">
                             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#212121] transition-transform group-hover:rotate-12">
                                 <ShoppingBag className="size-4 text-[#F57C00]" />
                             </div>
@@ -123,11 +148,11 @@ export default function Tracking({ order }: { order: Order }) {
                         <div className="flex items-center gap-4">
                             <span className="text-xs font-black uppercase tracking-widest text-[#9E9E9E]">Order #{order.id}</span>
                             <div className="h-4 w-[1px] bg-zinc-200"></div>
-                            <Link href="/">
-                                <Button variant="ghost" className="h-8 rounded-full px-4 text-xs font-bold text-[#F57C00] hover:bg-[#FFF3E0]">
+                            <Button asChild variant="ghost" className="h-8 rounded-full px-4 text-xs font-bold text-[#F57C00] hover:bg-[#FFF3E0]">
+                                <Link href={menuHref}>
                                     New Order
-                                </Button>
-                            </Link>
+                                </Link>
+                            </Button>
                         </div>
                     </div>
                 </header>
@@ -363,12 +388,12 @@ export default function Tracking({ order }: { order: Order }) {
 
                     {/* Secondary Actions Footer */}
                     <div className="mt-12 flex flex-col items-center justify-center gap-6 border-t border-zinc-100 pt-12">
-                        <Link href={`/orders/${order.tracking_token}/confirmation`}>
-                            <Button variant="ghost" className="h-12 rounded-xl px-8 font-bold text-[#757575] hover:bg-zinc-100">
+                        <Button asChild variant="ghost" className="h-12 rounded-xl px-8 font-bold text-[#757575] hover:bg-zinc-100">
+                            <Link href={`/orders/${order.tracking_token}/confirmation`}>
                                 <Clock3 className="mr-2 size-4" />
                                 View Order Confirmation
-                            </Button>
-                        </Link>
+                            </Link>
+                        </Button>
 
                         <div className="flex items-center gap-4 text-[#9E9E9E]">
                             <div className="h-[1px] w-12 bg-zinc-200"></div>

@@ -216,15 +216,16 @@ class WebhookController extends Controller
             ];
         }
 
-        if ($this->matchesCommand($message, 'myorders')) {
-            return [
-                'text' => $this->myOrdersReply($customer),
-                'options' => [],
-            ];
+        if ($this->matchesCommand($message, 'track')) {
+            return $this->ordersMiniAppReply('active');
+        }
+
+        if ($this->matchesCommand($message, 'history') || $this->matchesCommand($message, 'myorders')) {
+            return $this->ordersMiniAppReply('history');
         }
 
         return [
-            'text' => "I can help with:\n/start\n/help\n/menu\n/track <tracking_token>\n/myorders",
+            'text' => "I can help with:\n/start\n/help\n/menu\n/track\n/history\n/track <tracking_token>",
             'options' => [],
         ];
     }
@@ -236,17 +237,17 @@ class WebhookController extends Controller
 
     protected function startReply(): string
     {
-        return "Welcome to our cafe bot.\nUse /menu to order, /track <tracking_token> to track, or /myorders for recent orders.";
+        return "Welcome to our cafe bot.\nUse /menu to order, /track for active orders, /history for your Telegram history, or /track <tracking_token> for one order.";
     }
 
     protected function startReplyWithContactRequest(): string
     {
-        return "Welcome to our cafe bot.\nPlease share your phone number so we can send order updates.\nUse /menu to order, /track <tracking_token> to track, or /myorders for recent orders.";
+        return "Welcome to our cafe bot.\nPlease share your phone number so we can send order updates.\nUse /menu to order, /track for active orders, /history for your Telegram history, or /track <tracking_token> for one order.";
     }
 
     protected function helpReply(): string
     {
-        return "Available commands:\n/menu\n/track <tracking_token>\n/myorders";
+        return "Available commands:\n/menu\n/track\n/history\n/track <tracking_token>";
     }
 
     /**
@@ -265,6 +266,7 @@ class WebhookController extends Controller
                             [
                                 [
                                     'text' => $launchPayload['button_text'],
+                                    'style' => 'primary',
                                     'web_app' => [
                                         'url' => $launchPayload['url'],
                                     ],
@@ -332,6 +334,70 @@ class WebhookController extends Controller
         )->all();
 
         return "Your recent orders:\n".implode("\n", $lines);
+    }
+
+    /**
+     * @return array{text: string, options: array<string, mixed>}
+     */
+    protected function ordersMiniAppReply(string $scope): array
+    {
+        $normalizedScope = in_array($scope, ['active', 'history'], true) ? $scope : 'active';
+        $ordersUrl = $this->ordersMiniAppUrl($normalizedScope);
+
+        if ($ordersUrl === null) {
+            return [
+                'text' => 'Orders miniapp link is not configured yet.',
+                'options' => [],
+            ];
+        }
+
+        $buttonText = $this->ordersMiniAppButtonLabel($normalizedScope);
+        $text = $normalizedScope === 'history'
+            ? "Tap below to open your Telegram order history.\nOr use this link: {$ordersUrl}"
+            : "Tap below to open your active Telegram orders.\nOr use this link: {$ordersUrl}";
+
+        return [
+            'text' => $text,
+            'options' => [
+                'reply_markup' => [
+                    'inline_keyboard' => [
+                        [
+                            [
+                                'text' => $buttonText,
+                                'web_app' => [
+                                    'url' => $ordersUrl,
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    protected function ordersMiniAppButtonLabel(string $scope): string
+    {
+        return $scope === 'history'
+            ? 'Order History'
+            : 'Track Active Orders';
+    }
+
+    protected function ordersMiniAppUrl(string $scope): ?string
+    {
+        $normalizedScope = in_array($scope, ['active', 'history'], true) ? $scope : 'active';
+        $baseUrl = rtrim((string) config('app.url', ''), '/');
+
+        if ($baseUrl !== '') {
+            return "{$baseUrl}/telegram/orders?scope={$normalizedScope}";
+        }
+
+        try {
+            return route('telegram.orders', [
+                'scope' => $normalizedScope,
+            ]);
+        } catch (\Throwable) {
+            return null;
+        }
     }
 
     /**

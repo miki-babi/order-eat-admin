@@ -32,6 +32,30 @@ type Order = {
     items: OrderItem[];
 };
 
+function isTelegramContext(): boolean {
+    if (typeof window === 'undefined') {
+        return false;
+    }
+
+    const telegram = (window as Window & { Telegram?: { WebApp?: unknown } }).Telegram;
+
+    if (telegram?.WebApp) {
+        return true;
+    }
+
+    const hasInitData = (raw: string): boolean => {
+        const normalized = raw.trim().replace(/^[?#]/, '');
+
+        if (normalized === '') {
+            return false;
+        }
+
+        return new URLSearchParams(normalized).has('tgWebAppData');
+    };
+
+    return hasInitData(window.location.search) || hasInitData(window.location.hash);
+}
+
 function currency(value: number): string {
     return new Intl.NumberFormat('en-ET', {
         style: 'currency',
@@ -41,6 +65,8 @@ function currency(value: number): string {
 }
 
 export default function Confirmation({ order }: { order: Order }) {
+    const menuHref = isTelegramContext() ? '/telegram/menu' : '/';
+
     return (
         <>
             <Head title={`Order #${order.id} Confirmed - Cafe`} />
@@ -83,23 +109,23 @@ export default function Confirmation({ order }: { order: Order }) {
                                 </div>
 
                                 <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                                    <Link className="flex-1" href={`/orders/${order.tracking_token}/track`}>
-                                        <Button className="h-14 w-full rounded-2xl bg-[#F57C00] px-8 text-base font-black text-white shadow-lg shadow-[#F57C00]/20 transition-all hover:bg-[#E65100] active:scale-[0.98]">
+                                    <Button asChild className="h-14 w-full rounded-2xl bg-[#F57C00] px-8 text-base font-black text-white shadow-lg shadow-[#F57C00]/20 transition-all hover:bg-[#E65100] active:scale-[0.98] sm:flex-1">
+                                        <Link href={`/orders/${order.tracking_token}/track`}>
                                             Track Live Status
                                             <ArrowRight className="ml-2 size-5" />
-                                        </Button>
-                                    </Link>
+                                        </Link>
+                                    </Button>
                                     {order.pickup_location.google_maps_url && (
-                                        <a
-                                            href={order.pickup_location.google_maps_url}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="flex-shrink-0"
-                                        >
-                                            <Button variant="outline" className="h-14 rounded-2xl border-white/20 bg-white/5 px-6 text-white hover:bg-white/10 hover:text-white transition-all">
+                                        <Button asChild variant="outline" className="h-14 rounded-2xl border-white/20 bg-white/5 px-6 text-white hover:bg-white/10 hover:text-white transition-all">
+                                            <a
+                                                href={order.pickup_location.google_maps_url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="flex-shrink-0"
+                                            >
                                                 <MapPin className="size-5" />
-                                            </Button>
-                                        </a>
+                                            </a>
+                                        </Button>
                                     )}
                                 </div>
                             </div>
@@ -162,11 +188,11 @@ export default function Confirmation({ order }: { order: Order }) {
 
                         {/* Secondary Actions */}
                         <div className="flex flex-col items-center justify-center gap-6 pt-8">
-                            <Link href="/">
-                                <Button variant="link" className="text-sm font-bold text-[#757575] hover:text-[#F57C00]">
+                            <Button asChild variant="link" className="text-sm font-bold text-[#757575] hover:text-[#F57C00]">
+                                <Link href={menuHref}>
                                     Need to order more? Return to Menu
-                                </Button>
-                            </Link>
+                                </Link>
+                            </Button>
 
                             <div className="flex items-center gap-4 text-[#9E9E9E]">
                                 <div className="h-[1px] w-12 bg-zinc-200"></div>

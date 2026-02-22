@@ -402,6 +402,116 @@ test('telegram webhook replies with tracking details for customer order', functi
     });
 });
 
+test('telegram webhook opens active orders miniapp on /track command', function () {
+    Config::set('telegram.webhook_secret', null);
+    Config::set('telegram.bot_token', 'test-bot-token');
+    Config::set('app.url', 'https://example.test');
+
+    Customer::query()->create([
+        'name' => 'Track Command Customer',
+        'phone' => '251911000101',
+        'telegram_id' => 909001,
+        'telegram_username' => 'track_command_user',
+    ]);
+
+    Http::fake([
+        'https://api.telegram.org/*' => Http::response(['ok' => true], 200),
+    ]);
+
+    $payload = [
+        'update_id' => 10012,
+        'message' => [
+            'message_id' => 13,
+            'date' => now()->timestamp,
+            'chat' => [
+                'id' => 70110023,
+                'type' => 'private',
+            ],
+            'from' => [
+                'id' => 909001,
+                'is_bot' => false,
+                'first_name' => 'Track',
+                'username' => 'track_command_user',
+            ],
+            'text' => '/track',
+        ],
+    ];
+
+    $this->postJson(route('api.telegram.webhook'), $payload)
+        ->assertOk()
+        ->assertJson([
+            'ok' => true,
+        ]);
+
+    Http::assertSent(function ($request): bool {
+        $data = $request->data();
+        $replyMarkup = is_array($data) ? ($data['reply_markup'] ?? null) : null;
+        $decodedMarkup = is_string($replyMarkup) ? json_decode($replyMarkup, true) : null;
+
+        return is_array($data)
+            && str_contains($request->url(), '/sendMessage')
+            && str_contains((string) ($data['text'] ?? ''), 'active Telegram orders')
+            && is_array($decodedMarkup)
+            && data_get($decodedMarkup, 'inline_keyboard.0.0.text') === 'Track Active Orders'
+            && data_get($decodedMarkup, 'inline_keyboard.0.0.web_app.url') === 'https://example.test/telegram/orders?scope=active';
+    });
+});
+
+test('telegram webhook opens history miniapp on /history command', function () {
+    Config::set('telegram.webhook_secret', null);
+    Config::set('telegram.bot_token', 'test-bot-token');
+    Config::set('app.url', 'https://example.test');
+
+    Customer::query()->create([
+        'name' => 'History Command Customer',
+        'phone' => '251911000202',
+        'telegram_id' => 909002,
+        'telegram_username' => 'history_command_user',
+    ]);
+
+    Http::fake([
+        'https://api.telegram.org/*' => Http::response(['ok' => true], 200),
+    ]);
+
+    $payload = [
+        'update_id' => 10013,
+        'message' => [
+            'message_id' => 14,
+            'date' => now()->timestamp,
+            'chat' => [
+                'id' => 70110024,
+                'type' => 'private',
+            ],
+            'from' => [
+                'id' => 909002,
+                'is_bot' => false,
+                'first_name' => 'History',
+                'username' => 'history_command_user',
+            ],
+            'text' => '/history',
+        ],
+    ];
+
+    $this->postJson(route('api.telegram.webhook'), $payload)
+        ->assertOk()
+        ->assertJson([
+            'ok' => true,
+        ]);
+
+    Http::assertSent(function ($request): bool {
+        $data = $request->data();
+        $replyMarkup = is_array($data) ? ($data['reply_markup'] ?? null) : null;
+        $decodedMarkup = is_string($replyMarkup) ? json_decode($replyMarkup, true) : null;
+
+        return is_array($data)
+            && str_contains($request->url(), '/sendMessage')
+            && str_contains((string) ($data['text'] ?? ''), 'order history')
+            && is_array($decodedMarkup)
+            && data_get($decodedMarkup, 'inline_keyboard.0.0.text') === 'Order History'
+            && data_get($decodedMarkup, 'inline_keyboard.0.0.web_app.url') === 'https://example.test/telegram/orders?scope=history';
+    });
+});
+
 test('telegram miniapp identity endpoint rejects invalid init data signature', function () {
     Config::set('telegram.bot_token', 'test-bot-token');
 
@@ -467,4 +577,122 @@ test('telegram miniapp identity endpoint auto-fills existing customer by telegra
 
     expect($customer->fresh()?->name)->toBe('MiniApp Existing Customer');
     expect($customer->fresh()?->tokens()->where('token', $expectedToken)->exists())->toBeTrue();
+});
+
+test('telegram miniapp orders endpoint returns scoped telegram history', function () {
+    Config::set('telegram.bot_token', 'test-bot-token');
+
+    $customer = Customer::query()->create([
+        'name' => 'Orders Scope Customer',
+        'phone' => '251933000111',
+        'telegram_id' => 77889900,
+        'telegram_username' => 'orders_scope_user',
+    ]);
+
+    $otherCustomer = Customer::query()->create([
+        'name' => 'Other Telegram Customer',
+        'phone' => '251933000222',
+        'telegram_id' => 66778899,
+        'telegram_username' => 'other_scope_user',
+    ]);
+
+    $location = PickupLocation::query()->create([
+        'name' => 'Orders Scope Branch',
+        'address' => 'Addis Ababa',
+        'is_active' => true,
+    ]);
+
+    $activeOrder = $customer->orders()->create([
+        'pickup_date' => now()->toDateString(),
+        'pickup_location_id' => $location->id,
+        'source_channel' => Order::SOURCE_TELEGRAM,
+        'order_status' => 'preparing',
+        'receipt_status' => 'approved',
+        'tracking_token' => str_repeat('a', 40),
+        'total_amount' => 150,
+    ]);
+
+    $completedOrder = $customer->orders()->create([
+        'pickup_date' => now()->subDay()->toDateString(),
+        'pickup_location_id' => $location->id,
+        'source_channel' => Order::SOURCE_TELEGRAM,
+        'order_status' => 'completed',
+        'receipt_status' => 'approved',
+        'tracking_token' => str_repeat('b', 40),
+        'total_amount' => 250,
+    ]);
+
+    $customer->orders()->create([
+        'pickup_date' => now()->toDateString(),
+        'pickup_location_id' => $location->id,
+        'source_channel' => Order::SOURCE_WEB,
+        'order_status' => 'pending',
+        'receipt_status' => 'pending',
+        'tracking_token' => str_repeat('c', 40),
+        'total_amount' => 300,
+    ]);
+
+    $otherCustomer->orders()->create([
+        'pickup_date' => now()->toDateString(),
+        'pickup_location_id' => $location->id,
+        'source_channel' => Order::SOURCE_TELEGRAM,
+        'order_status' => 'pending',
+        'receipt_status' => 'pending',
+        'tracking_token' => str_repeat('d', 40),
+        'total_amount' => 350,
+    ]);
+
+    $user = [
+        'id' => 77889900,
+        'first_name' => 'Orders',
+        'last_name' => 'Scope',
+        'username' => 'orders_scope_user',
+    ];
+
+    $signedFields = [
+        'auth_date' => (string) now()->timestamp,
+        'query_id' => 'AAEAAAF',
+        'user' => json_encode($user, JSON_THROW_ON_ERROR),
+    ];
+
+    ksort($signedFields, SORT_STRING);
+
+    $dataCheckString = collect($signedFields)
+        ->map(fn (string $value, string $key): string => $key.'='.$value)
+        ->implode("\n");
+    $secretKey = hash_hmac('sha256', 'test-bot-token', 'WebAppData', true);
+    $hash = hash_hmac('sha256', $dataCheckString, $secretKey);
+    $initData = http_build_query(array_merge($signedFields, [
+        'hash' => $hash,
+    ]));
+
+    $this->postJson(route('api.telegram.miniapp.orders'), [
+        'init_data' => $initData,
+        'scope' => 'active',
+    ])
+        ->assertOk()
+        ->assertJson([
+            'ok' => true,
+            'scope' => 'active',
+            'meta' => [
+                'active_orders_count' => 1,
+                'history_orders_count' => 2,
+            ],
+        ])
+        ->assertJsonCount(1, 'orders')
+        ->assertJsonPath('orders.0.id', $activeOrder->id);
+
+    $this->postJson(route('api.telegram.miniapp.orders'), [
+        'init_data' => $initData,
+        'scope' => 'history',
+    ])
+        ->assertOk()
+        ->assertJson([
+            'ok' => true,
+            'scope' => 'history',
+        ])
+        ->assertJsonCount(2, 'orders');
+
+    expect(Order::query()->where('tracking_token', str_repeat('c', 40))->exists())->toBeTrue();
+    expect($completedOrder->fresh())->not->toBeNull();
 });

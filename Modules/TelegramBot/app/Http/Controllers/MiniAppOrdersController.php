@@ -1,0 +1,236 @@
+<?php
+
+namespace Modules\TelegramBot\Http\Controllers;
+
+use App\Http\Controllers\Controller;
+use App\Models\Order;
+use App\Services\CustomerIdentityService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+
+class MiniAppOrdersController extends Controller
+{
+    /**
+     * Validate Telegram miniapp init data and return order history for that Telegram customer.
+     */
+    public function __invoke(Request $request, CustomerIdentityService $customerIdentityService): JsonResponse
+    {
+        $validated = $request->validate([
+            'init_data' => ['required', 'string', 'max:8192'],
+            'scope' => ['nullable', 'string', Rule::in(['active', 'history'])],
+        ]);
+
+        $scope = (string) ($validated['scope'] ?? 'active');
+        $botToken = trim((string) config('telegram.bot_token', ''));
+
+        if ($botToken === '') {
+            return response()->json([
+                'ok' => false,
+                'error' => 'bot_token_not_configured',
+            ], 503);
+        }
+
+        $identityPayload = $this->parseIdentityPayload((string) $validated['init_data']);
+
+        if ($identityPayload === null) {
+            return response()->json([
+                'ok' => false,
+                'error' => 'invalid_init_data',
+            ], 422);
+        }
+
+        if (! $this->passesInitDataSignature($identityPayload['signed_fields'], $identityPayload['hash'], $botToken)) {
+            return response()->json([
+                'ok' => false,
+                'error' => 'invalid_init_data_signature',
+            ], 422);
+        }
+
+        $customerToken = $this->telegramToken((string) $identityPayload['telegram_id']);
+        $customer = $customerIdentityService->resolveCustomer($customerToken, [
+            'name' => $identityPayload['display_name'],
+            'allow_name_overwrite' => false,
+            'telegram_id' => $identityPayload['telegram_id'],
+            'telegram_username' => $identityPayload['telegram_username'],
+            'source_channel' => Order::SOURCE_TELEGRAM,
+            'user_agent' => $request->userAgent(),
+            'ip' => $request->ip(),
+        ]);
+
+        $ordersQuery = Order::query()
+            ->with('pickupLocation:id,name,address,google_maps_url')
+            ->where('customer_id', $customer->id)
+            ->where('source_channel', Order::SOURCE_TELEGRAM)
+            ->latest();
+
+        if ($scope === 'active') {
+            $ordersQuery->whereIn('order_status', ['pending', 'preparing', 'ready']);
+        }
+
+        if ($scope === 'active') {
+            $ordersQuery->limit(100);
+        }
+
+        $orders = $ordersQuery->get();
+
+        $activeOrdersCount = Order::query()
+            ->where('customer_id', $customer->id)
+            ->where('source_channel', Order::SOURCE_TELEGRAM)
+            ->whereIn('order_status', ['pending', 'preparing', 'ready'])
+            ->count();
+
+        $historyOrdersCount = Order::query()
+            ->where('customer_id', $customer->id)
+            ->where('source_channel', Order::SOURCE_TELEGRAM)
+            ->count();
+
+        return response()->json([
+            'ok' => true,
+            'scope' => $scope,
+            'customer' => [
+                'customer_token' => $customerToken,
+                'telegram_id' => $identityPayload['telegram_id'],
+                'telegram_username' => is_string($customer->telegram_username) && trim($customer->telegram_username) !== ''
+                    ? $customer->telegram_username
+                    : $identityPayload['telegram_username'],
+            ],
+            'meta' => [
+                'active_orders_count' => $activeOrdersCount,
+                'history_orders_count' => $historyOrdersCount,
+            ],
+            'orders' => $orders->map(fn (Order $order): array => [
+                'id' => $order->id,
+                'tracking_token' => $order->tracking_token,
+                'order_status' => $order->order_status,
+                'receipt_status' => $order->receipt_status,
+                'pickup_date' => $order->pickup_date?->toDateString(),
+                'total_amount' => (float) $order->total_amount,
+                'created_at' => $order->created_at?->toDateTimeString(),
+                'pickup_location' => [
+                    'name' => $order->pickupLocation?->name,
+                    'address' => $order->pickupLocation?->address,
+                    'google_maps_url' => $order->pickupLocation?->google_maps_url,
+                ],
+            ])->values(),
+        ]);
+    }
+
+    /**
+     * @return array{
+     *     telegram_id: int,
+     *     telegram_username: string|null,
+     *     display_name: string,
+     *     hash: string,
+     *     signed_fields: array<string, string>
+     * }|null
+     */
+    protected function parseIdentityPayload(string $initData): ?array
+    {
+        parse_str($initData, $parsed);
+
+        if (! is_array($parsed) || $parsed === []) {
+            return null;
+        }
+
+        $hash = $parsed['hash'] ?? null;
+
+        if (! is_string($hash) || trim($hash) === '') {
+            return null;
+        }
+
+        $signedFields = [];
+
+        foreach ($parsed as $key => $value) {
+            if (! is_string($key) || $key === '' || $key === 'hash' || is_array($value)) {
+                continue;
+            }
+
+            $signedFields[$key] = (string) $value;
+        }
+
+        $userJson = $signedFields['user'] ?? null;
+
+        if (! is_string($userJson) || trim($userJson) === '') {
+            return null;
+        }
+
+        $user = json_decode($userJson, true);
+
+        if (! is_array($user)) {
+            return null;
+        }
+
+        $telegramId = $this->normalizeTelegramId($user['id'] ?? null);
+
+        if ($telegramId === null) {
+            return null;
+        }
+
+        $telegramUsername = null;
+
+        if (is_string($user['username'] ?? null) && trim((string) $user['username']) !== '') {
+            $telegramUsername = ltrim(trim((string) $user['username']), '@');
+        }
+
+        $firstName = trim((string) ($user['first_name'] ?? ''));
+        $lastName = trim((string) ($user['last_name'] ?? ''));
+        $displayName = trim($firstName.' '.$lastName);
+
+        if ($displayName === '') {
+            $displayName = $telegramUsername !== null ? '@'.$telegramUsername : 'Telegram Customer';
+        }
+
+        return [
+            'telegram_id' => $telegramId,
+            'telegram_username' => $telegramUsername,
+            'display_name' => $displayName,
+            'hash' => trim($hash),
+            'signed_fields' => $signedFields,
+        ];
+    }
+
+    /**
+     * @param  array<string, string>  $signedFields
+     */
+    protected function passesInitDataSignature(array $signedFields, string $hash, string $botToken): bool
+    {
+        if ($signedFields === []) {
+            return false;
+        }
+
+        ksort($signedFields, SORT_STRING);
+
+        $dataCheckLines = [];
+
+        foreach ($signedFields as $key => $value) {
+            $dataCheckLines[] = $key.'='.$value;
+        }
+
+        $dataCheckString = implode("\n", $dataCheckLines);
+        $secretKey = hash_hmac('sha256', $botToken, 'WebAppData', true);
+        $calculatedHash = hash_hmac('sha256', $dataCheckString, $secretKey);
+
+        return hash_equals(strtolower($hash), strtolower($calculatedHash));
+    }
+
+    protected function telegramToken(string $telegramUserId): string
+    {
+        return 'tg_'.substr(hash('sha256', 'telegram:'.$telegramUserId), 0, 60);
+    }
+
+    protected function normalizeTelegramId(mixed $value): ?int
+    {
+        if (is_int($value)) {
+            return $value > 0 ? $value : null;
+        }
+
+        if (! is_string($value) || trim($value) === '' || ! ctype_digit(trim($value))) {
+            return null;
+        }
+
+        $telegramId = (int) trim($value);
+
+        return $telegramId > 0 ? $telegramId : null;
+    }
+}

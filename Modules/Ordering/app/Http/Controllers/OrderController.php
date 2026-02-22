@@ -50,6 +50,19 @@ class OrderController extends Controller
         );
     }
 
+    /**
+     * Show Telegram miniapp order tracker list.
+     */
+    public function telegramOrders(Request $request): Response
+    {
+        $scope = strtolower(trim((string) $request->query('scope', 'active')));
+        $scope = in_array($scope, ['active', 'history'], true) ? $scope : 'active';
+
+        return Inertia::render('customer/telegram-orders', [
+            'scope' => $scope,
+        ]);
+    }
+
     protected function renderMenuPage(
         Request $request,
         CustomerIdentityService $customerIdentityService,
