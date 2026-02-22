@@ -103,6 +103,71 @@ test('telegram webhook creates telegram customer and sends start response', func
     });
 });
 
+test('telegram webhook retries without style when telegram api rejects style field', function () {
+    Config::set('telegram.webhook_secret', null);
+    Config::set('telegram.bot_token', 'test-bot-token');
+
+    Http::fake([
+        'https://api.telegram.org/*' => Http::sequence()
+            ->push([
+                'ok' => false,
+                'error_code' => 400,
+                'description' => "Bad Request: can't parse reply keyboard button",
+            ], 200)
+            ->push(['ok' => true], 200),
+    ]);
+
+    $payload = [
+        'update_id' => 10001,
+        'message' => [
+            'message_id' => 1,
+            'date' => now()->timestamp,
+            'chat' => [
+                'id' => 99887766,
+                'type' => 'private',
+            ],
+            'from' => [
+                'id' => 11223344,
+                'is_bot' => false,
+                'first_name' => 'Alex',
+                'last_name' => 'Guest',
+                'username' => 'alex_guest',
+            ],
+            'text' => '/start',
+        ],
+    ];
+
+    $this->postJson(route('api.telegram.webhook'), $payload)
+        ->assertOk()
+        ->assertJson([
+            'ok' => true,
+        ]);
+
+    Http::assertSentCount(2);
+
+    Http::assertSent(function ($request): bool {
+        $data = $request->data();
+        $replyMarkup = is_array($data) ? ($data['reply_markup'] ?? null) : null;
+        $decodedMarkup = is_string($replyMarkup) ? json_decode($replyMarkup, true) : null;
+
+        return is_array($data)
+            && str_contains($request->url(), '/sendMessage')
+            && data_get($decodedMarkup, 'keyboard.0.0.style') === 'primary'
+            && data_get($decodedMarkup, 'keyboard.0.0.request_contact') === true;
+    });
+
+    Http::assertSent(function ($request): bool {
+        $data = $request->data();
+        $replyMarkup = is_array($data) ? ($data['reply_markup'] ?? null) : null;
+        $decodedMarkup = is_string($replyMarkup) ? json_decode($replyMarkup, true) : null;
+
+        return is_array($data)
+            && str_contains($request->url(), '/sendMessage')
+            && data_get($decodedMarkup, 'keyboard.0.0.style') === null
+            && data_get($decodedMarkup, 'keyboard.0.0.request_contact') === true;
+    });
+});
+
 test('telegram webhook sends inline miniapp launch when customer already has a phone', function () {
     Config::set('telegram.webhook_secret', null);
     Config::set('telegram.bot_token', 'test-bot-token');

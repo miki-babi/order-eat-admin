@@ -2,6 +2,7 @@
 
 namespace Modules\TelegramBot\Services;
 
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -23,24 +24,30 @@ class TelegramBotApiService
         }
 
         try {
-            $payload = array_merge([
-                'chat_id' => (string) $chatId,
-                'text' => $text,
-            ], $options);
+            $payload = $this->buildPayload($chatId, $text, $options);
+            $response = $this->postMessage($token, $payload);
 
-            if (isset($payload['reply_markup']) && is_array($payload['reply_markup'])) {
-                $payload['reply_markup'] = json_encode($payload['reply_markup'], JSON_THROW_ON_ERROR);
-            }
-
-            $response = Http::asForm()
-                ->timeout($this->timeoutSeconds())
-                ->post("https://api.telegram.org/bot{$token}/sendMessage", $payload);
-
-            if ($response->failed()) {
+            if ($this->isFailedTelegramResponse($response)) {
                 Log::warning('telegram.webhook.send_message_failed', [
                     'status' => $response->status(),
                     'body' => $response->body(),
                 ]);
+
+                $replyMarkup = $options['reply_markup'] ?? null;
+
+                if (is_array($replyMarkup) && $this->containsStyleField($replyMarkup)) {
+                    $fallbackOptions = $options;
+                    $fallbackOptions['reply_markup'] = $this->stripStyleField($replyMarkup);
+                    $fallbackPayload = $this->buildPayload($chatId, $text, $fallbackOptions);
+                    $fallbackResponse = $this->postMessage($token, $fallbackPayload);
+
+                    if ($this->isFailedTelegramResponse($fallbackResponse)) {
+                        Log::warning('telegram.webhook.send_message_fallback_failed', [
+                            'status' => $fallbackResponse->status(),
+                            'body' => $fallbackResponse->body(),
+                        ]);
+                    }
+                }
             }
         } catch (\Throwable $exception) {
             Log::warning('telegram.webhook.send_message_exception', [
@@ -61,5 +68,78 @@ class TelegramBotApiService
         $timeout = (int) config('telegram.http_timeout', 10);
 
         return max(1, $timeout);
+    }
+
+    /**
+     * @param  array<string, mixed>  $options
+     * @return array<string, mixed>
+     */
+    protected function buildPayload(int|string $chatId, string $text, array $options): array
+    {
+        $payload = array_merge([
+            'chat_id' => (string) $chatId,
+            'text' => $text,
+        ], $options);
+
+        if (isset($payload['reply_markup']) && is_array($payload['reply_markup'])) {
+            $payload['reply_markup'] = json_encode($payload['reply_markup'], JSON_THROW_ON_ERROR);
+        }
+
+        return $payload;
+    }
+
+    /**
+     * @param  array<string, mixed>  $payload
+     */
+    protected function postMessage(string $token, array $payload): Response
+    {
+        return Http::asForm()
+            ->timeout($this->timeoutSeconds())
+            ->post("https://api.telegram.org/bot{$token}/sendMessage", $payload);
+    }
+
+    protected function isFailedTelegramResponse(Response $response): bool
+    {
+        if ($response->failed()) {
+            return true;
+        }
+
+        $json = $response->json();
+
+        return is_array($json)
+            && array_key_exists('ok', $json)
+            && $json['ok'] !== true;
+    }
+
+    protected function containsStyleField(array $value): bool
+    {
+        foreach ($value as $key => $item) {
+            if ($key === 'style') {
+                return true;
+            }
+
+            if (is_array($item) && $this->containsStyleField($item)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    protected function stripStyleField(array $value): array
+    {
+        $stripped = [];
+
+        foreach ($value as $key => $item) {
+            if ($key === 'style') {
+                continue;
+            }
+
+            $stripped[$key] = is_array($item)
+                ? $this->stripStyleField($item)
+                : $item;
+        }
+
+        return $stripped;
     }
 }
