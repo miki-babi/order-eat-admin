@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../wayfinder'
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::update
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:602
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:635
 * @route '/staff/sms-notification-settings/{smsNotificationSetting}'
 */
 export const update = (args: { smsNotificationSetting: string | number | { id: string | number } } | [smsNotificationSetting: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -16,7 +16,7 @@ update.definition = {
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::update
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:602
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:635
 * @route '/staff/sms-notification-settings/{smsNotificationSetting}'
 */
 update.url = (args: { smsNotificationSetting: string | number | { id: string | number } } | [smsNotificationSetting: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions) => {
@@ -49,7 +49,7 @@ update.url = (args: { smsNotificationSetting: string | number | { id: string | n
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::update
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:602
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:635
 * @route '/staff/sms-notification-settings/{smsNotificationSetting}'
 */
 update.put = (args: { smsNotificationSetting: string | number | { id: string | number } } | [smsNotificationSetting: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -59,7 +59,7 @@ update.put = (args: { smsNotificationSetting: string | number | { id: string | n
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::update
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:602
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:635
 * @route '/staff/sms-notification-settings/{smsNotificationSetting}'
 */
 const updateForm = (args: { smsNotificationSetting: string | number | { id: string | number } } | [smsNotificationSetting: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -74,7 +74,7 @@ const updateForm = (args: { smsNotificationSetting: string | number | { id: stri
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::update
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:602
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:635
 * @route '/staff/sms-notification-settings/{smsNotificationSetting}'
 */
 updateForm.put = (args: { smsNotificationSetting: string | number | { id: string | number } } | [smsNotificationSetting: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({

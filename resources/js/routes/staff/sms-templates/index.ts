@@ -82,7 +82,7 @@ index.form = indexForm
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::update
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:582
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:615
 * @route '/staff/sms-templates/{smsTemplate}'
 */
 export const update = (args: { smsTemplate: string | number | { id: string | number } } | [smsTemplate: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -97,7 +97,7 @@ update.definition = {
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::update
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:582
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:615
 * @route '/staff/sms-templates/{smsTemplate}'
 */
 update.url = (args: { smsTemplate: string | number | { id: string | number } } | [smsTemplate: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions) => {
@@ -130,7 +130,7 @@ update.url = (args: { smsTemplate: string | number | { id: string | number } } |
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::update
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:582
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:615
 * @route '/staff/sms-templates/{smsTemplate}'
 */
 update.put = (args: { smsTemplate: string | number | { id: string | number } } | [smsTemplate: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -140,7 +140,7 @@ update.put = (args: { smsTemplate: string | number | { id: string | number } } |
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::update
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:582
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:615
 * @route '/staff/sms-templates/{smsTemplate}'
 */
 const updateForm = (args: { smsTemplate: string | number | { id: string | number } } | [smsTemplate: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -155,7 +155,7 @@ const updateForm = (args: { smsTemplate: string | number | { id: string | number
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::update
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:582
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:615
 * @route '/staff/sms-templates/{smsTemplate}'
 */
 updateForm.put = (args: { smsTemplate: string | number | { id: string | number } } | [smsTemplate: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({

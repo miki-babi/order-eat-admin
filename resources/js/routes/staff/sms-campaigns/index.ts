@@ -82,7 +82,7 @@ previewAudience.form = previewAudienceForm
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::send
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:223
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:256
 * @route '/staff/sms-campaigns/send'
 */
 export const send = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -97,7 +97,7 @@ send.definition = {
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::send
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:223
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:256
 * @route '/staff/sms-campaigns/send'
 */
 send.url = (options?: RouteQueryOptions) => {
@@ -106,7 +106,7 @@ send.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::send
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:223
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:256
 * @route '/staff/sms-campaigns/send'
 */
 send.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -116,7 +116,7 @@ send.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::send
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:223
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:256
 * @route '/staff/sms-campaigns/send'
 */
 const sendForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -126,7 +126,7 @@ const sendForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => (
 
 /**
 * @see \Modules\Messaging\Http\Controllers\Staff\SmsTemplateController::send
-* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:223
+* @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:256
 * @route '/staff/sms-campaigns/send'
 */
 sendForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({

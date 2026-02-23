@@ -160,7 +160,10 @@ class SmsTemplateController extends Controller
     /**
      * Preview customers that match promo targeting filters.
      */
-    public function previewAudience(PreviewPromoAudienceRequest $request): JsonResponse
+    public function previewAudience(
+        PreviewPromoAudienceRequest $request,
+        SmsTemplateService $smsTemplateService,
+    ): JsonResponse
     {
         /** @var \App\Models\User $user */
         $user = $request->user();
@@ -183,13 +186,42 @@ class SmsTemplateController extends Controller
             ->where('last_order_at', '<', now()->subDays(90))
             ->count();
 
-        $sampleRows = (clone $audienceQuery)
+        $sampleAudienceRows = (clone $audienceQuery)
             ->orderByDesc('orders_count')
             ->orderByDesc('total_spent')
             ->limit(20)
+            ->get();
+
+        $sampleCustomerIds = $sampleAudienceRows
+            ->pluck('id')
+            ->map(fn ($id) => (int) $id)
+            ->filter(fn (int $id) => $id > 0)
+            ->values()
+            ->all();
+
+        /** @var \Illuminate\Support\Collection<int, \App\Models\Customer> $sampleCustomers */
+        $sampleCustomers = Customer::query()
+            ->whereIn('id', $sampleCustomerIds)
             ->get()
-            ->map(function ($row) use ($now): array {
+            ->keyBy('id');
+
+        $sampleRows = $sampleAudienceRows
+            ->map(function ($row) use ($now, $sampleCustomers, $smsTemplateService, $user): array {
                 $lastOrderAt = $row->last_order_at ? Carbon::parse((string) $row->last_order_at) : null;
+                $customer = $sampleCustomers->get((int) $row->id);
+                $previewVariables = [];
+
+                if ($customer instanceof Customer) {
+                    $latestOrderQuery = $customer->orders()->with(['pickupLocation', 'items.menuItem'])->latest();
+                    BranchAccess::scopeQuery($latestOrderQuery, $user);
+                    $latestOrder = $latestOrderQuery->first();
+
+                    $previewVariables = collect(
+                        $smsTemplateService->variablesForCustomer($customer, $latestOrder),
+                    )
+                        ->mapWithKeys(fn ($value, $key) => [(string) $key => (string) $value])
+                        ->all();
+                }
 
                 return [
                     'id' => (int) $row->id,
@@ -201,6 +233,7 @@ class SmsTemplateController extends Controller
                     'average_order_value' => (float) ($row->average_order_value ?? 0),
                     'last_order_at' => $lastOrderAt?->toDateTimeString(),
                     'recency_days' => $lastOrderAt?->diffInDays($now),
+                    'preview_variables' => $previewVariables,
                 ];
             })
             ->values();

@@ -117,6 +117,7 @@ type PromoAudiencePreviewRow = {
     average_order_value: number;
     last_order_at: string | null;
     recency_days: number | null;
+    preview_variables: Record<string, string>;
 };
 
 type PromoAudiencePreview = {
@@ -203,6 +204,8 @@ export default function SmsTemplates({
     const [promoWizardOpen, setPromoWizardOpen] = useState(false);
     const [promoStepIndex, setPromoStepIndex] = useState(0);
     const [promoSubmitMode, setPromoSubmitMode] = useState<'send' | 'save_send' | null>(null);
+    const [promoConfirmOpen, setPromoConfirmOpen] = useState(false);
+    const [promoConfirmMode, setPromoConfirmMode] = useState<'send' | 'save_send' | null>(null);
     const [audiencePreview, setAudiencePreview] = useState<PromoAudiencePreview | null>(null);
     const [audiencePreviewLoading, setAudiencePreviewLoading] = useState(false);
     const [audiencePreviewError, setAudiencePreviewError] = useState<string | null>(null);
@@ -446,6 +449,8 @@ export default function SmsTemplates({
         promoForm.clearErrors();
         setPromoStepIndex(0);
         setPromoWizardOpen(true);
+        setPromoConfirmOpen(false);
+        setPromoConfirmMode(null);
         setAudiencePreview(null);
         setAudiencePreviewError(null);
     };
@@ -453,6 +458,8 @@ export default function SmsTemplates({
     const closePromoWizard = () => {
         setPromoWizardOpen(false);
         setPromoStepIndex(0);
+        setPromoConfirmOpen(false);
+        setPromoConfirmMode(null);
         setPromoSubmitMode(null);
     };
 
@@ -615,6 +622,46 @@ export default function SmsTemplates({
         promoForm.data.message.trim().length > 0 &&
         (audiencePreview?.summary.matched_customers ?? 0) > 0 &&
         !hasPartialTelegramButton;
+    const promoPreviewSample = audiencePreview?.sample[0] ?? null;
+    const promoPreviewVariables = promoPreviewSample?.preview_variables ?? {};
+    const promoMessageUsesRecentAndFrequentItems =
+        /\{recent_item\}/i.test(promoForm.data.message) &&
+        /\{freq_item\}/i.test(promoForm.data.message);
+    const recentItemPreviewValue = promoPreviewVariables.recent_item?.trim() ?? '';
+    const frequentItemPreviewValue = promoPreviewVariables.freq_item?.trim() ?? '';
+    const promoPreviewItemsResolveToSameValue =
+        recentItemPreviewValue !== '' &&
+        frequentItemPreviewValue !== '' &&
+        recentItemPreviewValue.toLowerCase() === frequentItemPreviewValue.toLowerCase();
+    const renderedPromoMessagePreview = promoForm.data.message.replace(/\{([a-z0-9_]+)\}/gi, (match, rawToken) => {
+        const token = String(rawToken).toLowerCase();
+
+        if (Object.prototype.hasOwnProperty.call(promoPreviewVariables, token)) {
+            return promoPreviewVariables[token] ?? '';
+        }
+
+        return match;
+    });
+    const isConfirmingSaveAndSend = promoConfirmMode === 'save_send';
+    const promoConfirmationActionLabel = isConfirmingSaveAndSend ? 'Save Template + Send' : 'Send Promo';
+
+    const requestPromoCampaignConfirmation = (mode: 'send' | 'save_send') => {
+        if (!canSendPromoCampaign || promoForm.processing) {
+            return;
+        }
+
+        setPromoConfirmMode(mode);
+        setPromoConfirmOpen(true);
+    };
+
+    const cancelPromoCampaignConfirmation = () => {
+        if (promoForm.processing) {
+            return;
+        }
+
+        setPromoConfirmOpen(false);
+        setPromoConfirmMode(null);
+    };
 
     const sendPromoCampaign = (saveTemplate: boolean) => {
         if (!canSendPromoCampaign) {
@@ -647,6 +694,17 @@ export default function SmsTemplates({
                 }));
             },
         });
+    };
+
+    const confirmPromoCampaignSend = () => {
+        if (promoConfirmMode === null) {
+            return;
+        }
+
+        const saveTemplate = promoConfirmMode === 'save_send';
+        setPromoConfirmOpen(false);
+        setPromoConfirmMode(null);
+        sendPromoCampaign(saveTemplate);
     };
 
     return (
@@ -1493,7 +1551,7 @@ export default function SmsTemplates({
                                             type="button"
                                             className="h-11 rounded-xl bg-[#F57C00] px-7 font-black uppercase tracking-widest hover:bg-[#E65100]"
                                             disabled={!canSendPromoCampaign || promoForm.processing}
-                                            onClick={() => sendPromoCampaign(false)}
+                                            onClick={() => requestPromoCampaignConfirmation('send')}
                                         >
                                             {promoForm.processing && promoSubmitMode === 'send' ? 'Sending...' : 'Send Promo'}
                                         </Button>
@@ -1501,7 +1559,7 @@ export default function SmsTemplates({
                                             type="button"
                                             className="h-11 rounded-xl bg-[#212121] px-7 font-black uppercase tracking-widest hover:bg-[#F57C00]"
                                             disabled={!canSendPromoCampaign || promoForm.processing}
-                                            onClick={() => sendPromoCampaign(true)}
+                                            onClick={() => requestPromoCampaignConfirmation('save_send')}
                                         >
                                             {promoForm.processing && promoSubmitMode === 'save_send'
                                                 ? 'Saving + Sending...'
@@ -1525,6 +1583,140 @@ export default function SmsTemplates({
                                     <ArrowRight className="ml-2 size-4" />
                                 </Button>
                             )}
+                        </div>
+                    </DialogContent>
+                </Dialog>
+
+                <Dialog
+                    open={promoConfirmOpen}
+                    onOpenChange={(open) => {
+                        if (open) {
+                            setPromoConfirmOpen(true);
+                            return;
+                        }
+
+                        cancelPromoCampaignConfirmation();
+                    }}
+                >
+                    <DialogContent className="border-none p-0 sm:max-w-2xl">
+                        <DialogHeader className="border-b border-zinc-100 bg-zinc-50/70 p-6">
+                            <p className="text-[10px] font-black uppercase tracking-widest text-[#F57C00]">
+                                Final Confirmation
+                            </p>
+                            <DialogTitle className="mt-1 text-xl font-black text-[#212121]">
+                                Review promo preview before sending
+                            </DialogTitle>
+                            <DialogDescription className="mt-1 text-xs font-bold text-zinc-500">
+                                This preview is generated from a sample customer in your current audience.
+                            </DialogDescription>
+                        </DialogHeader>
+
+                        <div className="space-y-4 p-6">
+                            <div className="grid gap-3 md:grid-cols-3">
+                                <div className="rounded-xl border border-zinc-200 bg-white px-4 py-3">
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Platform</p>
+                                    <p className="mt-1 text-sm font-black text-[#212121]">
+                                        {promoForm.data.platform === 'telegram' ? 'Telegram' : 'SMS'}
+                                    </p>
+                                </div>
+                                <div className="rounded-xl border border-zinc-200 bg-white px-4 py-3">
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Audience</p>
+                                    <p className="mt-1 text-sm font-black text-[#212121]">
+                                        {(audiencePreview?.summary.matched_customers ?? 0).toLocaleString()} customers
+                                    </p>
+                                </div>
+                                <div className="rounded-xl border border-zinc-200 bg-white px-4 py-3">
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Action</p>
+                                    <p className="mt-1 text-sm font-black text-[#212121]">
+                                        {promoConfirmationActionLabel}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="rounded-xl border border-zinc-200 bg-zinc-50/60 px-4 py-3">
+                                <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500">
+                                    Sample Recipient
+                                </p>
+                                {promoPreviewSample ? (
+                                    <p className="mt-1 text-xs font-bold text-zinc-700">
+                                        {promoPreviewSample.name} ({promoPreviewSample.phone})
+                                        {promoPreviewSample.telegram_username
+                                            ? ` · @${promoPreviewSample.telegram_username}`
+                                            : ''}
+                                    </p>
+                                ) : (
+                                    <p className="mt-1 text-xs font-bold text-zinc-700">
+                                        Audience preview sample unavailable. Unknown placeholders stay as tokens.
+                                    </p>
+                                )}
+                            </div>
+
+                            <div className="rounded-2xl border border-zinc-200 bg-white p-4">
+                                <p className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">
+                                    Message Preview
+                                </p>
+                                <div className="mt-2 rounded-xl border border-zinc-200 bg-zinc-50/50 p-4 text-sm font-bold leading-relaxed text-zinc-700 whitespace-pre-wrap">
+                                    {renderedPromoMessagePreview.trim() === ''
+                                        ? 'Preview is empty for this sample.'
+                                        : renderedPromoMessagePreview}
+                                </div>
+                                {promoForm.data.platform === 'telegram' &&
+                                promoForm.data.telegram_button_text.trim() !== '' &&
+                                promoForm.data.telegram_button_url.trim() !== '' ? (
+                                    <div className="mt-3 rounded-xl border border-sky-200 bg-sky-50 px-3 py-2">
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-sky-600">
+                                            Telegram Inline Button
+                                        </p>
+                                        <p className="mt-1 text-xs font-bold text-sky-700">
+                                            {promoForm.data.telegram_button_text} ({promoForm.data.telegram_button_url})
+                                        </p>
+                                    </div>
+                                ) : null}
+                            </div>
+
+                            <div className="space-y-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
+                                <p className="text-[10px] font-black uppercase tracking-widest text-amber-700">
+                                    Placeholder Warning
+                                </p>
+                                <p className="text-xs font-bold leading-relaxed text-amber-800">
+                                    Placeholder values are customer-specific, so final messages can vary per recipient.
+                                </p>
+                                {promoMessageUsesRecentAndFrequentItems ? (
+                                    <p className="text-xs font-bold leading-relaxed text-amber-800">
+                                        You used both {'{recent_item}'} and {'{freq_item}'}. They can resolve to the same item for some
+                                        customers, so the promo might look repetitive by accident.
+                                    </p>
+                                ) : null}
+                                {promoPreviewItemsResolveToSameValue ? (
+                                    <p className="text-xs font-bold leading-relaxed text-amber-800">
+                                        In this sample preview, both tokens resolved to "{recentItemPreviewValue}".
+                                    </p>
+                                ) : null}
+                            </div>
+                        </div>
+
+                        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-100 bg-zinc-50/60 p-6">
+                            <Button
+                                type="button"
+                                variant="outline"
+                                className="h-11 rounded-xl border-zinc-200 font-bold"
+                                disabled={promoForm.processing}
+                                onClick={cancelPromoCampaignConfirmation}
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                type="button"
+                                className="h-11 rounded-xl bg-[#F57C00] px-8 font-black uppercase tracking-widest hover:bg-[#E65100]"
+                                disabled={promoForm.processing || promoConfirmMode === null}
+                                onClick={confirmPromoCampaignSend}
+                            >
+                                {promoForm.processing
+                                    ? isConfirmingSaveAndSend
+                                        ? 'Saving + Sending...'
+                                        : 'Sending...'
+                                    : promoConfirmationActionLabel}
+                            </Button>
                         </div>
                     </DialogContent>
                 </Dialog>
