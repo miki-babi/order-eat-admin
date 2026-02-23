@@ -6,6 +6,14 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
 
+use Illuminate\Support\Facades\Artisan;
+
+Route::get('/create-storage-link', function () {
+    Artisan::call('storage:link');
+    return 'Storage link created successfully!';
+});
+
+
 Route::get('dashboard', function (Request $request) {
     $user = $request->user();
 
