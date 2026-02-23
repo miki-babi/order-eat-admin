@@ -13,7 +13,7 @@ import {
     Users,
     XCircle,
 } from 'lucide-react';
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import InputError from '@/components/input-error';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -209,6 +209,8 @@ export default function SmsTemplates({
     const [promoShowcaseIndex, setPromoShowcaseIndex] = useState(0);
     const [isPromoShowcaseHovered, setIsPromoShowcaseHovered] = useState(false);
     const [selectedPlaceholder, setSelectedPlaceholder] = useState<SmsPlaceholder | null>(null);
+    const promoMessageTextareaRef = useRef<HTMLTextAreaElement | null>(null);
+    const templateBodyTextareaRef = useRef<HTMLTextAreaElement | null>(null);
 
     const templateForm = useForm({
         label: templates[0]?.label ?? '',
@@ -271,6 +273,69 @@ export default function SmsTemplates({
         ? placeholderDetails[selectedPlaceholder.token] ??
           'This variable is replaced automatically with customer/order data when the campaign is sent.'
         : '';
+
+    const insertTokenAtCursor = ({
+        token,
+        textarea,
+        currentValue,
+        maxLength,
+        updateValue,
+    }: {
+        token: string;
+        textarea: HTMLTextAreaElement | null;
+        currentValue: string;
+        maxLength: number;
+        updateValue: (value: string) => void;
+    }) => {
+        const tokenText = `{${token}}`;
+
+        if (!textarea) {
+            updateValue(`${currentValue}${tokenText}`.slice(0, maxLength));
+            return;
+        }
+
+        const selectionStart = textarea.selectionStart ?? currentValue.length;
+        const selectionEnd = textarea.selectionEnd ?? selectionStart;
+        const nextValue = `${currentValue.slice(0, selectionStart)}${tokenText}${currentValue.slice(selectionEnd)}`.slice(
+            0,
+            maxLength,
+        );
+
+        updateValue(nextValue);
+
+        const cursorPosition = Math.min(selectionStart + tokenText.length, nextValue.length);
+        const refocusTextarea = () => {
+            textarea.focus();
+            textarea.setSelectionRange(cursorPosition, cursorPosition);
+        };
+
+        if (typeof window !== 'undefined') {
+            window.requestAnimationFrame(refocusTextarea);
+            return;
+        }
+
+        refocusTextarea();
+    };
+
+    const insertPromoPlaceholder = (token: string) => {
+        insertTokenAtCursor({
+            token,
+            textarea: promoMessageTextareaRef.current,
+            currentValue: promoForm.data.message,
+            maxLength: promoMessageLimit,
+            updateValue: (value) => promoForm.setData('message', value),
+        });
+    };
+
+    const insertTemplatePlaceholder = (token: string) => {
+        insertTokenAtCursor({
+            token,
+            textarea: templateBodyTextareaRef.current,
+            currentValue: templateForm.data.body,
+            maxLength: 480,
+            updateValue: (value) => templateForm.setData('body', value),
+        });
+    };
 
     useEffect(() => {
         if (isPromoShowcaseHovered) {
@@ -1259,6 +1324,7 @@ export default function SmsTemplates({
                                     </div>
 
                                     <textarea
+                                        ref={promoMessageTextareaRef}
                                         className="min-h-[180px] w-full rounded-2xl border border-zinc-200 bg-white p-4 text-sm font-medium leading-relaxed focus:outline-none focus:ring-2 focus:ring-[#F57C00]/20 transition-all placeholder:text-zinc-300"
                                         value={promoForm.data.message}
                                         maxLength={promoMessageLimit}
@@ -1390,7 +1456,7 @@ export default function SmsTemplates({
                                                             type="button"
                                                             className="rounded-lg px-2 py-0.5 hover:bg-zinc-50"
                                                             title={placeholder.description}
-                                                            onClick={() => setSelectedPlaceholder(placeholder)}
+                                                            onClick={() => insertPromoPlaceholder(placeholder.token)}
                                                         >
                                                             {`{${placeholder.token}}`}
                                                         </button>
@@ -1602,6 +1668,7 @@ export default function SmsTemplates({
                                         </div>
                                         <textarea
                                             id="template-body"
+                                            ref={templateBodyTextareaRef}
                                             className="min-h-[220px] w-full rounded-2xl border border-zinc-200 bg-white p-5 text-sm font-medium leading-relaxed focus:outline-none focus:ring-2 focus:ring-[#F57C00]/20 transition-all placeholder:text-zinc-300"
                                             value={templateForm.data.body}
                                             maxLength={480}
@@ -1649,7 +1716,7 @@ export default function SmsTemplates({
                                     key={placeholder.token}
                                     type="button"
                                     className="group relative flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-left ring-1 ring-zinc-200 transition-all hover:ring-[#F57C00]/30 hover:shadow-sm"
-                                    onClick={() => setSelectedPlaceholder(placeholder)}
+                                    onClick={() => insertTemplatePlaceholder(placeholder.token)}
                                     title={placeholder.description}
                                 >
                                     <code className="text-xs font-black text-[#F57C00]">{`{${placeholder.token}}`}</code>

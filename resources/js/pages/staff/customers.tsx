@@ -1,6 +1,6 @@
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import { ChevronLeft, ChevronRight, Clock3, MapPin, MessageSquare, Package, Search, Store, TrendingUp, Users } from 'lucide-react';
-import { useMemo, useState, type FormEvent } from 'react';
+import { useMemo, useRef, useState, type FormEvent } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -178,6 +178,7 @@ export default function StaffCustomers({
         telegram_button_text: '',
         telegram_button_url: '',
     });
+    const messageTextareaRef = useRef<HTMLTextAreaElement | null>(null);
     const isTelegramPlatform = smsForm.data.platform === 'telegram';
     const messageLimit = isTelegramPlatform ? 2000 : 480;
     const hasPartialTelegramButton =
@@ -235,6 +236,39 @@ export default function StaffCustomers({
                 smsForm.reset('message', 'telegram_button_text', 'telegram_button_url');
             },
         });
+    };
+
+    const insertMessageToken = (token: string) => {
+        const tokenText = `{${token}}`;
+        const textarea = messageTextareaRef.current;
+        const currentMessage = smsForm.data.message;
+
+        if (!textarea) {
+            smsForm.setData('message', `${currentMessage}${tokenText}`.slice(0, messageLimit));
+            return;
+        }
+
+        const selectionStart = textarea.selectionStart ?? currentMessage.length;
+        const selectionEnd = textarea.selectionEnd ?? selectionStart;
+        const nextMessage = `${currentMessage.slice(0, selectionStart)}${tokenText}${currentMessage.slice(selectionEnd)}`.slice(
+            0,
+            messageLimit,
+        );
+
+        smsForm.setData('message', nextMessage);
+
+        const cursorPosition = Math.min(selectionStart + tokenText.length, nextMessage.length);
+        const refocusTextarea = () => {
+            textarea.focus();
+            textarea.setSelectionRange(cursorPosition, cursorPosition);
+        };
+
+        if (typeof window !== 'undefined') {
+            window.requestAnimationFrame(refocusTextarea);
+            return;
+        }
+
+        refocusTextarea();
     };
 
     const closeHistoryModal = () => {
@@ -508,6 +542,7 @@ export default function StaffCustomers({
                                 <div className="relative">
                                     <textarea
                                         id="message"
+                                        ref={messageTextareaRef}
                                         className="min-h-[160px] w-full rounded-2xl border border-zinc-200 bg-white p-4 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#F57C00]/20 transition-all placeholder:text-zinc-300"
                                         value={smsForm.data.message}
                                         maxLength={messageLimit}
@@ -580,8 +615,20 @@ export default function StaffCustomers({
                                         {smsPlaceholders.length > 0 && (
                                             <div className="flex flex-wrap gap-1.5">
                                                 {smsPlaceholders.map((placeholder) => (
-                                                    <Badge key={placeholder.token} variant="outline" className="cursor-help rounded-lg border-zinc-200 bg-white px-2 py-0.5 text-[9px] font-bold text-zinc-500 hover:text-[#F57C00]" title={placeholder.description}>
-                                                        {`{${placeholder.token}}`}
+                                                    <Badge
+                                                        key={placeholder.token}
+                                                        asChild
+                                                        variant="outline"
+                                                        className="rounded-lg border-zinc-200 bg-white px-0 py-0 text-[9px] font-bold text-zinc-500"
+                                                    >
+                                                        <button
+                                                            type="button"
+                                                            className="rounded-lg px-2 py-0.5 transition-colors hover:bg-zinc-50 hover:text-[#F57C00]"
+                                                            title={placeholder.description}
+                                                            onClick={() => insertMessageToken(placeholder.token)}
+                                                        >
+                                                            {`{${placeholder.token}}`}
+                                                        </button>
                                                     </Badge>
                                                 ))}
                                             </div>
