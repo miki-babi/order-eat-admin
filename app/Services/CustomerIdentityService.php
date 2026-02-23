@@ -9,6 +9,7 @@ use App\Models\SmsLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class CustomerIdentityService
 {
@@ -60,6 +61,7 @@ class CustomerIdentityService
     public function resolveCustomer(string $clientToken, array $attributes = []): Customer
     {
         $token = $this->sanitizeToken($clientToken) ?? CustomerToken::generateToken();
+        $rawTelegramId = $attributes['telegram_id'] ?? null;
         $name = $this->normalizeString($attributes['name'] ?? null);
         $phone = $this->normalizeString($attributes['phone'] ?? null);
         $allowNameOverwrite = array_key_exists('allow_name_overwrite', $attributes)
@@ -74,6 +76,7 @@ class CustomerIdentityService
         /** @var Customer $customer */
         $customer = DB::transaction(function () use (
             $token,
+            $rawTelegramId,
             $name,
             $phone,
             $allowNameOverwrite,
@@ -140,7 +143,37 @@ class CustomerIdentityService
                 $customer->phone = $this->syntheticPhoneFromToken($token);
             }
 
+            if ($lastSeenChannel === Order::SOURCE_TELEGRAM) {
+                Log::info('telegram.identity.resolve_customer_before_save', [
+                    'token_short' => substr($token, 0, 16),
+                    'incoming_telegram_id_raw' => is_scalar($rawTelegramId) ? (string) $rawTelegramId : null,
+                    'incoming_telegram_id_raw_type' => get_debug_type($rawTelegramId),
+                    'normalized_telegram_id' => $telegramId,
+                    'customer_exists' => $customer->exists,
+                    'customer_id' => $customer->id,
+                    'customer_telegram_id_before_save' => $customer->telegram_id,
+                    'customer_telegram_username_before_save' => $customer->telegram_username,
+                    'customer_name_before_save' => $customer->name,
+                    'customer_phone_before_save' => $customer->phone,
+                ]);
+            }
+
             $customer->save();
+
+            if ($lastSeenChannel === Order::SOURCE_TELEGRAM) {
+                $customer->refresh();
+
+                Log::info('telegram.identity.resolve_customer_after_save', [
+                    'token_short' => substr($token, 0, 16),
+                    'normalized_telegram_id' => $telegramId,
+                    'saved_customer_id' => $customer->id,
+                    'saved_customer_telegram_id' => $customer->telegram_id,
+                    'saved_customer_telegram_username' => $customer->telegram_username,
+                    'saved_customer_name' => $customer->name,
+                    'saved_customer_phone' => $customer->phone,
+                ]);
+            }
+
             $this->touchToken(
                 customer: $customer,
                 token: $token,

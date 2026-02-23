@@ -12,6 +12,7 @@ use App\Services\FeatureToggleService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Modules\TelegramBot\Services\TelegramBotApiService;
@@ -251,6 +252,13 @@ class WebhookController extends Controller
         array $startDebugContext,
     ): void {
         $rawUpdate = $request->json()->all();
+        $telegramUserId = is_int($messagePayload['telegram_user_id']) ? $messagePayload['telegram_user_id'] : null;
+        $resolvedTelegramIdAsInt = $this->parseIntegerLike($customer->telegram_id);
+        $signed32Projection = $telegramUserId !== null ? $this->toSignedInt32($telegramUserId) : null;
+        $matchesSigned32Projection = $signed32Projection !== null
+            && $resolvedTelegramIdAsInt !== null
+            ? $resolvedTelegramIdAsInt === $signed32Projection
+            : null;
 
         if (! is_array($rawUpdate) || $rawUpdate === []) {
             $rawUpdate = $request->all();
@@ -265,6 +273,7 @@ class WebhookController extends Controller
             'reply_chat_id_source' => $replyChatId === $messagePayload['telegram_user_id'] ? 'from.id' : 'chat.id',
             'chat_id' => $messagePayload['chat_id'],
             'telegram_user_id_from_id' => $messagePayload['telegram_user_id'],
+            'from_id_signed_32bit_projection' => $signed32Projection,
             'telegram_username' => $messagePayload['telegram_username'],
             'preexisting' => [
                 'customer_by_telegram_id' => $startDebugContext['had_customer_by_telegram_id'],
@@ -278,10 +287,13 @@ class WebhookController extends Controller
                 'name' => $customer->name,
                 'phone' => $customer->phone,
                 'telegram_id' => $customer->telegram_id,
+                'telegram_id_as_int' => $resolvedTelegramIdAsInt,
                 'telegram_username' => $customer->telegram_username,
                 'created_at' => $customer->created_at?->toDateTimeString(),
                 'updated_at' => $customer->updated_at?->toDateTimeString(),
             ],
+            'resolved_matches_signed_32bit_projection' => $matchesSigned32Projection,
+            'schema' => $this->customersTelegramIdSchemaSnapshot(),
             'message_payload' => $this->sanitizeLogValue($messagePayload),
             'raw_update' => $this->sanitizeLogValue(is_array($rawUpdate) ? $rawUpdate : []),
         ]);
@@ -466,6 +478,86 @@ class WebhookController extends Controller
         }
 
         return null;
+    }
+
+    /**
+     * Capture customers.telegram_id column metadata from the runtime database.
+     *
+     * @return array<string, mixed>
+     */
+    protected function customersTelegramIdSchemaSnapshot(): array
+    {
+        $connection = DB::connection();
+        $driver = $connection->getDriverName();
+
+        $snapshot = [
+            'connection' => $connection->getName(),
+            'driver' => $driver,
+            'table_exists' => Schema::hasTable('customers'),
+            'column_exists' => Schema::hasColumn('customers', 'telegram_id'),
+        ];
+
+        try {
+            $snapshot['schema_column_type'] = Schema::getColumnType('customers', 'telegram_id');
+        } catch (\Throwable $exception) {
+            $snapshot['schema_column_type_error'] = $exception->getMessage();
+        }
+
+        if ($driver === 'mysql') {
+            try {
+                $row = DB::table('information_schema.COLUMNS')
+                    ->select('DATA_TYPE', 'COLUMN_TYPE', 'IS_NULLABLE', 'CHARACTER_MAXIMUM_LENGTH')
+                    ->whereRaw('TABLE_SCHEMA = DATABASE()')
+                    ->where('TABLE_NAME', 'customers')
+                    ->where('COLUMN_NAME', 'telegram_id')
+                    ->first();
+
+                if ($row !== null) {
+                    $snapshot['information_schema'] = [
+                        'data_type' => $row->DATA_TYPE,
+                        'column_type' => $row->COLUMN_TYPE,
+                        'is_nullable' => $row->IS_NULLABLE,
+                        'character_maximum_length' => $row->CHARACTER_MAXIMUM_LENGTH,
+                    ];
+                }
+            } catch (\Throwable $exception) {
+                $snapshot['information_schema_error'] = $exception->getMessage();
+            }
+
+            try {
+                $snapshot['customers_trigger_count'] = count(DB::select("SHOW TRIGGERS WHERE `Table` = 'customers'"));
+            } catch (\Throwable $exception) {
+                $snapshot['customers_trigger_count_error'] = $exception->getMessage();
+            }
+        }
+
+        return $snapshot;
+    }
+
+    protected function parseIntegerLike(mixed $value): ?int
+    {
+        if (is_int($value)) {
+            return $value;
+        }
+
+        if (is_string($value) && preg_match('/^-?\d+$/', trim($value)) === 1) {
+            return (int) trim($value);
+        }
+
+        return null;
+    }
+
+    protected function toSignedInt32(int $value): int
+    {
+        $unsigned = $value % 4294967296;
+
+        if ($unsigned < 0) {
+            $unsigned += 4294967296;
+        }
+
+        return $unsigned >= 2147483648
+            ? $unsigned - 4294967296
+            : $unsigned;
     }
 
     /**
