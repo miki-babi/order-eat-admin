@@ -85,7 +85,7 @@ index.form = indexForm
 * @see Modules/Ordering/app/Http/Controllers/Staff/OrderController.php:176
 * @route '/staff/orders/{order}'
 */
-export const update = (args: { order: number | { id: number } } | [order: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
+export const update = (args: { order: string | number | { id: string | number } } | [order: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
     url: update.url(args, options),
     method: 'patch',
 })
@@ -100,7 +100,7 @@ update.definition = {
 * @see Modules/Ordering/app/Http/Controllers/Staff/OrderController.php:176
 * @route '/staff/orders/{order}'
 */
-update.url = (args: { order: number | { id: number } } | [order: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
+update.url = (args: { order: string | number | { id: string | number } } | [order: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { order: args }
     }
@@ -133,7 +133,7 @@ update.url = (args: { order: number | { id: number } } | [order: number | { id: 
 * @see Modules/Ordering/app/Http/Controllers/Staff/OrderController.php:176
 * @route '/staff/orders/{order}'
 */
-update.patch = (args: { order: number | { id: number } } | [order: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
+update.patch = (args: { order: string | number | { id: string | number } } | [order: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
     url: update.url(args, options),
     method: 'patch',
 })
@@ -143,7 +143,7 @@ update.patch = (args: { order: number | { id: number } } | [order: number | { id
 * @see Modules/Ordering/app/Http/Controllers/Staff/OrderController.php:176
 * @route '/staff/orders/{order}'
 */
-const updateForm = (args: { order: number | { id: number } } | [order: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+const updateForm = (args: { order: string | number | { id: string | number } } | [order: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: update.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PATCH',
@@ -158,7 +158,7 @@ const updateForm = (args: { order: number | { id: number } } | [order: number | 
 * @see Modules/Ordering/app/Http/Controllers/Staff/OrderController.php:176
 * @route '/staff/orders/{order}'
 */
-updateForm.patch = (args: { order: number | { id: number } } | [order: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+updateForm.patch = (args: { order: string | number | { id: string | number } } | [order: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: update.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PATCH',

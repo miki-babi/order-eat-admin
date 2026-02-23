@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Customer;
+use App\Models\CustomerToken;
 use App\Models\FeatureToggle;
 use App\Models\Order;
 use App\Models\PickupLocation;
@@ -986,6 +987,63 @@ test('telegram miniapp identity endpoint auto-fills existing customer by telegra
     expect($customer->fresh()?->tokens()->where('token', $expectedToken)->exists())->toBeTrue();
 });
 
+test('telegram miniapp identity launch syncs stale customer telegram id from init data', function () {
+    Config::set('telegram.bot_token', 'test-bot-token');
+
+    $customer = Customer::query()->create([
+        'name' => 'Stale Telegram Customer',
+        'phone' => '251933990011',
+        'telegram_id' => '-1857773598',
+        'telegram_username' => 'stale_old_username',
+    ]);
+
+    $user = [
+        'id' => 6732160994,
+        'first_name' => 'Stale',
+        'last_name' => 'Fixed',
+        'username' => 'stale_fixed_username',
+    ];
+
+    $signedFields = [
+        'auth_date' => (string) now()->timestamp,
+        'query_id' => 'AAEAAAG',
+        'user' => json_encode($user, JSON_THROW_ON_ERROR),
+    ];
+
+    ksort($signedFields, SORT_STRING);
+
+    $dataCheckString = collect($signedFields)
+        ->map(fn (string $value, string $key): string => $key.'='.$value)
+        ->implode("\n");
+    $secretKey = hash_hmac('sha256', 'test-bot-token', 'WebAppData', true);
+    $hash = hash_hmac('sha256', $dataCheckString, $secretKey);
+    $initData = http_build_query(array_merge($signedFields, [
+        'hash' => $hash,
+    ]));
+    $expectedToken = 'tg_'.substr(hash('sha256', 'telegram:6732160994'), 0, 60);
+
+    CustomerToken::query()->create([
+        'customer_id' => $customer->id,
+        'token' => $expectedToken,
+    ]);
+
+    $this->postJson(route('api.telegram.miniapp.identity'), [
+        'init_data' => $initData,
+    ])
+        ->assertOk()
+        ->assertJson([
+            'ok' => true,
+            'customer' => [
+                'customer_token' => $expectedToken,
+                'telegram_id' => 6732160994,
+                'telegram_username' => 'stale_fixed_username',
+            ],
+        ]);
+
+    expect($customer->fresh()?->telegram_id)->toBe('6732160994');
+    expect($customer->fresh()?->telegram_username)->toBe('stale_fixed_username');
+});
+
 test('telegram miniapp orders endpoint returns scoped telegram history', function () {
     Config::set('telegram.bot_token', 'test-bot-token');
 
@@ -1102,4 +1160,79 @@ test('telegram miniapp orders endpoint returns scoped telegram history', functio
 
     expect(Order::query()->where('tracking_token', str_repeat('c', 40))->exists())->toBeTrue();
     expect($completedOrder->fresh())->not->toBeNull();
+});
+
+test('telegram miniapp orders launch syncs stale customer telegram id from init data', function () {
+    Config::set('telegram.bot_token', 'test-bot-token');
+
+    $customer = Customer::query()->create([
+        'name' => 'Orders Stale Customer',
+        'phone' => '251933990022',
+        'telegram_id' => '-1857773598',
+        'telegram_username' => 'orders_stale_user',
+    ]);
+
+    $location = PickupLocation::query()->create([
+        'name' => 'Orders Sync Branch',
+        'address' => 'Addis Ababa',
+        'is_active' => true,
+    ]);
+
+    $customer->orders()->create([
+        'pickup_date' => now()->toDateString(),
+        'pickup_location_id' => $location->id,
+        'source_channel' => Order::SOURCE_TELEGRAM,
+        'order_status' => 'pending',
+        'receipt_status' => 'approved',
+        'tracking_token' => str_repeat('e', 40),
+        'total_amount' => 125,
+    ]);
+
+    $user = [
+        'id' => 6732160994,
+        'first_name' => 'Orders',
+        'last_name' => 'Fixed',
+        'username' => 'orders_fixed_user',
+    ];
+
+    $signedFields = [
+        'auth_date' => (string) now()->timestamp,
+        'query_id' => 'AAEAAAH',
+        'user' => json_encode($user, JSON_THROW_ON_ERROR),
+    ];
+
+    ksort($signedFields, SORT_STRING);
+
+    $dataCheckString = collect($signedFields)
+        ->map(fn (string $value, string $key): string => $key.'='.$value)
+        ->implode("\n");
+    $secretKey = hash_hmac('sha256', 'test-bot-token', 'WebAppData', true);
+    $hash = hash_hmac('sha256', $dataCheckString, $secretKey);
+    $initData = http_build_query(array_merge($signedFields, [
+        'hash' => $hash,
+    ]));
+    $expectedToken = 'tg_'.substr(hash('sha256', 'telegram:6732160994'), 0, 60);
+
+    CustomerToken::query()->create([
+        'customer_id' => $customer->id,
+        'token' => $expectedToken,
+    ]);
+
+    $this->postJson(route('api.telegram.miniapp.orders'), [
+        'init_data' => $initData,
+        'scope' => 'history',
+    ])
+        ->assertOk()
+        ->assertJson([
+            'ok' => true,
+            'scope' => 'history',
+            'customer' => [
+                'customer_token' => $expectedToken,
+                'telegram_id' => 6732160994,
+                'telegram_username' => 'orders_fixed_user',
+            ],
+        ]);
+
+    expect($customer->fresh()?->telegram_id)->toBe('6732160994');
+    expect($customer->fresh()?->telegram_username)->toBe('orders_fixed_user');
 });

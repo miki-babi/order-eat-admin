@@ -3,6 +3,7 @@
 namespace Modules\TelegramBot\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Customer;
 use App\Models\Order;
 use App\Services\CustomerIdentityService;
 use Illuminate\Http\JsonResponse;
@@ -54,6 +55,11 @@ class MiniAppIdentityController extends Controller
             'user_agent' => $request->userAgent(),
             'ip' => $request->ip(),
         ]);
+        $customer = $this->syncTelegramIdentity(
+            $customer,
+            $identityPayload['telegram_id'],
+            $identityPayload['telegram_username'],
+        );
 
         $name = $this->isPlaceholderName($customer->name)
             ? ($identityPayload['display_name'] === 'Telegram Customer' ? null : $identityPayload['display_name'])
@@ -219,5 +225,36 @@ class MiniAppIdentityController extends Controller
         }
 
         return preg_match('/^q[a-f0-9]{19}$/i', trim($value)) === 1;
+    }
+
+    protected function syncTelegramIdentity(Customer $customer, int $telegramId, ?string $telegramUsername): Customer
+    {
+        $currentTelegramId = is_scalar($customer->telegram_id)
+            ? trim((string) $customer->telegram_id)
+            : '';
+        $normalizedTelegramUsername = is_string($telegramUsername) && trim($telegramUsername) !== ''
+            ? ltrim(trim($telegramUsername), '@')
+            : null;
+        $currentTelegramUsername = is_string($customer->telegram_username)
+            ? trim($customer->telegram_username)
+            : '';
+        $targetTelegramId = (string) $telegramId;
+        $shouldSyncTelegramId = $currentTelegramId !== $targetTelegramId;
+        $shouldSyncTelegramUsername = $normalizedTelegramUsername !== null
+            && strcasecmp($currentTelegramUsername, $normalizedTelegramUsername) !== 0;
+
+        if (! $shouldSyncTelegramId && ! $shouldSyncTelegramUsername) {
+            return $customer;
+        }
+
+        $customer->telegram_id = $targetTelegramId;
+
+        if ($normalizedTelegramUsername !== null) {
+            $customer->telegram_username = $normalizedTelegramUsername;
+        }
+
+        $customer->save();
+
+        return $customer->fresh() ?? $customer;
     }
 }

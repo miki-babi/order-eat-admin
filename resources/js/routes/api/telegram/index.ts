@@ -2,7 +2,7 @@ import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFo
 import miniapp from './miniapp'
 /**
 * @see \Modules\TelegramBot\Http\Controllers\WebhookController::__invoke
-* @see Modules/TelegramBot/app/Http/Controllers/WebhookController.php:27
+* @see Modules/TelegramBot/app/Http/Controllers/WebhookController.php:28
 * @route '/api/telegram/webhook'
 */
 export const webhook = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -17,7 +17,7 @@ webhook.definition = {
 
 /**
 * @see \Modules\TelegramBot\Http\Controllers\WebhookController::__invoke
-* @see Modules/TelegramBot/app/Http/Controllers/WebhookController.php:27
+* @see Modules/TelegramBot/app/Http/Controllers/WebhookController.php:28
 * @route '/api/telegram/webhook'
 */
 webhook.url = (options?: RouteQueryOptions) => {
@@ -26,7 +26,7 @@ webhook.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \Modules\TelegramBot\Http\Controllers\WebhookController::__invoke
-* @see Modules/TelegramBot/app/Http/Controllers/WebhookController.php:27
+* @see Modules/TelegramBot/app/Http/Controllers/WebhookController.php:28
 * @route '/api/telegram/webhook'
 */
 webhook.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -36,7 +36,7 @@ webhook.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \Modules\TelegramBot\Http\Controllers\WebhookController::__invoke
-* @see Modules/TelegramBot/app/Http/Controllers/WebhookController.php:27
+* @see Modules/TelegramBot/app/Http/Controllers/WebhookController.php:28
 * @route '/api/telegram/webhook'
 */
 const webhookForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -46,7 +46,7 @@ const webhookForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> =
 
 /**
 * @see \Modules\TelegramBot\Http\Controllers\WebhookController::__invoke
-* @see Modules/TelegramBot/app/Http/Controllers/WebhookController.php:27
+* @see Modules/TelegramBot/app/Http/Controllers/WebhookController.php:28
 * @route '/api/telegram/webhook'
 */
 webhookForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
