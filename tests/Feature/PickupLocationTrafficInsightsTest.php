@@ -186,6 +186,7 @@ test('pickup location traffic analytics respect branch access scope', function (
         'tracking_token' => Str::random(40),
         'total_amount' => 300,
     ]);
+    $currentHour = now()->hour;
 
     $this->actingAs($staff)
         ->get(route('staff.pickup-locations.index'))
@@ -197,6 +198,6 @@ test('pickup location traffic analytics respect branch access scope', function (
             ->where('locations.0.source_traffic.total', 1)
             ->where('locations.0.source_traffic.table', 1)
             ->where('locations.0.source_traffic.telegram', 0)
-            ->where('locations.0.hourly_profile.0.orders_count', 0)
+            ->where("locations.0.hourly_profile.{$currentHour}.orders_count", 1)
         );
 });

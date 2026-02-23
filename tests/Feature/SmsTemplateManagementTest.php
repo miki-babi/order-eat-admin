@@ -9,8 +9,9 @@ use App\Models\SmsPhoneList;
 use App\Models\SmsTemplate;
 use App\Models\User;
 use Illuminate\Http\Client\Request as HttpRequest;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
 test('staff can open sms templates page and defaults are synced', function () {
@@ -47,6 +48,8 @@ test('staff can update sms template body', function () {
 });
 
 test('staff can send telegram promo campaign and save template from wizard action', function () {
+    Config::set('telegram.bot_token', 'test-bot-token');
+
     $staff = User::factory()->create([
         'role' => 'staff',
     ]);

@@ -227,6 +227,7 @@ class TelegramBotApiService
 
         return str_contains($description, 'style')
             || str_contains($description, 'reply markup')
+            || str_contains($description, 'reply keyboard')
             || str_contains($description, 'inline keyboard');
     }
 

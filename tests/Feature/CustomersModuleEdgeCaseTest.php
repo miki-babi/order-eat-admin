@@ -8,6 +8,7 @@ use App\Models\Role;
 use App\Models\SmsLog;
 use App\Models\User;
 use Illuminate\Http\Client\Request as HttpRequest;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
@@ -84,6 +85,8 @@ test('customers sms validates customer list and message length', function () {
 });
 
 test('customers telegram outreach sends inline link button payload', function () {
+    Config::set('telegram.bot_token', 'test-bot-token');
+
     $staff = User::factory()->create([
         'role' => 'staff',
     ]);

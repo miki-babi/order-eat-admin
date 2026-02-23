@@ -4,6 +4,7 @@ namespace Modules\TelegramBot\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
+use App\Models\CustomerToken;
 use App\Models\FeatureToggle;
 use App\Models\Order;
 use App\Services\CustomerIdentityService;
@@ -71,8 +72,46 @@ class WebhookController extends Controller
             ]);
         }
 
+        $incomingMessage = $this->extractIncomingMessage($messagePayload);
+        $isStartCommand = is_string($incomingMessage)
+            && $incomingMessage !== ''
+            && $this->matchesCommand($incomingMessage, 'start');
+        $telegramToken = $this->telegramToken((string) $telegramUserId);
+        $startDebugContext = null;
+
+        if ($isStartCommand) {
+            $normalizedTelegramUsername = null;
+
+            if (is_string($messagePayload['telegram_username'])) {
+                $normalizedTelegramUsername = strtolower(ltrim(trim($messagePayload['telegram_username']), '@'));
+                $normalizedTelegramUsername = $normalizedTelegramUsername === '' ? null : $normalizedTelegramUsername;
+            }
+
+            $hadCustomerByTelegramId = Customer::query()
+                ->where('telegram_id', (string) $telegramUserId)
+                ->exists();
+            $hadCustomerByTelegramUsername = $normalizedTelegramUsername !== null
+                ? Customer::query()
+                    ->whereRaw('LOWER(telegram_username) = ?', [$normalizedTelegramUsername])
+                    ->exists()
+                : false;
+            $hadCustomerToken = CustomerToken::query()
+                ->where('token', $telegramToken)
+                ->exists();
+
+            $startDebugContext = [
+                'had_customer_by_telegram_id' => $hadCustomerByTelegramId,
+                'had_customer_by_telegram_username' => $hadCustomerByTelegramUsername,
+                'had_customer_token' => $hadCustomerToken,
+                'is_new_telegram_customer' => ! $hadCustomerByTelegramId
+                    && ! $hadCustomerByTelegramUsername
+                    && ! $hadCustomerToken,
+                'telegram_token_short' => substr($telegramToken, 0, 16),
+            ];
+        }
+
         $customer = $customerIdentityService->resolveCustomer(
-            $this->telegramToken((string) $telegramUserId),
+            $telegramToken,
             [
                 'name' => $messagePayload['display_name'],
                 'telegram_id' => $telegramUserId,
@@ -108,17 +147,6 @@ class WebhookController extends Controller
             ]);
         }
 
-        $incomingMessage = null;
-
-        if (
-            is_string($messagePayload['callback_data'])
-            && trim($messagePayload['callback_data']) !== ''
-        ) {
-            $incomingMessage = $this->normalizeCallbackDataToCommand(trim($messagePayload['callback_data']));
-        } elseif (is_string($messagePayload['text']) && trim($messagePayload['text']) !== '') {
-            $incomingMessage = trim($messagePayload['text']);
-        }
-
         if (is_string($incomingMessage) && $incomingMessage !== '') {
             $reply = $this->buildReply(
                 $incomingMessage,
@@ -129,6 +157,21 @@ class WebhookController extends Controller
 
             if ($reply !== null) {
                 $replyChatId = $this->replyTargetChatId($incomingMessage, $chatId, $telegramUserId);
+
+                if (
+                    $isStartCommand
+                    && is_array($startDebugContext)
+                    && ($startDebugContext['is_new_telegram_customer'] ?? false) === true
+                ) {
+                    $this->logNewStartCustomerDebug(
+                        request: $request,
+                        messagePayload: $messagePayload,
+                        incomingMessage: $incomingMessage,
+                        customer: $customer,
+                        replyChatId: $replyChatId,
+                        startDebugContext: $startDebugContext,
+                    );
+                }
 
                 $telegramBotApiService->sendMessage($replyChatId, $reply['text'], array_merge([
                     'disable_web_page_preview' => true,
@@ -177,6 +220,71 @@ class WebhookController extends Controller
         }
 
         Log::info('telegram.webhook.received', $context);
+    }
+
+    /**
+     * @param  array{
+     *     chat_id: int|string|null,
+     *     telegram_user_id: int|null,
+     *     telegram_username: string|null,
+     *     display_name: string,
+     *     text: string|null,
+     *     callback_data: string|null,
+     *     callback_query_id: string|null,
+     *     contact_phone: string|null,
+     *     contact_user_id: int|null
+     * }  $messagePayload
+     * @param  array{
+     *     had_customer_by_telegram_id: bool,
+     *     had_customer_by_telegram_username: bool,
+     *     had_customer_token: bool,
+     *     is_new_telegram_customer: bool,
+     *     telegram_token_short: string
+     * }  $startDebugContext
+     */
+    protected function logNewStartCustomerDebug(
+        Request $request,
+        array $messagePayload,
+        string $incomingMessage,
+        Customer $customer,
+        int|string $replyChatId,
+        array $startDebugContext,
+    ): void {
+        $rawUpdate = $request->json()->all();
+
+        if (! is_array($rawUpdate) || $rawUpdate === []) {
+            $rawUpdate = $request->all();
+        }
+
+        Log::info('telegram.webhook.start_new_customer_debug', [
+            'ip' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'path' => $request->path(),
+            'incoming_message' => $incomingMessage,
+            'reply_chat_id' => $replyChatId,
+            'reply_chat_id_source' => $replyChatId === $messagePayload['telegram_user_id'] ? 'from.id' : 'chat.id',
+            'chat_id' => $messagePayload['chat_id'],
+            'telegram_user_id_from_id' => $messagePayload['telegram_user_id'],
+            'telegram_username' => $messagePayload['telegram_username'],
+            'preexisting' => [
+                'customer_by_telegram_id' => $startDebugContext['had_customer_by_telegram_id'],
+                'customer_by_telegram_username' => $startDebugContext['had_customer_by_telegram_username'],
+                'customer_token' => $startDebugContext['had_customer_token'],
+            ],
+            'is_new_telegram_customer' => $startDebugContext['is_new_telegram_customer'],
+            'telegram_token_short' => $startDebugContext['telegram_token_short'],
+            'resolved_customer' => [
+                'id' => $customer->id,
+                'name' => $customer->name,
+                'phone' => $customer->phone,
+                'telegram_id' => $customer->telegram_id,
+                'telegram_username' => $customer->telegram_username,
+                'created_at' => $customer->created_at?->toDateTimeString(),
+                'updated_at' => $customer->updated_at?->toDateTimeString(),
+            ],
+            'message_payload' => $this->sanitizeLogValue($messagePayload),
+            'raw_update' => $this->sanitizeLogValue(is_array($rawUpdate) ? $rawUpdate : []),
+        ]);
     }
 
     protected function sanitizeLogValue(mixed $value, ?string $key = null): mixed
@@ -336,6 +444,28 @@ class WebhookController extends Controller
     protected function telegramToken(string $telegramUserId): string
     {
         return 'tg_'.substr(hash('sha256', 'telegram:'.$telegramUserId), 0, 60);
+    }
+
+    /**
+     * @param  array{
+     *     text: string|null,
+     *     callback_data: string|null
+     * }  $messagePayload
+     */
+    protected function extractIncomingMessage(array $messagePayload): ?string
+    {
+        if (
+            is_string($messagePayload['callback_data'])
+            && trim($messagePayload['callback_data']) !== ''
+        ) {
+            return $this->normalizeCallbackDataToCommand(trim($messagePayload['callback_data']));
+        }
+
+        if (is_string($messagePayload['text']) && trim($messagePayload['text']) !== '') {
+            return trim($messagePayload['text']);
+        }
+
+        return null;
     }
 
     /**

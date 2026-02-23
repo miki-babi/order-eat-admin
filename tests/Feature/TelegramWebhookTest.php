@@ -278,6 +278,56 @@ test('telegram webhook start command uses from.id as reply target even when chat
     });
 });
 
+test('telegram webhook logs detailed debug context for new customer start command', function () {
+    Config::set('telegram.webhook_secret', null);
+    Config::set('telegram.bot_token', 'test-bot-token');
+
+    Log::spy();
+
+    Http::fake([
+        'https://api.telegram.org/*' => Http::response(['ok' => true], 200),
+    ]);
+
+    $payload = [
+        'update_id' => 10021,
+        'message' => [
+            'message_id' => 22,
+            'date' => now()->timestamp,
+            'chat' => [
+                'id' => -66778899,
+                'type' => 'private',
+            ],
+            'from' => [
+                'id' => 22335577,
+                'is_bot' => false,
+                'first_name' => 'Debug',
+                'last_name' => 'Start',
+                'username' => 'debug_start_user',
+            ],
+            'text' => '/start',
+        ],
+    ];
+
+    $this->postJson(route('api.telegram.webhook'), $payload)
+        ->assertOk()
+        ->assertJson([
+            'ok' => true,
+        ]);
+
+    Log::shouldHaveReceived('info')
+        ->withArgs(function (string $message, array $context): bool {
+            return $message === 'telegram.webhook.start_new_customer_debug'
+                && data_get($context, 'reply_chat_id_source') === 'from.id'
+                && data_get($context, 'reply_chat_id') === 22335577
+                && data_get($context, 'telegram_user_id_from_id') === 22335577
+                && data_get($context, 'chat_id') === -66778899
+                && data_get($context, 'is_new_telegram_customer') === true
+                && data_get($context, 'preexisting.customer_by_telegram_id') === false
+                && data_get($context, 'resolved_customer.telegram_id') === 22335577;
+        })
+        ->once();
+});
+
 test('telegram webhook retries without style when telegram api rejects style field', function () {
     Config::set('telegram.webhook_secret', null);
     Config::set('telegram.bot_token', 'test-bot-token');
