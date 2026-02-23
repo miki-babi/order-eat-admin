@@ -496,7 +496,7 @@ test('staff can add and remove sms whitelist blacklist entries', function () {
 
     $entry = SmsPhoneList::query()->firstOrFail();
 
-    expect($entry->normalized_phone)->toBe('251911000000');
+    expect($entry->normalized_phone)->toBe('911000000');
     expect($entry->list_type)->toBe('blacklist');
 
     $this->actingAs($staff)
@@ -526,7 +526,7 @@ test('staff can import customer contacts csv', function () {
         ])
         ->assertRedirect();
 
-    expect(Customer::query()->where('name', 'Alice')->where('phone', '251911234567')->exists())->toBeTrue();
-    expect(Customer::query()->where('name', 'Bob')->where('phone', '251922222222')->exists())->toBeTrue();
+    expect(Customer::query()->where('name', 'Alice')->where('phone', '911234567')->exists())->toBeTrue();
+    expect(Customer::query()->where('name', 'Bob')->where('phone', '922222222')->exists())->toBeTrue();
     expect(Customer::query()->count())->toBe(2);
 });

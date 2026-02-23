@@ -19,6 +19,10 @@ class CustomerIdentityService
 
     private const TOKEN_PATTERN = '/^[A-Za-z0-9_-]{20,120}$/';
 
+    public function __construct(
+        private SmsEthiopiaService $smsService,
+    ) {}
+
     /**
      * Resolve a stable customer token from form payload, then cookie, then generate.
      */
@@ -63,7 +67,8 @@ class CustomerIdentityService
         $token = $this->sanitizeToken($clientToken) ?? CustomerToken::generateToken();
         $rawTelegramId = $attributes['telegram_id'] ?? null;
         $name = $this->normalizeString($attributes['name'] ?? null);
-        $phone = $this->normalizeString($attributes['phone'] ?? null);
+        $phone = $this->normalizePhone($attributes['phone'] ?? null);
+        $phoneCandidates = $this->phoneLookupCandidates($attributes['phone'] ?? null);
         $allowNameOverwrite = array_key_exists('allow_name_overwrite', $attributes)
             ? (bool) $attributes['allow_name_overwrite']
             : true;
@@ -79,6 +84,7 @@ class CustomerIdentityService
             $rawTelegramId,
             $name,
             $phone,
+            $phoneCandidates,
             $allowNameOverwrite,
             $telegramId,
             $telegramUsername,
@@ -91,7 +97,9 @@ class CustomerIdentityService
                 ->where('token', $token)
                 ->first();
             $tokenCustomer = $tokenRecord?->customer;
-            $phoneCustomer = $phone ? Customer::query()->where('phone', $phone)->first() : null;
+            $phoneCustomer = $phoneCandidates !== []
+                ? Customer::query()->whereIn('phone', $phoneCandidates)->first()
+                : null;
             $telegramCustomer = $telegramId ? Customer::query()->where('telegram_id', $telegramId)->first() : null;
 
             $customer = $phoneCustomer
@@ -123,6 +131,25 @@ class CustomerIdentityService
                 $customer->phone = $phone;
             } elseif (! $customer->exists && ! is_string($customer->phone)) {
                 $customer->phone = $this->syntheticPhoneFromToken($token);
+            }
+
+            $existingPhone = $this->normalizePhone($customer->phone);
+
+            if ($existingPhone !== null) {
+                $canonicalPhoneCustomer = Customer::query()
+                    ->where('phone', $existingPhone)
+                    ->when(
+                        $customer->exists,
+                        fn ($query) => $query->where('id', '!=', $customer->id),
+                    )
+                    ->first();
+
+                if ($canonicalPhoneCustomer instanceof Customer) {
+                    $this->mergeCustomerInto($customer, $canonicalPhoneCustomer);
+                    $customer = $canonicalPhoneCustomer->fresh() ?? $canonicalPhoneCustomer;
+                }
+
+                $customer->phone = $existingPhone;
             }
 
             if ($telegramId !== null) {
@@ -277,7 +304,7 @@ class CustomerIdentityService
             && trim($source->phone) !== ''
             && ! $this->isSyntheticPhone($source->phone)
         ) {
-            $target->phone = $source->phone;
+            $target->phone = $this->normalizePhone($source->phone) ?? $source->phone;
         }
 
         $source->delete();
@@ -337,6 +364,38 @@ class CustomerIdentityService
         $normalized = trim($value);
 
         return $normalized === '' ? null : $normalized;
+    }
+
+    protected function normalizePhone(mixed $value): ?string
+    {
+        if (! is_string($value)) {
+            return null;
+        }
+
+        $normalized = $this->smsService->normalizePhone($value);
+
+        return is_string($normalized) && $normalized !== '' ? $normalized : null;
+    }
+
+    /**
+     * Build candidates that match both canonical and legacy phone formats.
+     *
+     * @return array<int, string>
+     */
+    protected function phoneLookupCandidates(mixed $value): array
+    {
+        $local = $this->normalizePhone($value);
+
+        if ($local === null) {
+            return [];
+        }
+
+        return array_values(array_unique([
+            $local,
+            '0'.$local,
+            '251'.$local,
+            '+251'.$local,
+        ]));
     }
 
     protected function normalizeTelegramId(mixed $value): ?int

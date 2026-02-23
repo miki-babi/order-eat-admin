@@ -222,7 +222,7 @@ test('customers can place an order from the public menu flow', function () {
     expect($order)->not->toBeNull();
     expect($order->total_amount)->toEqual('240.00');
     expect($order->source_channel)->toBe('web');
-    expect(Customer::query()->where('phone', '251911000000')->exists())->toBeTrue();
+    expect(Customer::query()->where('phone', '911000000')->exists())->toBeTrue();
     expect($order->items()->count())->toBe(1);
 
     $response->assertRedirect(route('orders.confirmation', $order->tracking_token, false));

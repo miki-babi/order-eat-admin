@@ -515,7 +515,7 @@ test('telegram webhook stores phone number when contact is shared', function () 
     $customer = Customer::query()->where('telegram_id', 22334455)->first();
 
     expect($customer)->not->toBeNull();
-    expect($customer?->phone)->toBe('+251911222333');
+    expect($customer?->phone)->toBe('911222333');
 
     Http::assertSentCount(3);
 
