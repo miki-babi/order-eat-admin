@@ -490,7 +490,7 @@ class WebhookController extends Controller
             return $telegramUserId;
         }
 
-        return $telegramUserId;
+        return $chatId;
     }
 
     protected function startReply(): string

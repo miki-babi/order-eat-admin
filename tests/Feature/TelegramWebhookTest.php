@@ -221,7 +221,7 @@ test('telegram webhook logs masked payload when payload logging is enabled', fun
         ->once();
 });
 
-test('telegram webhook creates telegram customer and sends start response', function () {
+test('telegram webhook start command uses from.id as reply target even when chat.id is negative', function () {
     Config::set('telegram.webhook_secret', null);
     Config::set('telegram.bot_token', 'test-bot-token');
 
@@ -235,7 +235,7 @@ test('telegram webhook creates telegram customer and sends start response', func
             'message_id' => 1,
             'date' => now()->timestamp,
             'chat' => [
-                'id' => 99887766,
+                'id' => -99887766,
                 'type' => 'private',
             ],
             'from' => [
