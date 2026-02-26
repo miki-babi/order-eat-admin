@@ -4,7 +4,7 @@ import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFo
 * @see Modules/SystemAdmin/app/Http/Controllers/SystemAdminDashboardController.php:104
 * @route '/__system-admin/features/{featureToggle}'
 */
-export const update = (args: { featureToggle: number | { id: number } } | [featureToggle: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
+export const update = (args: { featureToggle: string | number | { id: string | number } } | [featureToggle: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
     url: update.url(args, options),
     method: 'put',
 })
@@ -19,7 +19,7 @@ update.definition = {
 * @see Modules/SystemAdmin/app/Http/Controllers/SystemAdminDashboardController.php:104
 * @route '/__system-admin/features/{featureToggle}'
 */
-update.url = (args: { featureToggle: number | { id: number } } | [featureToggle: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
+update.url = (args: { featureToggle: string | number | { id: string | number } } | [featureToggle: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { featureToggle: args }
     }
@@ -52,7 +52,7 @@ update.url = (args: { featureToggle: number | { id: number } } | [featureToggle:
 * @see Modules/SystemAdmin/app/Http/Controllers/SystemAdminDashboardController.php:104
 * @route '/__system-admin/features/{featureToggle}'
 */
-update.put = (args: { featureToggle: number | { id: number } } | [featureToggle: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
+update.put = (args: { featureToggle: string | number | { id: string | number } } | [featureToggle: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
     url: update.url(args, options),
     method: 'put',
 })
@@ -62,7 +62,7 @@ update.put = (args: { featureToggle: number | { id: number } } | [featureToggle:
 * @see Modules/SystemAdmin/app/Http/Controllers/SystemAdminDashboardController.php:104
 * @route '/__system-admin/features/{featureToggle}'
 */
-const updateForm = (args: { featureToggle: number | { id: number } } | [featureToggle: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+const updateForm = (args: { featureToggle: string | number | { id: string | number } } | [featureToggle: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: update.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PUT',
@@ -77,7 +77,7 @@ const updateForm = (args: { featureToggle: number | { id: number } } | [featureT
 * @see Modules/SystemAdmin/app/Http/Controllers/SystemAdminDashboardController.php:104
 * @route '/__system-admin/features/{featureToggle}'
 */
-updateForm.put = (args: { featureToggle: number | { id: number } } | [featureToggle: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+updateForm.put = (args: { featureToggle: string | number | { id: string | number } } | [featureToggle: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: update.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PUT',
