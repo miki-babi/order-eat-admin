@@ -733,14 +733,38 @@ class SmsTemplateController extends Controller
                 continue;
             }
 
+            $canonicalPhone = $smsService->withPlusCountryCode($normalizedPhone);
+
+            if (! $canonicalPhone) {
+                $skipped++;
+                continue;
+            }
+
             $finalName = $name !== '' ? $name : 'Customer '.Str::substr($normalizedPhone, -4);
 
-            $customer = Customer::query()->firstOrNew([
-                'phone' => $normalizedPhone,
-            ]);
+            $customer = Customer::query()
+                ->where('phone', $canonicalPhone)
+                ->first();
+
+            if (! $customer) {
+                $customer = Customer::query()
+                    ->whereIn('phone', [
+                        '251'.$normalizedPhone,
+                        '0'.$normalizedPhone,
+                        $normalizedPhone,
+                    ])
+                    ->first();
+            }
+
+            if (! $customer) {
+                $customer = new Customer([
+                    'phone' => $canonicalPhone,
+                ]);
+            }
 
             $wasExisting = $customer->exists;
 
+            $customer->phone = $canonicalPhone;
             $customer->name = $finalName;
             $customer->save();
 

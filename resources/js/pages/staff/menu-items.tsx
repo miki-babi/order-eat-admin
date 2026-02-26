@@ -17,6 +17,7 @@ type MenuItemRow = {
     price: number;
     category: string | null;
     is_active: boolean;
+    is_featured: boolean;
     visibility_channels: string[];
     image_url: string | null;
     order_items_count: number;
@@ -89,6 +90,7 @@ export default function MenuItems({
         category: '',
         image: null as File | null,
         is_active: true,
+        is_featured: false,
         visibility_channels: [...channelOptions],
     });
 
@@ -100,6 +102,7 @@ export default function MenuItems({
         category: '',
         image: null as File | null,
         is_active: true,
+        is_featured: false,
         visibility_channels: [...channelOptions],
     });
 
@@ -119,6 +122,7 @@ export default function MenuItems({
             onSuccess: () => {
                 createForm.reset();
                 createForm.setData('is_active', true);
+                createForm.setData('is_featured', false);
                 createForm.setData('visibility_channels', [...channelOptions]);
             },
         });
@@ -134,6 +138,7 @@ export default function MenuItems({
             category: item.category ?? '',
             image: null,
             is_active: item.is_active,
+            is_featured: item.is_featured,
             visibility_channels: [...item.visibility_channels],
         });
     };
@@ -381,6 +386,18 @@ export default function MenuItems({
                                         />
                                         <Label htmlFor="is_active_edit" className="cursor-pointer text-xs font-bold text-zinc-600">Active Listing</Label>
                                     </div>
+                                    <div className="flex items-center gap-2 rounded-xl bg-zinc-50 px-4 py-2 ring-1 ring-zinc-200">
+                                        <input
+                                            type="checkbox"
+                                            id="is_featured_edit"
+                                            className="h-4 w-4 rounded border-zinc-300 text-[#F57C00] focus:ring-[#F57C00]/20"
+                                            checked={editForm.data.is_featured}
+                                            onChange={(event) =>
+                                                editForm.setData('is_featured', event.target.checked)
+                                            }
+                                        />
+                                        <Label htmlFor="is_featured_edit" className="cursor-pointer text-xs font-bold text-zinc-600">Featured Item</Label>
+                                    </div>
                                     <div className="flex items-center gap-3 ml-auto">
                                         <Button
                                             type="button"
@@ -437,6 +454,11 @@ export default function MenuItems({
                                                 <Badge className={`w-fit font-black uppercase tracking-widest text-[9px] shadow-xl ${item.is_active ? 'bg-[#F57C00] text-white' : 'bg-white text-zinc-500 ring-1 ring-zinc-200'}`}>
                                                     {item.is_active ? 'Live' : 'Draft'}
                                                 </Badge>
+                                                {item.is_featured ? (
+                                                    <Badge className="w-fit bg-[#FFF3E0] text-[#E65100] font-black uppercase tracking-widest text-[9px] shadow-xl ring-1 ring-[#F57C00]/20">
+                                                        Featured
+                                                    </Badge>
+                                                ) : null}
                                                 <div className="flex flex-wrap gap-1">
                                                     {item.visibility_channels.map((channel) => (
                                                         <Badge key={`${item.id}-${channel}`} className="w-fit bg-white/90 text-zinc-700 font-black uppercase tracking-widest text-[9px] ring-1 ring-zinc-200/80">
@@ -602,6 +624,18 @@ export default function MenuItems({
                                         }
                                     />
                                     <Label htmlFor="is_active_new" className="cursor-pointer text-xs font-bold text-zinc-600">Active Listing</Label>
+                                </div>
+                                <div className="flex items-center gap-2 rounded-xl bg-zinc-50 px-4 py-2 ring-1 ring-zinc-200">
+                                    <input
+                                        type="checkbox"
+                                        id="is_featured_new"
+                                        className="h-4 w-4 rounded border-zinc-300 text-[#F57C00] focus:ring-[#F57C00]/20"
+                                        checked={createForm.data.is_featured}
+                                        onChange={(event) =>
+                                            createForm.setData('is_featured', event.target.checked)
+                                        }
+                                    />
+                                    <Label htmlFor="is_featured_new" className="cursor-pointer text-xs font-bold text-zinc-600">Featured Item</Label>
                                 </div>
                                 <Button type="submit" className="h-11 px-8 ml-auto rounded-xl bg-[#212121] font-black shadow-lg shadow-zinc-200 hover:bg-[#F57C00]" disabled={createForm.processing}>
                                     {createForm.processing ? 'Publishing...' : 'Add to Catalog'}

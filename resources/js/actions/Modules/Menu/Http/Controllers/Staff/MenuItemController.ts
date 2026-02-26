@@ -82,7 +82,7 @@ index.form = indexForm
 
 /**
 * @see \Modules\Menu\Http\Controllers\Staff\MenuItemController::store
-* @see Modules/Menu/app/Http/Controllers/Staff/MenuItemController.php:81
+* @see Modules/Menu/app/Http/Controllers/Staff/MenuItemController.php:82
 * @route '/staff/menu-items'
 */
 export const store = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -97,7 +97,7 @@ store.definition = {
 
 /**
 * @see \Modules\Menu\Http\Controllers\Staff\MenuItemController::store
-* @see Modules/Menu/app/Http/Controllers/Staff/MenuItemController.php:81
+* @see Modules/Menu/app/Http/Controllers/Staff/MenuItemController.php:82
 * @route '/staff/menu-items'
 */
 store.url = (options?: RouteQueryOptions) => {
@@ -106,7 +106,7 @@ store.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \Modules\Menu\Http\Controllers\Staff\MenuItemController::store
-* @see Modules/Menu/app/Http/Controllers/Staff/MenuItemController.php:81
+* @see Modules/Menu/app/Http/Controllers/Staff/MenuItemController.php:82
 * @route '/staff/menu-items'
 */
 store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -116,7 +116,7 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \Modules\Menu\Http\Controllers\Staff\MenuItemController::store
-* @see Modules/Menu/app/Http/Controllers/Staff/MenuItemController.php:81
+* @see Modules/Menu/app/Http/Controllers/Staff/MenuItemController.php:82
 * @route '/staff/menu-items'
 */
 const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -126,7 +126,7 @@ const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => 
 
 /**
 * @see \Modules\Menu\Http\Controllers\Staff\MenuItemController::store
-* @see Modules/Menu/app/Http/Controllers/Staff/MenuItemController.php:81
+* @see Modules/Menu/app/Http/Controllers/Staff/MenuItemController.php:82
 * @route '/staff/menu-items'
 */
 storeForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -138,10 +138,10 @@ store.form = storeForm
 
 /**
 * @see \Modules\Menu\Http\Controllers\Staff\MenuItemController::update
-* @see Modules/Menu/app/Http/Controllers/Staff/MenuItemController.php:104
+* @see Modules/Menu/app/Http/Controllers/Staff/MenuItemController.php:106
 * @route '/staff/menu-items/{menuItem}'
 */
-export const update = (args: { menuItem: string | number | { id: string | number } } | [menuItem: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
+export const update = (args: { menuItem: number | { id: number } } | [menuItem: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
     url: update.url(args, options),
     method: 'put',
 })
@@ -153,10 +153,10 @@ update.definition = {
 
 /**
 * @see \Modules\Menu\Http\Controllers\Staff\MenuItemController::update
-* @see Modules/Menu/app/Http/Controllers/Staff/MenuItemController.php:104
+* @see Modules/Menu/app/Http/Controllers/Staff/MenuItemController.php:106
 * @route '/staff/menu-items/{menuItem}'
 */
-update.url = (args: { menuItem: string | number | { id: string | number } } | [menuItem: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions) => {
+update.url = (args: { menuItem: number | { id: number } } | [menuItem: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { menuItem: args }
     }
@@ -186,20 +186,20 @@ update.url = (args: { menuItem: string | number | { id: string | number } } | [m
 
 /**
 * @see \Modules\Menu\Http\Controllers\Staff\MenuItemController::update
-* @see Modules/Menu/app/Http/Controllers/Staff/MenuItemController.php:104
+* @see Modules/Menu/app/Http/Controllers/Staff/MenuItemController.php:106
 * @route '/staff/menu-items/{menuItem}'
 */
-update.put = (args: { menuItem: string | number | { id: string | number } } | [menuItem: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
+update.put = (args: { menuItem: number | { id: number } } | [menuItem: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
     url: update.url(args, options),
     method: 'put',
 })
 
 /**
 * @see \Modules\Menu\Http\Controllers\Staff\MenuItemController::update
-* @see Modules/Menu/app/Http/Controllers/Staff/MenuItemController.php:104
+* @see Modules/Menu/app/Http/Controllers/Staff/MenuItemController.php:106
 * @route '/staff/menu-items/{menuItem}'
 */
-const updateForm = (args: { menuItem: string | number | { id: string | number } } | [menuItem: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+const updateForm = (args: { menuItem: number | { id: number } } | [menuItem: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: update.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PUT',
@@ -211,10 +211,10 @@ const updateForm = (args: { menuItem: string | number | { id: string | number } 
 
 /**
 * @see \Modules\Menu\Http\Controllers\Staff\MenuItemController::update
-* @see Modules/Menu/app/Http/Controllers/Staff/MenuItemController.php:104
+* @see Modules/Menu/app/Http/Controllers/Staff/MenuItemController.php:106
 * @route '/staff/menu-items/{menuItem}'
 */
-updateForm.put = (args: { menuItem: string | number | { id: string | number } } | [menuItem: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+updateForm.put = (args: { menuItem: number | { id: number } } | [menuItem: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: update.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PUT',
@@ -228,10 +228,10 @@ update.form = updateForm
 
 /**
 * @see \Modules\Menu\Http\Controllers\Staff\MenuItemController::destroy
-* @see Modules/Menu/app/Http/Controllers/Staff/MenuItemController.php:135
+* @see Modules/Menu/app/Http/Controllers/Staff/MenuItemController.php:138
 * @route '/staff/menu-items/{menuItem}'
 */
-export const destroy = (args: { menuItem: string | number | { id: string | number } } | [menuItem: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
+export const destroy = (args: { menuItem: number | { id: number } } | [menuItem: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
     url: destroy.url(args, options),
     method: 'delete',
 })
@@ -243,10 +243,10 @@ destroy.definition = {
 
 /**
 * @see \Modules\Menu\Http\Controllers\Staff\MenuItemController::destroy
-* @see Modules/Menu/app/Http/Controllers/Staff/MenuItemController.php:135
+* @see Modules/Menu/app/Http/Controllers/Staff/MenuItemController.php:138
 * @route '/staff/menu-items/{menuItem}'
 */
-destroy.url = (args: { menuItem: string | number | { id: string | number } } | [menuItem: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions) => {
+destroy.url = (args: { menuItem: number | { id: number } } | [menuItem: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { menuItem: args }
     }
@@ -276,20 +276,20 @@ destroy.url = (args: { menuItem: string | number | { id: string | number } } | [
 
 /**
 * @see \Modules\Menu\Http\Controllers\Staff\MenuItemController::destroy
-* @see Modules/Menu/app/Http/Controllers/Staff/MenuItemController.php:135
+* @see Modules/Menu/app/Http/Controllers/Staff/MenuItemController.php:138
 * @route '/staff/menu-items/{menuItem}'
 */
-destroy.delete = (args: { menuItem: string | number | { id: string | number } } | [menuItem: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
+destroy.delete = (args: { menuItem: number | { id: number } } | [menuItem: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
     url: destroy.url(args, options),
     method: 'delete',
 })
 
 /**
 * @see \Modules\Menu\Http\Controllers\Staff\MenuItemController::destroy
-* @see Modules/Menu/app/Http/Controllers/Staff/MenuItemController.php:135
+* @see Modules/Menu/app/Http/Controllers/Staff/MenuItemController.php:138
 * @route '/staff/menu-items/{menuItem}'
 */
-const destroyForm = (args: { menuItem: string | number | { id: string | number } } | [menuItem: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+const destroyForm = (args: { menuItem: number | { id: number } } | [menuItem: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: destroy.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'DELETE',
@@ -301,10 +301,10 @@ const destroyForm = (args: { menuItem: string | number | { id: string | number }
 
 /**
 * @see \Modules\Menu\Http\Controllers\Staff\MenuItemController::destroy
-* @see Modules/Menu/app/Http/Controllers/Staff/MenuItemController.php:135
+* @see Modules/Menu/app/Http/Controllers/Staff/MenuItemController.php:138
 * @route '/staff/menu-items/{menuItem}'
 */
-destroyForm.delete = (args: { menuItem: string | number | { id: string | number } } | [menuItem: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+destroyForm.delete = (args: { menuItem: number | { id: number } } | [menuItem: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: destroy.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'DELETE',

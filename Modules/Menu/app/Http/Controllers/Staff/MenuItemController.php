@@ -46,6 +46,7 @@ class MenuItemController extends Controller
                 'price' => (float) $item->price,
                 'category' => $item->category,
                 'is_active' => $item->is_active,
+                'is_featured' => $item->is_featured,
                 'visibility_channels' => $this->normalizeVisibilityChannels($item->visibility_channels),
                 'image_url' => $this->toPublicAssetUrl($item->image_url),
                 'order_items_count' => $item->order_items_count,
@@ -92,6 +93,7 @@ class MenuItemController extends Controller
             'category' => $validated['category'] ?? null,
             'image_url' => $imagePath,
             'is_active' => $request->boolean('is_active', true),
+            'is_featured' => $request->boolean('is_featured', false),
             'visibility_channels' => $visibilityChannels,
         ]);
 
@@ -123,6 +125,7 @@ class MenuItemController extends Controller
             'category' => $validated['category'] ?? null,
             'image_url' => $imagePath,
             'is_active' => $request->boolean('is_active', $menuItem->is_active),
+            'is_featured' => $request->boolean('is_featured', $menuItem->is_featured),
             'visibility_channels' => $visibilityChannels,
         ]);
 

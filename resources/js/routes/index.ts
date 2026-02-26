@@ -218,7 +218,7 @@ registerForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> =>
 register.form = registerForm
 
 /**
-* @see routes/web.php:9
+* @see routes/web.php:17
 * @route '/dashboard'
 */
 export const dashboard = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -232,7 +232,7 @@ dashboard.definition = {
 } satisfies RouteDefinition<["get","head"]>
 
 /**
-* @see routes/web.php:9
+* @see routes/web.php:17
 * @route '/dashboard'
 */
 dashboard.url = (options?: RouteQueryOptions) => {
@@ -240,7 +240,7 @@ dashboard.url = (options?: RouteQueryOptions) => {
 }
 
 /**
-* @see routes/web.php:9
+* @see routes/web.php:17
 * @route '/dashboard'
 */
 dashboard.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -249,7 +249,7 @@ dashboard.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 })
 
 /**
-* @see routes/web.php:9
+* @see routes/web.php:17
 * @route '/dashboard'
 */
 dashboard.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -258,7 +258,7 @@ dashboard.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 })
 
 /**
-* @see routes/web.php:9
+* @see routes/web.php:17
 * @route '/dashboard'
 */
 const dashboardForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -267,7 +267,7 @@ const dashboardForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> 
 })
 
 /**
-* @see routes/web.php:9
+* @see routes/web.php:17
 * @route '/dashboard'
 */
 dashboardForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -276,7 +276,7 @@ dashboardForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> =>
 })
 
 /**
-* @see routes/web.php:9
+* @see routes/web.php:17
 * @route '/dashboard'
 */
 dashboardForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -292,7 +292,7 @@ dashboardForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> =
 dashboard.form = dashboardForm
 
 /**
-* @see routes/web.php:42
+* @see routes/web.php:50
 * @route '/welcome'
 */
 export const welcome = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -306,7 +306,7 @@ welcome.definition = {
 } satisfies RouteDefinition<["get","head"]>
 
 /**
-* @see routes/web.php:42
+* @see routes/web.php:50
 * @route '/welcome'
 */
 welcome.url = (options?: RouteQueryOptions) => {
@@ -314,7 +314,7 @@ welcome.url = (options?: RouteQueryOptions) => {
 }
 
 /**
-* @see routes/web.php:42
+* @see routes/web.php:50
 * @route '/welcome'
 */
 welcome.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -323,7 +323,7 @@ welcome.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 })
 
 /**
-* @see routes/web.php:42
+* @see routes/web.php:50
 * @route '/welcome'
 */
 welcome.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -332,7 +332,7 @@ welcome.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 })
 
 /**
-* @see routes/web.php:42
+* @see routes/web.php:50
 * @route '/welcome'
 */
 const welcomeForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -341,7 +341,7 @@ const welcomeForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> =>
 })
 
 /**
-* @see routes/web.php:42
+* @see routes/web.php:50
 * @route '/welcome'
 */
 welcomeForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -350,7 +350,7 @@ welcomeForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => (
 })
 
 /**
-* @see routes/web.php:42
+* @see routes/web.php:50
 * @route '/welcome'
 */
 welcomeForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -367,7 +367,7 @@ welcome.form = welcomeForm
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::home
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:31
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:32
 * @route '/'
 */
 export const home = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -382,7 +382,7 @@ home.definition = {
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::home
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:31
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:32
 * @route '/'
 */
 home.url = (options?: RouteQueryOptions) => {
@@ -391,7 +391,7 @@ home.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::home
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:31
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:32
 * @route '/'
 */
 home.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -401,7 +401,7 @@ home.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::home
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:31
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:32
 * @route '/'
 */
 home.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -411,7 +411,7 @@ home.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::home
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:31
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:32
 * @route '/'
 */
 const homeForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -421,7 +421,7 @@ const homeForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::home
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:31
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:32
 * @route '/'
 */
 homeForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -431,7 +431,7 @@ homeForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::home
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:31
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:32
 * @route '/'
 */
 homeForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({

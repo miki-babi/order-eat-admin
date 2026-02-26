@@ -136,8 +136,10 @@ class CustomerIdentityService
             $existingPhone = $this->normalizePhone($customer->phone);
 
             if ($existingPhone !== null) {
+                $phoneCandidatesForMerge = $this->phoneLookupCandidates($customer->phone);
+
                 $canonicalPhoneCustomer = Customer::query()
-                    ->where('phone', $existingPhone)
+                    ->whereIn('phone', $phoneCandidatesForMerge)
                     ->when(
                         $customer->exists,
                         fn ($query) => $query->where('id', '!=', $customer->id),
@@ -372,7 +374,7 @@ class CustomerIdentityService
             return null;
         }
 
-        $normalized = $this->smsService->normalizePhone($value);
+        $normalized = $this->smsService->withPlusCountryCode($value);
 
         return is_string($normalized) && $normalized !== '' ? $normalized : null;
     }
@@ -384,17 +386,23 @@ class CustomerIdentityService
      */
     protected function phoneLookupCandidates(mixed $value): array
     {
-        $local = $this->normalizePhone($value);
+        if (! is_string($value)) {
+            return [];
+        }
+
+        $local = $this->smsService->normalizePhone($value);
 
         if ($local === null) {
             return [];
         }
 
+        $canonical = '+251'.$local;
+
         return array_values(array_unique([
-            $local,
-            '0'.$local,
+            $canonical,
             '251'.$local,
-            '+251'.$local,
+            '0'.$local,
+            $local,
         ]));
     }
 

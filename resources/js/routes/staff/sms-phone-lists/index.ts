@@ -60,7 +60,7 @@ store.form = storeForm
 * @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:679
 * @route '/staff/sms-phone-lists/{smsPhoneList}'
 */
-export const destroy = (args: { smsPhoneList: string | number | { id: string | number } } | [smsPhoneList: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
+export const destroy = (args: { smsPhoneList: number | { id: number } } | [smsPhoneList: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
     url: destroy.url(args, options),
     method: 'delete',
 })
@@ -75,7 +75,7 @@ destroy.definition = {
 * @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:679
 * @route '/staff/sms-phone-lists/{smsPhoneList}'
 */
-destroy.url = (args: { smsPhoneList: string | number | { id: string | number } } | [smsPhoneList: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions) => {
+destroy.url = (args: { smsPhoneList: number | { id: number } } | [smsPhoneList: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { smsPhoneList: args }
     }
@@ -108,7 +108,7 @@ destroy.url = (args: { smsPhoneList: string | number | { id: string | number } }
 * @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:679
 * @route '/staff/sms-phone-lists/{smsPhoneList}'
 */
-destroy.delete = (args: { smsPhoneList: string | number | { id: string | number } } | [smsPhoneList: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
+destroy.delete = (args: { smsPhoneList: number | { id: number } } | [smsPhoneList: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
     url: destroy.url(args, options),
     method: 'delete',
 })
@@ -118,7 +118,7 @@ destroy.delete = (args: { smsPhoneList: string | number | { id: string | number 
 * @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:679
 * @route '/staff/sms-phone-lists/{smsPhoneList}'
 */
-const destroyForm = (args: { smsPhoneList: string | number | { id: string | number } } | [smsPhoneList: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+const destroyForm = (args: { smsPhoneList: number | { id: number } } | [smsPhoneList: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: destroy.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'DELETE',
@@ -133,7 +133,7 @@ const destroyForm = (args: { smsPhoneList: string | number | { id: string | numb
 * @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:679
 * @route '/staff/sms-phone-lists/{smsPhoneList}'
 */
-destroyForm.delete = (args: { smsPhoneList: string | number | { id: string | number } } | [smsPhoneList: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+destroyForm.delete = (args: { smsPhoneList: number | { id: number } } | [smsPhoneList: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: destroy.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'DELETE',

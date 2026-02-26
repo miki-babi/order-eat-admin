@@ -141,7 +141,7 @@ store.form = storeForm
 * @see Modules/Operations/app/Http/Controllers/Staff/TableQrController.php:126
 * @route '/staff/table-qr/{diningTable}'
 */
-export const update = (args: { diningTable: string | number | { id: string | number } } | [diningTable: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
+export const update = (args: { diningTable: number | { id: number } } | [diningTable: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
     url: update.url(args, options),
     method: 'put',
 })
@@ -156,7 +156,7 @@ update.definition = {
 * @see Modules/Operations/app/Http/Controllers/Staff/TableQrController.php:126
 * @route '/staff/table-qr/{diningTable}'
 */
-update.url = (args: { diningTable: string | number | { id: string | number } } | [diningTable: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions) => {
+update.url = (args: { diningTable: number | { id: number } } | [diningTable: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { diningTable: args }
     }
@@ -189,7 +189,7 @@ update.url = (args: { diningTable: string | number | { id: string | number } } |
 * @see Modules/Operations/app/Http/Controllers/Staff/TableQrController.php:126
 * @route '/staff/table-qr/{diningTable}'
 */
-update.put = (args: { diningTable: string | number | { id: string | number } } | [diningTable: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
+update.put = (args: { diningTable: number | { id: number } } | [diningTable: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
     url: update.url(args, options),
     method: 'put',
 })
@@ -199,7 +199,7 @@ update.put = (args: { diningTable: string | number | { id: string | number } } |
 * @see Modules/Operations/app/Http/Controllers/Staff/TableQrController.php:126
 * @route '/staff/table-qr/{diningTable}'
 */
-const updateForm = (args: { diningTable: string | number | { id: string | number } } | [diningTable: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+const updateForm = (args: { diningTable: number | { id: number } } | [diningTable: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: update.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PUT',
@@ -214,7 +214,7 @@ const updateForm = (args: { diningTable: string | number | { id: string | number
 * @see Modules/Operations/app/Http/Controllers/Staff/TableQrController.php:126
 * @route '/staff/table-qr/{diningTable}'
 */
-updateForm.put = (args: { diningTable: string | number | { id: string | number } } | [diningTable: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+updateForm.put = (args: { diningTable: number | { id: number } } | [diningTable: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: update.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PUT',
@@ -231,7 +231,7 @@ update.form = updateForm
 * @see Modules/Operations/app/Http/Controllers/Staff/TableQrController.php:147
 * @route '/staff/table-sessions/{tableSession}/verify'
 */
-export const verifySession = (args: { tableSession: string | number | { id: string | number } } | [tableSession: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
+export const verifySession = (args: { tableSession: number | { id: number } } | [tableSession: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
     url: verifySession.url(args, options),
     method: 'patch',
 })
@@ -246,7 +246,7 @@ verifySession.definition = {
 * @see Modules/Operations/app/Http/Controllers/Staff/TableQrController.php:147
 * @route '/staff/table-sessions/{tableSession}/verify'
 */
-verifySession.url = (args: { tableSession: string | number | { id: string | number } } | [tableSession: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions) => {
+verifySession.url = (args: { tableSession: number | { id: number } } | [tableSession: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { tableSession: args }
     }
@@ -279,7 +279,7 @@ verifySession.url = (args: { tableSession: string | number | { id: string | numb
 * @see Modules/Operations/app/Http/Controllers/Staff/TableQrController.php:147
 * @route '/staff/table-sessions/{tableSession}/verify'
 */
-verifySession.patch = (args: { tableSession: string | number | { id: string | number } } | [tableSession: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
+verifySession.patch = (args: { tableSession: number | { id: number } } | [tableSession: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
     url: verifySession.url(args, options),
     method: 'patch',
 })
@@ -289,7 +289,7 @@ verifySession.patch = (args: { tableSession: string | number | { id: string | nu
 * @see Modules/Operations/app/Http/Controllers/Staff/TableQrController.php:147
 * @route '/staff/table-sessions/{tableSession}/verify'
 */
-const verifySessionForm = (args: { tableSession: string | number | { id: string | number } } | [tableSession: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+const verifySessionForm = (args: { tableSession: number | { id: number } } | [tableSession: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: verifySession.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PATCH',
@@ -304,7 +304,7 @@ const verifySessionForm = (args: { tableSession: string | number | { id: string 
 * @see Modules/Operations/app/Http/Controllers/Staff/TableQrController.php:147
 * @route '/staff/table-sessions/{tableSession}/verify'
 */
-verifySessionForm.patch = (args: { tableSession: string | number | { id: string | number } } | [tableSession: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+verifySessionForm.patch = (args: { tableSession: number | { id: number } } | [tableSession: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: verifySession.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PATCH',

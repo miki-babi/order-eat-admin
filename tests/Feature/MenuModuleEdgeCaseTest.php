@@ -113,6 +113,47 @@ test('updating menu item visibility hides it from telegram menu when telegram ch
         );
 });
 
+test('staff can mark menu items as featured and see that state in menu listing payload', function () {
+    $staff = User::factory()->create([
+        'role' => 'staff',
+    ]);
+
+    $menuItem = MenuItem::query()->create([
+        'name' => 'Feature Toggle Item',
+        'description' => 'Featured update test.',
+        'price' => 160,
+        'category' => 'Drinks',
+        'is_active' => true,
+        'is_featured' => false,
+        'visibility_channels' => ['web'],
+    ]);
+
+    $this->actingAs($staff)
+        ->put(route('staff.menu-items.update', $menuItem), [
+            'name' => 'Feature Toggle Item',
+            'description' => 'Featured update test.',
+            'price' => 160,
+            'category' => 'Drinks',
+            'is_active' => true,
+            'is_featured' => true,
+            'visibility_channels' => ['web'],
+        ])
+        ->assertRedirect();
+
+    $menuItem->refresh();
+
+    expect($menuItem->is_featured)->toBeTrue();
+
+    $this->actingAs($staff)
+        ->get(route('staff.menu-items.index'))
+        ->assertOk()
+        ->assertInertia(fn (\Inertia\Testing\AssertableInertia $page) => $page
+            ->component('staff/menu-items')
+            ->where('items.0.id', $menuItem->id)
+            ->where('items.0.is_featured', true)
+        );
+});
+
 test('menu management feature lock redirects non-get requests', function () {
     $staff = User::factory()->create([
         'role' => 'staff',

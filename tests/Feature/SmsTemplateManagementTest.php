@@ -526,7 +526,7 @@ test('staff can import customer contacts csv', function () {
         ])
         ->assertRedirect();
 
-    expect(Customer::query()->where('name', 'Alice')->where('phone', '911234567')->exists())->toBeTrue();
-    expect(Customer::query()->where('name', 'Bob')->where('phone', '922222222')->exists())->toBeTrue();
+    expect(Customer::query()->where('name', 'Alice')->where('phone', '+251911234567')->exists())->toBeTrue();
+    expect(Customer::query()->where('name', 'Bob')->where('phone', '+251922222222')->exists())->toBeTrue();
     expect(Customer::query()->count())->toBe(2);
 });

@@ -4,6 +4,7 @@ namespace Modules\Ordering\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Modules\Ordering\Http\Requests\Orders\StoreOrderRequest;
+use Modules\Ordering\Http\Requests\Orders\StoreTableOrderPhoneRequest;
 use Modules\Ordering\Http\Requests\Orders\UploadOrderReceiptRequest;
 use App\Models\MenuItem;
 use App\Models\Order;
@@ -98,6 +99,7 @@ class OrderController extends Controller
                 'price' => (float) $item->price,
                 'category' => $item->category,
                 'image_url' => $this->toPublicAssetUrl($item->image_url),
+                'is_featured' => $item->is_featured,
             ]);
 
         $categories = $visibleItems
@@ -381,12 +383,45 @@ class OrderController extends Controller
     }
 
     /**
+     * Save customer phone for QR table orders from confirmation page popup.
+     */
+    public function storeTableOrderPhone(
+        StoreTableOrderPhoneRequest $request,
+        string $trackingToken,
+        SmsEthiopiaService $smsService,
+    ): RedirectResponse {
+        $order = Order::query()
+            ->with('customer')
+            ->where('tracking_token', $trackingToken)
+            ->firstOrFail();
+
+        if ($order->source_channel !== Order::SOURCE_TABLE || ! $order->customer) {
+            abort(403);
+        }
+
+        $phone = (string) $request->validated('phone');
+        $normalizedPhone = $smsService->withPlusCountryCode($phone);
+
+        if (! $normalizedPhone) {
+            return back()->withErrors([
+                'phone' => 'Invalid Ethiopian phone format.',
+            ]);
+        }
+
+        $order->customer->update([
+            'phone' => $normalizedPhone,
+        ]);
+
+        return back()->with('success', 'Phone number saved for order updates.');
+    }
+
+    /**
      * Find an order by its public tracking token.
      */
     protected function findOrderByToken(string $trackingToken): Order
     {
         return Order::query()
-            ->with(['customer', 'pickupLocation', 'diningTable', 'items.menuItem'])
+            ->with(['customer.tokens', 'pickupLocation', 'diningTable', 'items.menuItem'])
             ->where('tracking_token', $trackingToken)
             ->firstOrFail();
     }
@@ -401,6 +436,8 @@ class OrderController extends Controller
         return [
             'id' => $order->id,
             'tracking_token' => $order->tracking_token,
+            'source_channel' => $order->source_channel,
+            'should_prompt_phone_capture' => $this->shouldPromptPhoneCapture($order),
             'pickup_date' => $order->pickup_date?->toDateString(),
             'pickup_location' => [
                 'id' => $order->pickupLocation?->id,
@@ -433,6 +470,39 @@ class OrderController extends Controller
                 'line_total' => (float) $item->price * $item->quantity,
             ])->values(),
         ];
+    }
+
+    protected function shouldPromptPhoneCapture(Order $order): bool
+    {
+        if ($order->source_channel !== Order::SOURCE_TABLE || ! $order->customer) {
+            return false;
+        }
+
+        $customer = $order->customer;
+        $hasToken = $customer->relationLoaded('tokens')
+            ? $customer->tokens->isNotEmpty()
+            : $customer->tokens()->exists();
+
+        if (! $hasToken) {
+            return true;
+        }
+
+        return ! $this->customerHasRealPhone($customer->phone);
+    }
+
+    protected function customerHasRealPhone(?string $phone): bool
+    {
+        if (! is_string($phone)) {
+            return false;
+        }
+
+        $normalized = trim($phone);
+
+        if ($normalized === '') {
+            return false;
+        }
+
+        return preg_match('/^q[a-f0-9]{19}$/i', $normalized) !== 1;
     }
 
     /**

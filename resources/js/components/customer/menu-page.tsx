@@ -1,6 +1,6 @@
 import { Head, useForm, usePage } from '@inertiajs/react';
-import { ArrowRight, CheckCircle2, Clock3, ExternalLink, MapPin, Search, ShoppingCart, Upload } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { ArrowRight, CheckCircle2, ChevronLeft, ChevronRight, Clock3, ExternalLink, MapPin, Search, ShoppingCart, SparkleIcon, Upload, X } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,6 +13,7 @@ type MenuItem = {
     price: number;
     category: string | null;
     image_url: string | null;
+    is_featured?: boolean;
 };
 
 type PickupLocation = {
@@ -348,14 +349,21 @@ export default function CustomerMenuPage({
     );
     const [step, setStep] = useState(() => loadPersistedStep(stepStorageKey));
     const [search, setSearch] = useState(filters.search ?? '');
+    const [isSearchInputVisible, setIsSearchInputVisible] = useState(
+        () => (filters.search ?? '').trim() !== '',
+    );
     const [activeCategory, setActiveCategory] = useState(filters.category ?? 'all');
     const [hideTopChrome, setHideTopChrome] = useState(false);
     const [hideBottomActions, setHideBottomActions] = useState(false);
     const hasSyncedTelegramIdentity = useRef(false);
     const lastScrollY = useRef(0);
+    const searchInputRef = useRef<HTMLInputElement | null>(null);
+    const featuredCarouselRef = useRef<HTMLDivElement | null>(null);
     const [cart, setCart] = useState<Record<number, number>>(
         () => loadPersistedCart(cartStorageKey, allowedMenuItemIds),
     );
+    const [canScrollFeaturedPrev, setCanScrollFeaturedPrev] = useState(false);
+    const [canScrollFeaturedNext, setCanScrollFeaturedNext] = useState(false);
 
     const form = useForm<OrderForm>({
         customer_token: customerToken,
@@ -396,6 +404,84 @@ export default function CustomerMenuPage({
         [activeCategory, menuItems, search],
     );
 
+    const featuredItems = useMemo(
+        () => filteredItems.filter((item) => item.is_featured === true),
+        [filteredItems],
+    );
+
+    const updateFeaturedCarouselState = useCallback(() => {
+        const carousel = featuredCarouselRef.current;
+
+        if (!carousel) {
+            setCanScrollFeaturedPrev(false);
+            setCanScrollFeaturedNext(false);
+            return;
+        }
+
+        const maxScrollLeft = carousel.scrollWidth - carousel.clientWidth;
+
+        if (maxScrollLeft <= 1) {
+            setCanScrollFeaturedPrev(false);
+            setCanScrollFeaturedNext(false);
+            return;
+        }
+
+        setCanScrollFeaturedPrev(carousel.scrollLeft > 4);
+        setCanScrollFeaturedNext(carousel.scrollLeft < maxScrollLeft - 4);
+    }, []);
+
+    const scrollFeaturedCarousel = useCallback((direction: -1 | 1) => {
+        const carousel = featuredCarouselRef.current;
+
+        if (!carousel) {
+            return;
+        }
+
+        carousel.scrollBy({
+            left: carousel.clientWidth * 0.85 * direction,
+            behavior: 'smooth',
+        });
+    }, []);
+
+    const autoAdvanceFeaturedCarousel = useCallback(() => {
+        const carousel = featuredCarouselRef.current;
+
+        if (!carousel) {
+            return;
+        }
+
+        const maxScrollLeft = carousel.scrollWidth - carousel.clientWidth;
+
+        if (maxScrollLeft <= 1) {
+            return;
+        }
+
+        const firstSlide = carousel.querySelector<HTMLElement>('[data-featured-slide="true"]');
+        const slideWidth = firstSlide?.offsetWidth ?? 0;
+        const gap = 16;
+        const fallbackStep = carousel.clientWidth * 0.85;
+        const stepSize = slideWidth > 0 ? slideWidth + gap : fallbackStep;
+        const isAtEnd = carousel.scrollLeft >= maxScrollLeft - 4;
+
+        if (isAtEnd) {
+            carousel.scrollTo({
+                left: 0,
+                behavior: 'smooth',
+            });
+            return;
+        }
+
+        carousel.scrollBy({
+            left: Math.min(stepSize, maxScrollLeft - carousel.scrollLeft),
+            behavior: 'smooth',
+        });
+    }, []);
+
+    const hideSearchInput = useCallback(() => {
+        setSearch('');
+        setIsSearchInputVisible(false);
+    }, []);
+
     const cartItems = useMemo(() => {
         return Object.entries(cart)
             .map(([id, quantity]) => {
@@ -420,6 +506,58 @@ export default function CustomerMenuPage({
     useEffect(() => {
         persistCart(cartStorageKey, sanitizeCartPayload(cart, allowedMenuItemIds));
     }, [cart, cartStorageKey, allowedMenuItemIds]);
+
+    useEffect(() => {
+        updateFeaturedCarouselState();
+
+        if (typeof window === 'undefined') {
+            return;
+        }
+
+        const onResize = () => {
+            updateFeaturedCarouselState();
+        };
+
+        window.addEventListener('resize', onResize);
+
+        return () => {
+            window.removeEventListener('resize', onResize);
+        };
+    }, [featuredItems.length, step, updateFeaturedCarouselState]);
+
+    useEffect(() => {
+        if (!isSearchInputVisible || step !== 1) {
+            return;
+        }
+
+        const input = searchInputRef.current;
+
+        if (!input) {
+            return;
+        }
+
+        input.focus();
+        const caretPosition = input.value.length;
+        input.setSelectionRange(caretPosition, caretPosition);
+    }, [isSearchInputVisible, step]);
+
+    useEffect(() => {
+        if (step !== 1 || featuredItems.length <= 1) {
+            return;
+        }
+
+        if (typeof window === 'undefined') {
+            return;
+        }
+
+        const intervalId = window.setInterval(() => {
+            autoAdvanceFeaturedCarousel();
+        }, 3000);
+
+        return () => {
+            window.clearInterval(intervalId);
+        };
+    }, [autoAdvanceFeaturedCarousel, featuredItems.length, step]);
 
     useEffect(() => {
         persistStep(stepStorageKey, step);
@@ -783,40 +921,40 @@ export default function CustomerMenuPage({
                                 );
                             })}
                         </div>
-                        
+
                     </div>
 
                     <div className={`sticky top-[0px] z-60 mb-10 overflow-hidden rounded-2xl bg-white p-1.5 shadow-lg ring-1 ring-zinc-100 transition-all duration-300 md:relative md:top-0 md:bg-white md:p-1 md:shadow-md md:translate-y-0 md:opacity-100 md:pointer-events-auto ${step === 1 ? 'block' : 'hidden'} ${hideTopChrome ? '-translate-y-[160%] opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}`}>
 
-                    <div className=" flex flex-wrap gap-3 p-2 transition-all duration-300">
-                                            <button
-                                                type="button"
-                                                className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 shadow-sm ${activeCategory === 'all'
-                                                    ? 'bg-[#F57C00] text-white shadow-[#F57C00]/20 scale-105'
-                                                    : 'bg-white text-[#757575] hover:bg-[#F5F5F5] ring-1 ring-zinc-200'
-                                                    }`}
-                                                onClick={() => setActiveCategory('all')}
-                                            >
-                                                All items
-                                            </button>
-                                            {categories.map((category) => (
-                                                <button
-                                                    key={category}
-                                                    type="button"
-                                                    className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 shadow-sm ${activeCategory === category
-                                                        ? 'bg-[#F57C00] text-white shadow-[#F57C00]/20 scale-105'
-                                                        : 'bg-white text-[#757575] hover:bg-[#F5F5F5] ring-1 ring-zinc-200'
-                                                        }`}
-                                                    onClick={() => setActiveCategory(category)}
-                                                >
-                                                    {category}
-                                                </button>
-                                            ))}
-                                        </div>
-                                        </div>
+                        <div className=" flex scrollable gap-3 p-2 transition-all duration-300">
+                            <button
+                                type="button"
+                                className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 shadow-sm ${activeCategory === 'all'
+                                    ? 'bg-[#F57C00] text-white shadow-[#F57C00]/20 scale-105'
+                                    : 'bg-white text-[#757575] hover:bg-[#F5F5F5] ring-1 ring-zinc-200'
+                                    }`}
+                                onClick={() => setActiveCategory('all')}
+                            >
+                                All 
+                            </button>
+                            {categories.map((category) => (
+                                <button
+                                    key={category}
+                                    type="button"
+                                    className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 shadow-sm ${activeCategory === category
+                                        ? 'bg-[#F57C00] text-white shadow-[#F57C00]/20 scale-105'
+                                        : 'bg-white text-[#757575] hover:bg-[#F5F5F5] ring-1 ring-zinc-200'
+                                        }`}
+                                    onClick={() => setActiveCategory(category)}
+                                >
+                                    {category}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
 
                     <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
-                        <section className="space-y-6">
+                        <section className="min-w-0 space-y-6">
                             {flash?.success && (
                                 <div className="animate-in fade-in slide-in-from-top-4 rounded-xl border-l-4 border-[#2E7D32] bg-green-50 px-5 py-4 text-sm font-medium text-[#1B5E20] shadow-sm transition-all duration-500">
                                     {flash.success}
@@ -831,20 +969,142 @@ export default function CustomerMenuPage({
                             {step === 1 && (
                                 <div className="space-y-8 animate-in fade-in duration-500">
                                     {/* Search & Filters */}
-                                    <div className="space-y-6">
-                                        <div className="group relative transition-all duration-300 focus-within:ring-2 focus-within:ring-[#F57C00]/20 rounded-2xl">
-                                            <Search className="absolute top-1/2 left-5 size-5 -translate-y-1/2 text-[#757575] group-focus-within:text-[#F57C00] transition-colors duration-300" />
-                                            <Input
-                                                className="h-14 rounded-2xl border-none pl-14 text-base shadow-sm ring-1 ring-zinc-200 transition-all duration-300 focus:ring-2 focus:ring-[#F57C00] placeholder:text-[#9E9E9E]"
-                                                value={search}
-                                                onChange={(event) => setSearch(event.target.value)}
-                                                placeholder="Search by item, description, or category"
-                                            />
-                                        </div>
+                                    <div className="space-y-6 flex items-center justify-end gap-4">
+                                        {isSearchInputVisible ? (
+                                            <div className="group relative transition-all duration-300 focus-within:ring-2 focus-within:ring-[#F57C00]/20 rounded-2xl">
+                                                <Search className="absolute top-1/2 left-5 size-5 -translate-y-1/2 text-[#757575] group-focus-within:text-[#F57C00] transition-colors duration-300" />
+                                                <Input
+                                                    ref={searchInputRef}
+                                                    className="h-14 rounded-2xl border-none pl-14 pr-14 text-base shadow-sm ring-1 ring-zinc-200 transition-all duration-300 focus:ring-2 focus:ring-[#F57C00] placeholder:text-[#9E9E9E]"
+                                                    value={search}
+                                                    onChange={(event) => setSearch(event.target.value)}
+                                                    onBlur={() => {
+                                                        if (search.trim() === '') {
+                                                            setIsSearchInputVisible(false);
+                                                        }
+                                                    }}
+                                                    onKeyDown={(event) => {
+                                                        if (event.key === 'Escape') {
+                                                            hideSearchInput();
+                                                        }
+                                                    }}
+                                                    placeholder="Search by item, description, or category"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    className="absolute top-1/2 right-3 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-700"
+                                                    onClick={hideSearchInput}
+                                                    aria-label="Hide search"
+                                                >
+                                                    <X className="size-4" />
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <button
+                                                type="button"
+                                                className="inline-flex h-12 items-center gap-2 rounded-xl bg-white px-4 text-sm font-semibold text-[#757575] shadow-sm ring-1 ring-zinc-200 transition-all duration-300 hover:bg-[#F5F5F5]"
+                                                onClick={() => setIsSearchInputVisible(true)}
+                                            >
+                                                <Search className="size-4" />
+                                                Search menu
+                                            </button>
+                                        )}
 
-                                        
-                                        
+
+
                                     </div>
+
+                                    {featuredItems.length > 0 && (
+                                        <div className="space-y-4">
+                                            <div className="flex items-center justify-between gap-3">
+                                                <h2 className="animate-gold-shimmer bg-gradient-to-r from-[#D4AF37] via-[#F9D71C] to-[#D4AF37] bg-[length:200%_auto] bg-clip-text text-sm font-black uppercase tracking-widest text-transparent">
+                                                    <SparkleIcon className="animate-sparkle inline-block size-8 p-1 text-[#D4AF37] drop-shadow-[0_0_8px_rgba(212,175,55,0.5)]" />
+                                                    Top picks
+                                                </h2>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-xs font-semibold text-[#9E9E9E]">
+                                                        Top picks
+                                                    </span>
+                                                    <button
+                                                        type="button"
+                                                        className="flex h-8 w-8 items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-600 transition-colors hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-40"
+                                                        onClick={() => scrollFeaturedCarousel(-1)}
+                                                        disabled={!canScrollFeaturedPrev}
+                                                        aria-label="Previous featured items"
+                                                    >
+                                                        <ChevronLeft className="size-4" />
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        className="flex h-8 w-8 items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-600 transition-colors hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-40"
+                                                        onClick={() => scrollFeaturedCarousel(1)}
+                                                        disabled={!canScrollFeaturedNext}
+                                                        aria-label="Next featured items"
+                                                    >
+                                                        <ChevronRight className="size-4" />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div
+                                                ref={featuredCarouselRef}
+                                                onScroll={updateFeaturedCarouselState}
+                                                className="scrollable overflow-x-auto overscroll-x-contain scroll-smooth snap-x snap-mandatory pb-2"
+                                            >
+                                                <div className="flex min-w-0 gap-4 pr-1">
+                                                    {featuredItems.map((item) => (
+                                                        <article
+                                                            key={`featured-${item.id}`}
+                                                            data-featured-slide="true"
+                                                            className="group w-[240px] shrink-0 snap-start overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-zinc-200"
+                                                        >
+                                                            <div className="relative h-36 overflow-hidden">
+                                                                {item.image_url ? (
+                                                                    <img
+                                                                        src={item.image_url}
+                                                                        alt={item.name}
+                                                                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                                                        loading="lazy"
+                                                                    />
+                                                                ) : (
+                                                                    <div className="flex h-full w-full flex-col items-center justify-center bg-[#F5F5F5]">
+                                                                        <ShoppingCart className="size-5 text-zinc-400 opacity-60" />
+                                                                        <span className="mt-2 text-[10px] font-medium text-zinc-400">
+                                                                            No image
+                                                                        </span>
+                                                                    </div>
+                                                                )}
+                                                                <span className="absolute top-3 right-3 rounded-full bg-black/50 px-2.5 py-1 text-xs font-black text-white backdrop-blur-sm">
+                                                                    {currency(item.price)}
+                                                                </span>
+                                                            </div>
+                                                            <div className="space-y-3 p-4">
+                                                                <div>
+                                                                    <p className="line-clamp-1 text-sm font-black text-[#212121]">
+                                                                        {item.name}
+                                                                    </p>
+                                                                    <p className="mt-1 line-clamp-2 text-xs text-[#757575]">
+                                                                        {item.description ?? 'Freshly prepared and ready for pickup.'}
+                                                                    </p>
+                                                                </div>
+                                                                <Button
+                                                                    type="button"
+                                                                    className={`h-9 w-full rounded-xl text-sm font-bold transition-all duration-300 active:scale-95 ${(cart[item.id] ?? 0) > 0
+                                                                        ? 'bg-[#2E7D32] hover:bg-[#1B5E20]'
+                                                                        : 'bg-[#F57C00] hover:bg-[#E65100]'
+                                                                        }`}
+                                                                    onClick={() => updateItemQuantity(item.id, Math.max(1, (cart[item.id] ?? 0) + 1))}
+                                                                >
+                                                                    {(cart[item.id] ?? 0) > 0
+                                                                        ? `Add more (${cart[item.id] ?? 0})`
+                                                                        : 'Add to order'}
+                                                                </Button>
+                                                            </div>
+                                                        </article>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
 
                                     {/* Food Grid (Photo-First) */}
                                     <div className="grid gap-6 sm:grid-cols-2">
@@ -921,7 +1181,7 @@ export default function CustomerMenuPage({
                                                                     }`}
                                                                 onClick={() => updateItemQuantity(item.id, Math.max(1, (cart[item.id] ?? 0) + 1))}
                                                             >
-                                                                {(cart[item.id] ?? 0) > 0 ? 'Add more' : 'Add to cart'}
+                                                                {(cart[item.id] ?? 0) > 0 ? 'Add more' : 'Add to order'}
                                                             </Button>
                                                         </div>
                                                     </div>

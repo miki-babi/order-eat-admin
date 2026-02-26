@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition } from './../../wayfinder'
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::menu
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:43
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:44
 * @route '/telegram/menu'
 */
 export const menu = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ menu.definition = {
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::menu
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:43
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:44
 * @route '/telegram/menu'
 */
 menu.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ menu.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::menu
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:43
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:44
 * @route '/telegram/menu'
 */
 menu.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -35,7 +35,7 @@ menu.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::menu
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:43
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:44
 * @route '/telegram/menu'
 */
 menu.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -45,7 +45,7 @@ menu.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::menu
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:43
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:44
 * @route '/telegram/menu'
 */
 const menuForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -55,7 +55,7 @@ const menuForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::menu
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:43
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:44
 * @route '/telegram/menu'
 */
 menuForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -65,7 +65,7 @@ menuForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::menu
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:43
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:44
 * @route '/telegram/menu'
 */
 menuForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -82,7 +82,7 @@ menu.form = menuForm
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::orders
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:56
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:57
 * @route '/telegram/orders'
 */
 export const orders = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -97,7 +97,7 @@ orders.definition = {
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::orders
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:56
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:57
 * @route '/telegram/orders'
 */
 orders.url = (options?: RouteQueryOptions) => {
@@ -106,7 +106,7 @@ orders.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::orders
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:56
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:57
 * @route '/telegram/orders'
 */
 orders.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -116,7 +116,7 @@ orders.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::orders
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:56
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:57
 * @route '/telegram/orders'
 */
 orders.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -126,7 +126,7 @@ orders.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::orders
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:56
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:57
 * @route '/telegram/orders'
 */
 const ordersForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -136,7 +136,7 @@ const ordersForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => 
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::orders
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:56
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:57
 * @route '/telegram/orders'
 */
 ordersForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -146,7 +146,7 @@ ordersForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::orders
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:56
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:57
 * @route '/telegram/orders'
 */
 ordersForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({

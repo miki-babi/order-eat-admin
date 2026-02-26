@@ -33,6 +33,9 @@ Route::get('/orders/{trackingToken}/confirmation', [OrderController::class, 'con
 Route::get('/orders/{trackingToken}/track', [OrderController::class, 'track'])
     ->middleware('feature:customer_order_tracking')
     ->name('orders.track');
+Route::post('/orders/{trackingToken}/phone', [OrderController::class, 'storeTableOrderPhone'])
+    ->middleware('feature:customer_order_tracking')
+    ->name('orders.phone.store');
 Route::post('/orders/{trackingToken}/receipt', [OrderController::class, 'uploadReceipt'])
     ->middleware('feature:customer_receipt_upload')
     ->name('orders.receipt.upload');

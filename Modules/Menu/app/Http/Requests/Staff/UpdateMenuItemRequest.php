@@ -22,6 +22,7 @@ class UpdateMenuItemRequest extends FormRequest
             'category' => ['nullable', 'string', 'max:50'],
             'image' => ['nullable', 'image', 'max:5120'],
             'is_active' => ['nullable', 'boolean'],
+            'is_featured' => ['nullable', 'boolean'],
             'visibility_channels' => ['nullable', 'array'],
             'visibility_channels.*' => ['string', Rule::in(MenuItem::visibilityChannels())],
         ];

@@ -1,7 +1,11 @@
-import { Head, Link } from '@inertiajs/react';
-import { BadgeCheck, Clock3, MapPin, ShoppingBag, ArrowRight } from 'lucide-react';
+import { Head, Link, useForm } from '@inertiajs/react';
+import { BadgeCheck, Clock3, MapPin, Phone, ShoppingBag, ArrowRight } from 'lucide-react';
+import { useState } from 'react';
+import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
-import {  CardContent } from '@/components/ui/card';
+import { CardContent } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 
 type OrderItem = {
     id: number;
@@ -15,6 +19,8 @@ type OrderItem = {
 type Order = {
     id: number;
     tracking_token: string;
+    source_channel: 'web' | 'telegram' | 'table';
+    should_prompt_phone_capture: boolean;
     pickup_date: string;
     pickup_location: {
         id: number | null;
@@ -66,11 +72,90 @@ function currency(value: number): string {
 
 export default function Confirmation({ order }: { order: Order }) {
     const menuHref = isTelegramContext() ? '/telegram/menu' : '/';
+    const initialPhone = !order.should_prompt_phone_capture && typeof order.customer.phone === 'string'
+        ? order.customer.phone.trim()
+        : '';
+    const [savedPhone, setSavedPhone] = useState(initialPhone);
+    const [isPhoneDialogOpen, setIsPhoneDialogOpen] = useState(
+        order.source_channel === 'table' && order.should_prompt_phone_capture,
+    );
+    const phoneForm = useForm<{ phone: string }>({
+        phone: '',
+    });
+
+    const submitTablePhone = () => {
+        phoneForm.post(`/orders/${order.tracking_token}/phone`, {
+            preserveScroll: true,
+            onSuccess: () => {
+                setSavedPhone(phoneForm.data.phone.replace(/[^\d+]/g, '').trim());
+                setIsPhoneDialogOpen(false);
+                phoneForm.reset();
+            },
+        });
+    };
 
     return (
         <>
             <Head title={`Order #${order.id} Confirmed - Cafe`} />
             <div className="min-h-screen bg-[#FAFAFA] text-[#212121] selection:bg-[#F57C00]/20">
+                <Dialog
+                    open={isPhoneDialogOpen}
+                    onOpenChange={(open) => {
+                        if (phoneForm.processing) {
+                            return;
+                        }
+
+                        setIsPhoneDialogOpen(open);
+                    }}
+                >
+                    <DialogContent className="top-auto right-0 bottom-0 left-0 w-full max-w-none translate-x-0 translate-y-0 rounded-t-2xl rounded-b-none border-zinc-200 bg-white p-6 sm:top-[50%] sm:right-auto sm:bottom-auto sm:left-[50%] sm:w-full sm:max-w-md sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-2xl">
+                        <DialogHeader>
+                            <DialogTitle className="flex items-center gap-2 text-[#212121]">
+                                <Phone className="size-5 text-[#F57C00]" />
+                                Add your phone number
+                            </DialogTitle>
+                            <DialogDescription className="text-[#757575]">
+                                become our customer and receive real-time updates via SMS.
+                            </DialogDescription>
+                        </DialogHeader>
+
+                        <form
+                            className="space-y-3"
+                            onSubmit={(event) => {
+                                event.preventDefault();
+                                submitTablePhone();
+                            }}
+                        >
+                            <Input
+                                className="h-11 rounded-xl border-zinc-200 focus:ring-[#F57C00]"
+                                value={phoneForm.data.phone}
+                                onChange={(event) => phoneForm.setData('phone', event.target.value)}
+                                placeholder="251 9XX XXX XXX"
+                            />
+                            <InputError message={phoneForm.errors.phone} />
+
+                            <DialogFooter>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    className="rounded-xl"
+                                    disabled={phoneForm.processing}
+                                    onClick={() => setIsPhoneDialogOpen(false)}
+                                >
+                                    Skip
+                                </Button>
+                                <Button
+                                    type="submit"
+                                    className="rounded-xl bg-[#F57C00] text-white hover:bg-[#E65100]"
+                                    disabled={phoneForm.processing || phoneForm.data.phone.trim() === ''}
+                                >
+                                    {phoneForm.processing ? 'Saving...' : 'Save Phone'}
+                                </Button>
+                            </DialogFooter>
+                        </form>
+                    </DialogContent>
+                </Dialog>
+
                 <main className="mx-auto max-w-2xl px-4 py-12 md:py-20">
                     {/* Success Header Area */}
                     <div className="mb-12 text-center animate-in fade-in zoom-in duration-700">
@@ -81,10 +166,33 @@ export default function Confirmation({ order }: { order: Order }) {
                         <p className="mt-4 text-lg text-[#757575]">
                             We've received your order <span className="font-bold text-[#212121]">#{order.id}</span>
                         </p>
-                        <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-medium text-[#757575] shadow-sm ring-1 ring-zinc-100">
-                            <span className="h-2 w-2 rounded-full bg-[#2E7D32] animate-pulse"></span>
-                            Sent tracking link to {order.customer.phone}
-                        </div>
+                        {savedPhone !== '' ? (
+                            <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-medium text-[#757575] shadow-sm ring-1 ring-zinc-100">
+                                <span className="h-2 w-2 rounded-full bg-[#2E7D32] animate-pulse"></span>
+                                {order.source_channel === 'table'
+                                    ? `SMS updates will be sent to ${savedPhone}`
+                                    : `Sent tracking link to ${savedPhone}`}
+                            </div>
+                        ) : (
+                            <div className="mt-6 space-y-2">
+                                <div className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-medium text-[#757575] shadow-sm ring-1 ring-zinc-100">
+                                    <span className="h-2 w-2 rounded-full bg-amber-500"></span>
+                                    Add your phone number to receive SMS updates.
+                                </div>
+                                {order.source_channel === 'table' && (
+                                    <div>
+                                        <Button
+                                            type="button"
+                                            variant="link"
+                                            className="h-auto p-0 text-sm font-bold text-[#F57C00] hover:text-[#E65100]"
+                                            onClick={() => setIsPhoneDialogOpen(true)}
+                                        >
+                                            Add phone now
+                                        </Button>
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
 
                     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200">

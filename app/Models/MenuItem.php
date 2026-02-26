@@ -40,6 +40,7 @@ class MenuItem extends Model
         'category',
         'image_url',
         'is_active',
+        'is_featured',
         'visibility_channels',
     ];
 
@@ -62,6 +63,7 @@ class MenuItem extends Model
         return [
             'price' => 'decimal:2',
             'is_active' => 'boolean',
+            'is_featured' => 'boolean',
             'visibility_channels' => 'array',
         ];
     }

@@ -267,7 +267,7 @@ test('customer token keeps order history between qr and web flows', function () 
 
     expect($tokenRecord)->not->toBeNull();
     expect($customer)->not->toBeNull();
-    expect($customer?->phone)->toBe('977000001');
+    expect($customer?->phone)->toBe('+251977000001');
     expect($customer?->orders()->count())->toBe(2);
     expect(
         $customer?->orders()
@@ -365,7 +365,7 @@ test('customer token merges existing phone history into token profile', function
 
     expect($customer)->not->toBeNull();
     expect($customer?->name)->toBe('Unified Profile');
-    expect($customer?->phone)->toBe('977000009');
+    expect($customer?->phone)->toBe('+251977000009');
     expect(Customer::query()->count())->toBe(1);
     expect(
         CustomerToken::query()

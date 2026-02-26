@@ -20,6 +20,7 @@ test('public menu only returns items visible in requested channel', function () 
         'price' => 120,
         'category' => 'Drinks',
         'is_active' => true,
+        'is_featured' => true,
         'visibility_channels' => ['web'],
     ]);
 
@@ -39,6 +40,7 @@ test('public menu only returns items visible in requested channel', function () 
             ->where('filters.channel', 'web')
             ->has('menuItems', 1)
             ->where('menuItems.0.id', $webItem->id)
+            ->where('menuItems.0.is_featured', true)
         );
 });
 
@@ -106,7 +108,7 @@ test('telegram menu route only returns items visible in telegram channel', funct
 test('public menu pre-fills customer details from an existing token profile', function () {
     $customer = Customer::query()->create([
         'name' => 'Returning Customer',
-        'phone' => '251911234567',
+        'phone' => '+251911234567',
     ]);
 
     $token = CustomerToken::generateToken();
@@ -124,7 +126,7 @@ test('public menu pre-fills customer details from an existing token profile', fu
             ->component('customer/menu')
             ->where('customerToken', $token)
             ->where('customerPrefill.name', 'Returning Customer')
-            ->where('customerPrefill.phone', '251911234567')
+            ->where('customerPrefill.phone', '+251911234567')
         );
 });
 
@@ -222,7 +224,7 @@ test('customers can place an order from the public menu flow', function () {
     expect($order)->not->toBeNull();
     expect($order->total_amount)->toEqual('240.00');
     expect($order->source_channel)->toBe('web');
-    expect(Customer::query()->where('phone', '911000000')->exists())->toBeTrue();
+    expect(Customer::query()->where('phone', '+251911000000')->exists())->toBeTrue();
     expect($order->items()->count())->toBe(1);
 
     $response->assertRedirect(route('orders.confirmation', $order->tracking_token, false));
