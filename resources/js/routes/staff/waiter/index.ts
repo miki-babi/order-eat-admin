@@ -85,7 +85,7 @@ index.form = indexForm
 * @see Modules/Ordering/app/Http/Controllers/Staff/WaiterBoardController.php:121
 * @route '/staff/waiter-board/orders/{order}/confirm'
 */
-export const confirm = (args: { order: string | number | { id: string | number } } | [order: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
+export const confirm = (args: { order: number | { id: number } } | [order: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
     url: confirm.url(args, options),
     method: 'patch',
 })
@@ -100,7 +100,7 @@ confirm.definition = {
 * @see Modules/Ordering/app/Http/Controllers/Staff/WaiterBoardController.php:121
 * @route '/staff/waiter-board/orders/{order}/confirm'
 */
-confirm.url = (args: { order: string | number | { id: string | number } } | [order: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions) => {
+confirm.url = (args: { order: number | { id: number } } | [order: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { order: args }
     }
@@ -133,7 +133,7 @@ confirm.url = (args: { order: string | number | { id: string | number } } | [ord
 * @see Modules/Ordering/app/Http/Controllers/Staff/WaiterBoardController.php:121
 * @route '/staff/waiter-board/orders/{order}/confirm'
 */
-confirm.patch = (args: { order: string | number | { id: string | number } } | [order: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
+confirm.patch = (args: { order: number | { id: number } } | [order: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
     url: confirm.url(args, options),
     method: 'patch',
 })
@@ -143,7 +143,7 @@ confirm.patch = (args: { order: string | number | { id: string | number } } | [o
 * @see Modules/Ordering/app/Http/Controllers/Staff/WaiterBoardController.php:121
 * @route '/staff/waiter-board/orders/{order}/confirm'
 */
-const confirmForm = (args: { order: string | number | { id: string | number } } | [order: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+const confirmForm = (args: { order: number | { id: number } } | [order: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: confirm.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PATCH',
@@ -158,7 +158,7 @@ const confirmForm = (args: { order: string | number | { id: string | number } } 
 * @see Modules/Ordering/app/Http/Controllers/Staff/WaiterBoardController.php:121
 * @route '/staff/waiter-board/orders/{order}/confirm'
 */
-confirmForm.patch = (args: { order: string | number | { id: string | number } } | [order: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+confirmForm.patch = (args: { order: number | { id: number } } | [order: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: confirm.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PATCH',
@@ -175,7 +175,7 @@ confirm.form = confirmForm
 * @see Modules/Ordering/app/Http/Controllers/Staff/WaiterBoardController.php:222
 * @route '/staff/waiter-board/orders/{order}/serve'
 */
-export const serve = (args: { order: string | number | { id: string | number } } | [order: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
+export const serve = (args: { order: number | { id: number } } | [order: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
     url: serve.url(args, options),
     method: 'patch',
 })
@@ -190,7 +190,7 @@ serve.definition = {
 * @see Modules/Ordering/app/Http/Controllers/Staff/WaiterBoardController.php:222
 * @route '/staff/waiter-board/orders/{order}/serve'
 */
-serve.url = (args: { order: string | number | { id: string | number } } | [order: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions) => {
+serve.url = (args: { order: number | { id: number } } | [order: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { order: args }
     }
@@ -223,7 +223,7 @@ serve.url = (args: { order: string | number | { id: string | number } } | [order
 * @see Modules/Ordering/app/Http/Controllers/Staff/WaiterBoardController.php:222
 * @route '/staff/waiter-board/orders/{order}/serve'
 */
-serve.patch = (args: { order: string | number | { id: string | number } } | [order: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
+serve.patch = (args: { order: number | { id: number } } | [order: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
     url: serve.url(args, options),
     method: 'patch',
 })
@@ -233,7 +233,7 @@ serve.patch = (args: { order: string | number | { id: string | number } } | [ord
 * @see Modules/Ordering/app/Http/Controllers/Staff/WaiterBoardController.php:222
 * @route '/staff/waiter-board/orders/{order}/serve'
 */
-const serveForm = (args: { order: string | number | { id: string | number } } | [order: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+const serveForm = (args: { order: number | { id: number } } | [order: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: serve.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PATCH',
@@ -248,7 +248,7 @@ const serveForm = (args: { order: string | number | { id: string | number } } | 
 * @see Modules/Ordering/app/Http/Controllers/Staff/WaiterBoardController.php:222
 * @route '/staff/waiter-board/orders/{order}/serve'
 */
-serveForm.patch = (args: { order: string | number | { id: string | number } } | [order: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+serveForm.patch = (args: { order: number | { id: number } } | [order: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: serve.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PATCH',

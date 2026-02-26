@@ -4,7 +4,7 @@ import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFo
 * @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:635
 * @route '/staff/sms-notification-settings/{smsNotificationSetting}'
 */
-export const update = (args: { smsNotificationSetting: string | number | { id: string | number } } | [smsNotificationSetting: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
+export const update = (args: { smsNotificationSetting: number | { id: number } } | [smsNotificationSetting: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
     url: update.url(args, options),
     method: 'put',
 })
@@ -19,7 +19,7 @@ update.definition = {
 * @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:635
 * @route '/staff/sms-notification-settings/{smsNotificationSetting}'
 */
-update.url = (args: { smsNotificationSetting: string | number | { id: string | number } } | [smsNotificationSetting: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions) => {
+update.url = (args: { smsNotificationSetting: number | { id: number } } | [smsNotificationSetting: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { smsNotificationSetting: args }
     }
@@ -52,7 +52,7 @@ update.url = (args: { smsNotificationSetting: string | number | { id: string | n
 * @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:635
 * @route '/staff/sms-notification-settings/{smsNotificationSetting}'
 */
-update.put = (args: { smsNotificationSetting: string | number | { id: string | number } } | [smsNotificationSetting: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
+update.put = (args: { smsNotificationSetting: number | { id: number } } | [smsNotificationSetting: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
     url: update.url(args, options),
     method: 'put',
 })
@@ -62,7 +62,7 @@ update.put = (args: { smsNotificationSetting: string | number | { id: string | n
 * @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:635
 * @route '/staff/sms-notification-settings/{smsNotificationSetting}'
 */
-const updateForm = (args: { smsNotificationSetting: string | number | { id: string | number } } | [smsNotificationSetting: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+const updateForm = (args: { smsNotificationSetting: number | { id: number } } | [smsNotificationSetting: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: update.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PUT',
@@ -77,7 +77,7 @@ const updateForm = (args: { smsNotificationSetting: string | number | { id: stri
 * @see Modules/Messaging/app/Http/Controllers/Staff/SmsTemplateController.php:635
 * @route '/staff/sms-notification-settings/{smsNotificationSetting}'
 */
-updateForm.put = (args: { smsNotificationSetting: string | number | { id: string | number } } | [smsNotificationSetting: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+updateForm.put = (args: { smsNotificationSetting: number | { id: number } } | [smsNotificationSetting: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: update.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PUT',
