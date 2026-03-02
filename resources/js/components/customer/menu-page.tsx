@@ -1,4 +1,4 @@
-import { Head, useForm, usePage } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { ArrowRight, CheckCircle2, ChevronLeft, ChevronRight, Clock3, ExternalLink, MapPin, Search, ShoppingCart, SparkleIcon, Upload, X } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import InputError from '@/components/input-error';
@@ -887,6 +887,23 @@ export default function CustomerMenuPage({
                 )}
 
                 <main className="mx-auto w-full max-w-7xl px-4 py-8 md:px-8 pb-32 md:pb-12">
+                    <div className="mb-6 grid gap-3 md:grid-cols-2">
+                        <Link
+                            href="/cakes"
+                            className="rounded-2xl border border-zinc-200 bg-white p-4 text-sm font-bold text-[#212121] shadow-sm transition hover:border-[#F57C00]/40 hover:shadow"
+                        >
+                            Cake Preordering
+                            <p className="mt-1 text-xs font-medium text-zinc-500">Browse cakes and submit customized preorders.</p>
+                        </Link>
+                        <Link
+                            href="/catering"
+                            className="rounded-2xl border border-zinc-200 bg-white p-4 text-sm font-bold text-[#212121] shadow-sm transition hover:border-[#F57C00]/40 hover:shadow"
+                        >
+                            Catering Services
+                            <p className="mt-1 text-xs font-medium text-zinc-500">Explore catering packages and request event support.</p>
+                        </Link>
+                    </div>
+
                     {/* Material Step Tracker */}
                     <div className={`sticky top-[0px] z-40 mb-6 overflow-hidden rounded-2xl bg-white p-1.5 shadow-lg ring-1 ring-zinc-100 transition-all duration-300 md:relative md:top-0 md:bg-white md:p-1 md:shadow-md md:translate-y-0 md:opacity-100 md:pointer-events-auto ${hideTopChrome ? '-translate-y-[130%] opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}`}>
                         <div className="flex flex-row items-center gap-1">

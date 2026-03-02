@@ -11,7 +11,7 @@ import {
     SidebarMenu,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import type { NavItem } from '@/types';
+import type { NavGroup, NavItem } from '@/types';
 import AppLogo from './app-logo';
 
 const footerNavItems: NavItem[] = [
@@ -39,47 +39,82 @@ export function AppSidebar() {
     const isSystemAdmin = Boolean(auth?.user?.is_system_admin);
     const can = (permissionSlug: string): boolean => isAdmin || permissionSlugs.includes(permissionSlug);
 
-    const mainNavItems: NavItem[] = [
-        ...(can('orders.view')
-            ? [{ title: 'Order Queue', href: '/staff/orders', icon: ClipboardList }]
-            : []),
-        ...(can('orders.view')
-            ? [{ title: 'Waiter Board', href: '/staff/waiter-board', icon: ConciergeBell }]
-            : []),
-        ...(can('orders.view')
-            ? [{ title: 'Kitchen Board', href: '/staff/kitchen-board', icon: UtensilsCrossed }]
-            : []),
-        ...(can('orders.view')
-            ? [{ title: 'Cashier Board', href: '/staff/cashier-board', icon: Wallet }]
-            : []),
-        ...(can('customers.view')
-            ? [{ title: 'Customers', href: '/staff/customers', icon: Users }]
-            : []),
-        ...(can('pickup_locations.manage')
-            ? [{ title: 'Branch Locations', href: '/staff/pickup-locations', icon: MapPin }]
-            : []),
-        ...(can('pickup_locations.manage')
-            ? [{ title: 'Table Managment', href: '/staff/table-qr', icon: QrCode }]
-            : []),
-        ...(can('branches.assign')
-            ? [{ title: 'Screen Routing', href: '/staff/screens', icon: MonitorSmartphone }]
-            : []),
-        ...(can('menu_items.manage')
-            ? [{ title: 'Menu Catalog', href: '/staff/menu-items', icon: Coffee }]
-            : []),
-        ...(can('reports.view')
-            ? [{ title: 'Insights & Ops', href: '/staff/reports', icon: BarChart3 }]
-            : []),
-        ...(can('sms_templates.manage')
-            ? [{ title: 'Outreach Lab', href: '/staff/sms-templates', icon: MessageSquareText }]
-            : []),
-        ...(can('users.manage') || can('roles.manage') || can('permissions.manage')
-            ? [{ title: 'Gatekeeper', href: '/staff/access-control', icon: KeyRound }]
-            : []),
-        ...(isSystemAdmin
-            ? [{ title: 'System Admin', href: '/__system-admin/dashboard', icon: Shield }]
-            : []),
+    const mainNavGroups: NavGroup[] = [
+        {
+            label: 'Order Flow',
+            items: [
+                ...(can('orders.view')
+                    ? [{ title: 'Order Queue', href: '/staff/orders', icon: ClipboardList }]
+                    : []),
+                ...(can('orders.view')
+                    ? [{ title: 'Waiter Board', href: '/staff/waiter-board', icon: ConciergeBell }]
+                    : []),
+                ...(can('orders.view')
+                    ? [{ title: 'Kitchen Board', href: '/staff/kitchen-board', icon: UtensilsCrossed }]
+                    : []),
+                ...(can('orders.view')
+                    ? [{ title: 'Cashier Board', href: '/staff/cashier-board', icon: Wallet }]
+                    : []),
+                ...(can('orders.view')
+                    ? [{ title: 'Cake Preorders', href: '/staff/cake-preorders', icon: Coffee }]
+                    : []),
+                ...(can('orders.view')
+                    ? [{ title: 'Catering Requests', href: '/staff/catering-requests', icon: UtensilsCrossed }]
+                    : []),
+            ],
+        },
+        {
+            label: 'Catalog & Brand',
+            items: [
+                ...(can('menu_items.manage')
+                    ? [{ title: 'Menu Catalog', href: '/staff/menu-items', icon: Coffee }]
+                    : []),
+                ...(can('menu_items.manage')
+                    ? [{ title: 'Business Settings', href: '/staff/business-settings', icon: Store }]
+                    : []),
+            ],
+        },
+        {
+            label: 'Operations',
+            items: [
+                ...(can('customers.view')
+                    ? [{ title: 'Customers', href: '/staff/customers', icon: Users }]
+                    : []),
+                ...(can('pickup_locations.manage')
+                    ? [{ title: 'Branch Locations', href: '/staff/pickup-locations', icon: MapPin }]
+                    : []),
+                ...(can('pickup_locations.manage')
+                    ? [{ title: 'Table Management', href: '/staff/table-qr', icon: QrCode }]
+                    : []),
+                ...(can('branches.assign')
+                    ? [{ title: 'Screen Routing', href: '/staff/screens', icon: MonitorSmartphone }]
+                    : []),
+            ],
+        },
+        {
+            label: 'Insights & Messaging',
+            items: [
+                ...(can('reports.view')
+                    ? [{ title: 'Insights & Ops', href: '/staff/reports', icon: BarChart3 }]
+                    : []),
+                ...(can('sms_templates.manage')
+                    ? [{ title: 'Outreach Lab', href: '/staff/sms-templates', icon: MessageSquareText }]
+                    : []),
+            ],
+        },
+        {
+            label: 'Administration',
+            items: [
+                ...(can('users.manage') || can('roles.manage') || can('permissions.manage')
+                    ? [{ title: 'Gatekeeper', href: '/staff/access-control', icon: KeyRound }]
+                    : []),
+                ...(isSystemAdmin
+                    ? [{ title: 'System Admin', href: '/__system-admin/dashboard', icon: Shield }]
+                    : []),
+            ],
+        },
     ];
+    const mainNavItems = mainNavGroups.flatMap((group) => group.items);
 
     const homeHref = isSystemAdmin
         ? '/__system-admin/dashboard'
@@ -98,7 +133,7 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent className="flex-1">
-                <NavMain items={mainNavItems} />
+                <NavMain groups={mainNavGroups} />
             </SidebarContent>
 
             <SidebarFooter className="p-4 space-y-4 border-t border-zinc-100/50">

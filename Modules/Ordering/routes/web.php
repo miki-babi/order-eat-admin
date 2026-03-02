@@ -1,9 +1,14 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Modules\Ordering\Http\Controllers\CakePreorderController;
+use Modules\Ordering\Http\Controllers\CateringServiceController;
 use Modules\Ordering\Http\Controllers\OrderController;
 use Modules\Ordering\Http\Controllers\QrMenuController;
+use Modules\Ordering\Http\Controllers\Staff\CakePreorderController as StaffCakePreorderController;
+use Modules\Ordering\Http\Controllers\Staff\BusinessSettingsController;
 use Modules\Ordering\Http\Controllers\Staff\CashierBoardController;
+use Modules\Ordering\Http\Controllers\Staff\CateringRequestController as StaffCateringRequestController;
 use Modules\Ordering\Http\Controllers\Staff\KitchenBoardController;
 use Modules\Ordering\Http\Controllers\Staff\OrderController as StaffOrderController;
 use Modules\Ordering\Http\Controllers\Staff\WaiterBoardController;
@@ -17,6 +22,18 @@ Route::get('/telegram/menu', [OrderController::class, 'telegramMenu'])
 Route::get('/telegram/orders', [OrderController::class, 'telegramOrders'])
     ->middleware('feature:customer_order_tracking')
     ->name('telegram.orders');
+Route::get('/cakes', [CakePreorderController::class, 'index'])
+    ->middleware('feature:customer_cake_preordering')
+    ->name('cakes.index');
+Route::post('/cakes/preorders', [CakePreorderController::class, 'store'])
+    ->middleware('feature:customer_cake_preordering')
+    ->name('cakes.preorders.store');
+Route::get('/catering', [CateringServiceController::class, 'index'])
+    ->middleware('feature:customer_catering_requests')
+    ->name('catering.index');
+Route::post('/catering/requests', [CateringServiceController::class, 'store'])
+    ->middleware('feature:customer_catering_requests')
+    ->name('catering.requests.store');
 Route::get('/qr-menu/{diningTable:qr_code}', [QrMenuController::class, 'show'])
     ->middleware('feature:customer_qr_menu')
     ->name('qr-menu.show');
@@ -71,4 +88,43 @@ Route::middleware(['auth', 'verified', 'staff'])
         Route::get('cashier-board', [CashierBoardController::class, 'index'])
             ->middleware(['permission:orders.view', 'feature:staff_cashier_board'])
             ->name('cashier.index');
+
+        Route::get('cake-preorders', [StaffCakePreorderController::class, 'index'])
+            ->middleware(['permission:orders.view', 'feature:staff_cake_preorders'])
+            ->name('cake-preorders.index');
+        Route::post('cake-packages', [StaffCakePreorderController::class, 'storePackage'])
+            ->middleware(['permission:menu_items.manage', 'feature:staff_cake_preorders'])
+            ->name('cake-packages.store');
+        Route::put('cake-packages/{cakePackage}', [StaffCakePreorderController::class, 'updatePackage'])
+            ->middleware(['permission:menu_items.manage', 'feature:staff_cake_preorders'])
+            ->name('cake-packages.update');
+        Route::delete('cake-packages/{cakePackage}', [StaffCakePreorderController::class, 'destroyPackage'])
+            ->middleware(['permission:menu_items.manage', 'feature:staff_cake_preorders'])
+            ->name('cake-packages.destroy');
+        Route::patch('cake-preorders/{cakePreorder}/status', [StaffCakePreorderController::class, 'updatePreorderStatus'])
+            ->middleware(['permission:orders.update', 'feature:staff_cake_preorders'])
+            ->name('cake-preorders.status');
+
+        Route::get('catering-requests', [StaffCateringRequestController::class, 'index'])
+            ->middleware(['permission:orders.view', 'feature:staff_catering_requests'])
+            ->name('catering-requests.index');
+        Route::post('catering-packages', [StaffCateringRequestController::class, 'storePackage'])
+            ->middleware(['permission:menu_items.manage', 'feature:staff_catering_requests'])
+            ->name('catering-packages.store');
+        Route::put('catering-packages/{cateringPackage}', [StaffCateringRequestController::class, 'updatePackage'])
+            ->middleware(['permission:menu_items.manage', 'feature:staff_catering_requests'])
+            ->name('catering-packages.update');
+        Route::delete('catering-packages/{cateringPackage}', [StaffCateringRequestController::class, 'destroyPackage'])
+            ->middleware(['permission:menu_items.manage', 'feature:staff_catering_requests'])
+            ->name('catering-packages.destroy');
+        Route::patch('catering-requests/{cateringServiceRequest}/status', [StaffCateringRequestController::class, 'updateRequestStatus'])
+            ->middleware(['permission:orders.update', 'feature:staff_catering_requests'])
+            ->name('catering-requests.status');
+
+        Route::get('business-settings', [BusinessSettingsController::class, 'index'])
+            ->middleware(['permission:menu_items.manage'])
+            ->name('business-settings.index');
+        Route::patch('business-settings', [BusinessSettingsController::class, 'update'])
+            ->middleware(['permission:menu_items.manage'])
+            ->name('business-settings.update');
     });

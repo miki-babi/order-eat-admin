@@ -14,6 +14,11 @@ import orders from './orders'
 import waiter from './waiter'
 import kitchen from './kitchen'
 import cashier from './cashier'
+import cakePreorders from './cake-preorders'
+import cakePackages from './cake-packages'
+import cateringRequests from './catering-requests'
+import cateringPackages from './catering-packages'
+import businessSettings from './business-settings'
 import reports from './reports'
 
 const staff = {
@@ -33,6 +38,11 @@ const staff = {
     waiter: Object.assign(waiter, waiter),
     kitchen: Object.assign(kitchen, kitchen),
     cashier: Object.assign(cashier, cashier),
+    cakePreorders: Object.assign(cakePreorders, cakePreorders),
+    cakePackages: Object.assign(cakePackages, cakePackages),
+    cateringRequests: Object.assign(cateringRequests, cateringRequests),
+    cateringPackages: Object.assign(cateringPackages, cateringPackages),
+    businessSettings: Object.assign(businessSettings, businessSettings),
     reports: Object.assign(reports, reports),
 }
 
