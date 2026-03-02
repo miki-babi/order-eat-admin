@@ -1,9 +1,28 @@
-import { Head, Link, router, useForm } from '@inertiajs/react';
-import { ArrowRight, ChevronLeft, ChevronRight, ClipboardList, Clock3, Coffee, Filter, Receipt, Search, MapPin } from 'lucide-react';
+import {
+    ChevronDown,
+    ChevronUp,
+    MoreHorizontal,
+    ArrowRight,
+    ChevronLeft,
+    ChevronRight,
+    ClipboardList,
+    Clock3,
+    Coffee,
+    Filter,
+    Receipt,
+    Search,
+    MapPin,
+    RotateCcw
+} from 'lucide-react';
 import { useState, type FormEvent } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
+} from '@/components/ui/collapsible';
 import {
     Dialog,
     DialogContent,
@@ -12,9 +31,19 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+    DropdownMenuSeparator,
+    DropdownMenuLabel,
+} from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
+import { Head, Link, useForm, usePage, router } from '@inertiajs/react';
 import type { BreadcrumbItem } from '@/types';
 
 type OrderItem = {
@@ -152,13 +181,21 @@ export default function StaffOrders({
     sourceSummary: SourceSummary;
     summary: Summary;
 }) {
+    const [expandedCards, setExpandedCards] = useState<number[]>([]);
+    const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+    const [updatingOrderId, setUpdatingOrderId] = useState<number | null>(null);
     const [approveDialogOrder, setApproveDialogOrder] = useState<OrderRow | null>(null);
     const [approveNotifyCustomer, setApproveNotifyCustomer] = useState(true);
     const [disapproveDialogOrder, setDisapproveDialogOrder] = useState<OrderRow | null>(null);
     const [disapprovalReason, setDisapprovalReason] = useState('');
     const [disapproveNotifyCustomer, setDisapproveNotifyCustomer] = useState(true);
     const [disapprovalError, setDisapprovalError] = useState<string | null>(null);
-    const [updatingOrderId, setUpdatingOrderId] = useState<number | null>(null);
+
+    const toggleCard = (orderId: number) => {
+        setExpandedCards(prev =>
+            prev.includes(orderId) ? prev.filter(id => id !== orderId) : [...prev, orderId]
+        );
+    };
 
     const form = useForm({
         search: filters.search ?? '',
@@ -346,285 +383,321 @@ export default function StaffOrders({
                     </Card>
                 </div>
 
-                {/* 📌 Section 2 — Filter Panel */}
-                <Card className="border-none shadow-md ring-1 ring-zinc-200">
-                    <CardHeader className="border-b border-zinc-100 bg-zinc-50/50 py-4">
-                        <CardTitle className="flex items-center gap-2 text-sm font-black uppercase tracking-widest text-[#212121]">
-                            <Filter className="size-4 text-[#F57C00]" />
-                            Filters
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent className="pt-6">
-                        <div className="mb-5 flex flex-wrap gap-2">
-                            {sourceTabs.map((source) => {
-                                const active = form.data.source_channel === source;
-
+                {/* 📌 Section 2 — Filters & Tabs */}
+                <div className="space-y-4">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="flex bg-white p-1 rounded-xl ring-1 ring-zinc-200 w-fit">
+                            {[
+                                { label: 'Pending', value: 'pending' },
+                                { label: 'In Progress', value: 'preparing,ready' },
+                                { label: 'Completed', value: 'completed' },
+                                { label: 'All', value: '' }
+                            ].map((tab) => {
+                                const isActive = form.data.status === tab.value || (tab.value === '' && form.data.status === '');
                                 return (
                                     <Button
-                                        key={source}
-                                        type="button"
+                                        key={tab.label}
+                                        variant="ghost"
                                         size="sm"
-                                        variant={active ? 'default' : 'outline'}
-                                        className={`rounded-full px-4 text-xs font-black uppercase tracking-widest transition-all ${
-                                            active
-                                                ? 'bg-[#F57C00] text-white shadow-lg shadow-[#F57C00]/20 hover:bg-[#E65100]'
-                                                : 'border-zinc-200 text-zinc-600 hover:bg-zinc-50'
-                                        }`}
-                                        onClick={() => selectSourceTab(source)}
+                                        onClick={() => {
+                                            form.setData('status', tab.value);
+                                            router.get('/staff/orders', { ...form.data, status: tab.value }, { preserveState: true, replace: true });
+                                        }}
+                                        className={`rounded-lg px-6 h-9 text-xs font-bold transition-all ${isActive
+                                            ? 'bg-[#F57C00] text-white shadow-md hover:bg-[#E65100] hover:text-white'
+                                            : 'text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900'
+                                            }`}
                                     >
-                                        {sourceLabel[source]} ({sourceSummary[source]})
+                                        {tab.label}
                                     </Button>
                                 );
                             })}
                         </div>
-                        <form className="grid gap-6 md:grid-cols-4 lg:grid-cols-6" onSubmit={applyFilters}>
-                            <div className="lg:col-span-2">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]" htmlFor="search">Search</Label>
-                                <div className="relative mt-1.5">
-                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-400" />
-                                    <Input
-                                        id="search"
-                                        className="h-11 pl-10 rounded-xl border-zinc-200 focus:ring-[#F57C00] transition-all"
-                                        value={form.data.search}
-                                        onChange={(event) => form.setData('search', event.target.value)}
-                                        placeholder="Order ID, customer, phone, table..."
-                                    />
-                                </div>
-                            </div>
-                            <div>
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]" htmlFor="status">Order Status</Label>
-                                <select
-                                    id="status"
-                                    className="mt-1.5 h-11 w-full rounded-xl border border-zinc-200 bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#F57C00]/20 transition-all font-medium"
-                                    value={form.data.status}
-                                    onChange={(event) => form.setData('status', event.target.value)}
-                                >
-                                    <option value="">All Statuses</option>
-                                    {statusOptions.map((status) => (
-                                        <option key={status} value={status}>
-                                            {status.charAt(0).toUpperCase() + status.slice(1)}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div>
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]" htmlFor="receipt_status">Receipt</Label>
-                                <select
-                                    id="receipt_status"
-                                    className="mt-1.5 h-11 w-full rounded-xl border border-zinc-200 bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#F57C00]/20 transition-all font-medium"
-                                    value={form.data.receipt_status}
-                                    onChange={(event) =>
-                                        form.setData('receipt_status', event.target.value)
-                                    }
-                                >
-                                    <option value="">All Receipts</option>
-                                    {receiptStatusOptions.map((status) => (
-                                        <option key={status} value={status}>
-                                            {status.charAt(0).toUpperCase() + status.slice(1)}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div>
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]" htmlFor="date">Date</Label>
-                                <Input
-                                    id="date"
-                                    type="date"
-                                    className="mt-1.5 h-11 rounded-xl border-zinc-200 focus:ring-[#F57C00] transition-all"
-                                    value={form.data.date}
-                                    onChange={(event) => form.setData('date', event.target.value)}
-                                />
-                            </div>
-                            <div className="flex items-end gap-2 lg:col-span-1">
-                                <Button type="submit" className="h-11 flex-1 rounded-xl bg-[#F57C00] font-black shadow-lg shadow-[#F57C00]/20 hover:bg-[#E65100]">Apply</Button>
-                                <Button type="button" variant="outline" onClick={clearFilters} className="h-11 rounded-xl font-bold">Reset</Button>
-                            </div>
-                        </form>
-                    </CardContent>
-                </Card>
+
+                        <div className="flex items-center gap-2">
+                            <Collapsible open={isFiltersOpen} onOpenChange={setIsFiltersOpen}>
+                                <CollapsibleTrigger asChild>
+                                    <Button variant="outline" size="sm" className="h-11 rounded-xl gap-2 font-bold bg-white text-zinc-600 border-zinc-200 hover:bg-zinc-50">
+                                        <Filter className="size-4" />
+                                        Filters
+                                        {isFiltersOpen ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
+                                    </Button>
+                                </CollapsibleTrigger>
+                            </Collapsible>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={clearFilters}
+                                className="h-11 rounded-xl font-bold bg-white text-zinc-600 border-zinc-200 hover:bg-zinc-50"
+                            >
+                                <RotateCcw className="size-4" />
+                            </Button>
+                        </div>
+                    </div>
+
+                    <Collapsible open={isFiltersOpen}>
+                        <CollapsibleContent>
+                            <Card className="border-none shadow-md ring-1 ring-zinc-200 overflow-hidden">
+                                <CardContent className="p-6">
+                                    <div className="mb-5 flex flex-wrap gap-2">
+                                        <p className="w-full text-[10px] font-black uppercase tracking-widest text-[#9E9E9E] mb-2">Order Source</p>
+                                        {sourceTabs.map((source) => {
+                                            const active = form.data.source_channel === source;
+
+                                            return (
+                                                <Button
+                                                    key={source}
+                                                    type="button"
+                                                    size="sm"
+                                                    variant={active ? 'default' : 'outline'}
+                                                    className={`rounded-full px-4 text-[10px] font-black uppercase tracking-widest transition-all ${active
+                                                        ? 'bg-[#212121] text-white shadow-lg hover:bg-black'
+                                                        : 'border-zinc-200 text-zinc-600 hover:bg-zinc-50 font-bold'
+                                                        }`}
+                                                    onClick={() => selectSourceTab(source)}
+                                                >
+                                                    {sourceLabel[source]} ({sourceSummary[source]})
+                                                </Button>
+                                            );
+                                        })}
+                                    </div>
+                                    <form className="grid gap-6 md:grid-cols-4 lg:grid-cols-12" onSubmit={applyFilters}>
+                                        <div className="lg:col-span-5">
+                                            <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]" htmlFor="search">Search</Label>
+                                            <div className="relative mt-1.5">
+                                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-400" />
+                                                <Input
+                                                    id="search"
+                                                    className="h-11 pl-10 rounded-xl border-zinc-200 focus:ring-[#F57C00] transition-all bg-white"
+                                                    value={form.data.search}
+                                                    onChange={(event) => form.setData('search', event.target.value)}
+                                                    placeholder="Order ID, customer, phone, table..."
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="lg:col-span-3">
+                                            <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]" htmlFor="receipt_status">Receipt</Label>
+                                            <select
+                                                id="receipt_status"
+                                                className="mt-1.5 h-11 w-full rounded-xl border border-zinc-200 bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#F57C00]/20 transition-all font-bold"
+                                                value={form.data.receipt_status}
+                                                onChange={(event) =>
+                                                    form.setData('receipt_status', event.target.value)
+                                                }
+                                            >
+                                                <option value="">All Receipts</option>
+                                                {receiptStatusOptions.map((status) => (
+                                                    <option key={status} value={status}>
+                                                        {status.charAt(0).toUpperCase() + status.slice(1)}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <div className="lg:col-span-3">
+                                            <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]" htmlFor="date">Date</Label>
+                                            <Input
+                                                id="date"
+                                                type="date"
+                                                className="mt-1.5 h-11 rounded-xl border-zinc-200 focus:ring-[#F57C00] transition-all bg-white"
+                                                value={form.data.date}
+                                                onChange={(event) => form.setData('date', event.target.value)}
+                                            />
+                                        </div>
+                                        <div className="lg:col-span-1 flex items-end">
+                                            <Button type="submit" className="h-11 w-full rounded-xl bg-[#F57C00] font-black shadow-lg shadow-[#F57C00]/20 hover:bg-[#E65100]">Apply</Button>
+                                        </div>
+                                    </form>
+                                </CardContent>
+                            </Card>
+                        </CollapsibleContent>
+                    </Collapsible>
+                </div>
 
                 {/* 📌 Section 3 — Order Queue */}
                 <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                        <h2 className="flex items-center gap-2 text-lg font-black uppercase tracking-widest text-[#212121]">
+                        <h2 className="flex items-center gap-2 text-sm font-black uppercase tracking-widest text-[#212121]">
                             <ClipboardList className="size-5 text-[#F57C00]" />
                             Order Queue
                         </h2>
-                        <Badge variant="outline" className="rounded-full px-4 py-1 text-xs font-bold text-zinc-500">
+                        <Badge variant="outline" className="rounded-full px-4 py-1 text-xs font-bold text-zinc-500 bg-white">
                             {orders.total} Total Orders
                         </Badge>
                     </div>
 
                     {orders.data.length === 0 ? (
                         <Card className="border-dashed border-2 p-12 text-center bg-white shadow-none">
-                            <p className="text-zinc-500 font-medium">No orders found for current filters.</p>
+                            <p className="text-zinc-500 font-medium font-bold uppercase tracking-widest text-[10px]">No orders found for current filters.</p>
                         </Card>
                     ) : (
-                        orders.data.map((order) => (
-                            <Card key={order.id} className="overflow-hidden border-none shadow-md ring-1 ring-zinc-200 transition-all hover:ring-[#F57C00]/30 hover:shadow-xl">
-                                <div className="border-b border-zinc-100 bg-white px-6 py-4">
-                                    <div className="flex flex-wrap items-center justify-between gap-4">
-                                        <div className="flex items-center gap-4">
-                                            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#F57C00]/10 text-[#F57C00]">
-                                                <span className="text-base font-black">#{order.id}</span>
-                                            </div>
-                                            <div>
-                                                <h3 className="text-lg font-black text-[#212121]">{order.customer_name}</h3>
-                                                <p className="text-sm font-bold text-zinc-500">
-                                                    {order.customer_phone} • <span className="text-[#F57C00]">ETB {order.total_amount.toLocaleString()}</span>
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div className="flex flex-wrap items-center gap-3">
-                                            <Badge className={`rounded-full px-4 py-1 text-[10px] font-black uppercase tracking-widest shadow-none border-none ${
-                                                order.source_channel === 'web'
-                                                    ? 'bg-zinc-100 text-zinc-700'
-                                                    : order.source_channel === 'telegram'
-                                                        ? 'bg-blue-100 text-blue-700'
-                                                        : 'bg-orange-100 text-orange-700'
-                                            }`}>
-                                                {order.source_channel}
-                                            </Badge>
-                                            <Badge className={`rounded-full px-4 py-1 text-[10px] font-black uppercase tracking-widest shadow-none border-none ${badgeStyle(order.order_status)}`}>
-                                                {order.order_status}
-                                            </Badge>
-                                            <Badge className={`rounded-full px-4 py-1 text-[10px] font-black uppercase tracking-widest shadow-none border-none ${badgeStyle(order.receipt_status)}`}>
-                                                Receipt {order.receipt_status}
-                                            </Badge>
-                                            <Button variant="ghost" size="sm" asChild className="h-8 gap-2 rounded-full text-[10px] font-black uppercase tracking-widest hover:text-[#F57C00]">
-                                                <a href={order.tracking_url} target="_blank" rel="noreferrer">
-                                                    Live Tracking <ArrowRight className="size-3" />
-                                                </a>
-                                            </Button>
-                                        </div>
-                                    </div>
-                                </div>
+                        <div className="grid gap-3">
+                            {orders.data.map((order) => {
+                                const isExpanded = expandedCards.includes(order.id);
 
-                                <CardContent className="p-6">
-                                    <div className="grid gap-8 lg:grid-cols-12">
-                                        {/* Order Details List */}
-                                        <div className="lg:col-span-5 space-y-4">
-                                            <h4 className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">Order Items</h4>
-                                            <div className="space-y-3">
-                                                {order.items.map((item) => (
-                                                    <div key={item.id} className="flex items-center justify-between rounded-xl bg-zinc-50 p-3 ring-1 ring-zinc-100">
-                                                        <div className="flex items-center gap-3">
-                                                            <div className="size-10 shrink-0 overflow-hidden rounded-lg border bg-white shadow-sm">
-                                                                {item.image_url ? (
-                                                                    <img src={item.image_url} alt={item.name ?? 'Item'} className="h-full w-full object-cover" />
-                                                                ) : (
-                                                                    <div className="flex h-full w-full items-center justify-center bg-zinc-50 text-[8px] font-bold uppercase text-zinc-400">Prep</div>
-                                                                )}
-                                                            </div>
-                                                            <div>
-                                                                <p className="text-sm font-bold text-[#212121]">{item.name}</p>
-                                                                <p className="text-xs font-medium text-zinc-500">Qty: {item.quantity}</p>
-                                                            </div>
-                                                        </div>
-                                                        <span className="text-sm font-black text-[#212121]">{currency(item.line_total)}</span>
+                                return (
+                                    <Card key={order.id} className="overflow-hidden border-none shadow-sm ring-1 ring-zinc-200 transition-all hover:ring-[#F57C00]/30 bg-white rounded-2xl">
+                                        <div className="p-4 flex items-center justify-between gap-4">
+                                            <div className="flex items-center gap-4 flex-1 min-w-0">
+                                                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#F57C00]/10 text-[#F57C00] shrink-0">
+                                                    <span className="text-sm font-black">#{order.id}</span>
+                                                </div>
+                                                <div className="truncate">
+                                                    <h3 className="text-base font-black text-[#212121] truncate">{order.customer_name}</h3>
+                                                    <div className="flex items-center gap-2 mt-0.5">
+                                                        <span className="text-xs font-bold text-[#F57C00]">ETB {order.total_amount.toLocaleString()}</span>
+                                                        <span className="text-zinc-300">•</span>
+                                                        <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-tight">{order.source_channel}</span>
                                                     </div>
-                                                ))}
+                                                </div>
                                             </div>
-                                            <div className="pt-2">
-                                                <p className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">
-                                                    <MapPin className="size-3" />
-                                                    {order.pickup_location} • {order.pickup_date}
-                                                </p>
-                                                {order.table_name ? (
-                                                    <div className="mt-2 flex flex-wrap items-center gap-2">
-                                                        <Badge className="bg-zinc-100 text-zinc-700">
-                                                            Table {order.table_name}
-                                                        </Badge>
-                                                        <Badge className={order.table_session_verified ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}>
-                                                            Session {order.table_session_verified ? 'Verified' : 'Unverified'}
-                                                        </Badge>
-                                                        {order.table_session_token_short ? (
-                                                            <span className="text-[10px] font-mono text-zinc-500">
-                                                                {order.table_session_token_short}...
-                                                            </span>
-                                                        ) : null}
-                                                    </div>
-                                                ) : null}
-                                            </div>
-                                        </div>
 
-                                        {/* Action Controls */}
-                                        <div className="lg:col-span-7 space-y-6 lg:border-l lg:border-zinc-100 lg:pl-8">
-                                            <div className="grid gap-6 md:grid-cols-2">
-                                                <div className="space-y-3">
-                                                    <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">Order Status</Label>
-                                                    <select
-                                                        className="h-11 w-full rounded-xl border border-zinc-200 bg-white px-3 text-sm font-bold text-[#212121] focus:ring-2 focus:ring-[#F57C00]/20 outline-none transition-all"
-                                                        value={order.order_status}
-                                                        disabled={updatingOrderId === order.id}
-                                                        onChange={(event) =>
-                                                            updateOrder(order.id, {
-                                                                order_status: event.target.value,
-                                                            })
-                                                        }
-                                                    >
-                                                        {statusOptions.map((status) => (
-                                                            <option key={status} value={status}>
-                                                                {status.charAt(0).toUpperCase() + status.slice(1)}
-                                                            </option>
+                                            <div className="flex items-center gap-2 shrink-0">
+                                                <div className="hidden sm:flex items-center gap-2">
+                                                    <Badge className={`rounded-full px-3 py-0.5 text-[9px] font-black uppercase tracking-tight shadow-none border-none ${badgeStyle(order.order_status)}`}>
+                                                        {order.order_status}
+                                                    </Badge>
+                                                    <Badge className={`rounded-full px-3 py-0.5 text-[9px] font-black uppercase tracking-tight shadow-none border-none ${badgeStyle(order.receipt_status)}`}>
+                                                        {order.receipt_status === 'approved' ? 'Paid' : order.receipt_status === 'disapproved' ? 'Rejected' : 'Unpaid'}
+                                                    </Badge>
+                                                </div>
+
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-zinc-100">
+                                                            <MoreHorizontal className="size-5 text-zinc-500" />
+                                                        </Button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent align="end" className="w-56 rounded-xl p-2 shadow-xl border-zinc-100">
+                                                        <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">Change Status</DropdownMenuLabel>
+                                                        {statusOptions.map((st) => (
+                                                            <DropdownMenuItem
+                                                                key={st}
+                                                                disabled={order.order_status === st || updatingOrderId === order.id}
+                                                                onClick={() => updateOrder(order.id, { order_status: st })}
+                                                                className="rounded-lg font-bold text-sm capitalize"
+                                                            >
+                                                                Mark as {st}
+                                                            </DropdownMenuItem>
                                                         ))}
-                                                    </select>
-                                                </div>
-                                                <div className="space-y-3">
-                                                    <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">Receipt Status</Label>
-                                                    <div className="grid grid-cols-2 gap-2">
-                                                        <Button
-                                                            size="sm"
-                                                            className={`h-11 rounded-xl font-bold shadow-sm transition-all ${order.receipt_status === 'approved' ? 'bg-emerald-600 text-white' : 'bg-white border-zinc-200 text-[#212121] hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200'}`}
-                                                            variant={order.receipt_status === 'approved' ? 'default' : 'outline'}
-                                                            disabled={updatingOrderId === order.id}
-                                                            onClick={() => openApproveDialog(order)}
-                                                        >
-                                                            Approve
-                                                        </Button>
-                                                        <Button
-                                                            size="sm"
-                                                            className={`h-11 rounded-xl font-bold shadow-sm transition-all ${order.receipt_status === 'disapproved' ? 'bg-rose-600 text-white' : 'bg-white border-zinc-200 text-[#212121] hover:bg-rose-50 hover:text-rose-700 hover:border-rose-200'}`}
-                                                            variant={order.receipt_status === 'disapproved' ? 'destructive' : 'outline'}
-                                                            disabled={updatingOrderId === order.id}
-                                                            onClick={() => openDisapproveDialog(order)}
-                                                        >
-                                                            Reject
-                                                        </Button>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                                        <DropdownMenuSeparator />
+                                                        <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">Receipt Actions</DropdownMenuLabel>
+                                                        {order.receipt_status !== 'approved' && (
+                                                            <DropdownMenuItem
+                                                                onClick={() => openApproveDialog(order)}
+                                                                className="rounded-lg font-bold text-sm text-emerald-600 focus:text-emerald-700 focus:bg-emerald-50"
+                                                            >
+                                                                Approve Receipt
+                                                            </DropdownMenuItem>
+                                                        )}
+                                                        {order.receipt_status !== 'disapproved' && (
+                                                            <DropdownMenuItem
+                                                                onClick={() => openDisapproveDialog(order)}
+                                                                className="rounded-lg font-bold text-sm text-rose-600 focus:text-rose-700 focus:bg-rose-50"
+                                                            >
+                                                                Reject Receipt
+                                                            </DropdownMenuItem>
+                                                        )}
+                                                        <DropdownMenuSeparator />
+                                                        <DropdownMenuItem asChild>
+                                                            <a href={order.tracking_url} target="_blank" rel="noreferrer" className="rounded-lg font-bold text-sm text-sky-600">
+                                                                Live Tracking
+                                                            </a>
+                                                        </DropdownMenuItem>
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
 
-                                            <div className="rounded-2xl bg-zinc-50 p-4 ring-1 ring-zinc-100">
-                                                <div className="flex items-center justify-between">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="rounded-xl bg-white p-2.5 shadow-sm ring-1 ring-zinc-100">
-                                                            <Receipt className={`size-5 ${order.receipt_url ? 'text-[#F57C00]' : 'text-zinc-300'}`} />
-                                                        </div>
-                                                        <div>
-                                                            <p className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">Receipt Visualization</p>
-                                                            {order.receipt_url ? (
-                                                                <a href={order.receipt_url} target="_blank" rel="noreferrer" className="text-xs font-bold text-[#F57C00] hover:underline">
-                                                                    View Payment Receipt
-                                                                </a>
-                                                            ) : (
-                                                                <p className="text-xs font-bold text-zinc-400">No receipt uploaded yet</p>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                    {order.disapproval_reason && (
-                                                        <div className="text-right">
-                                                            <p className="text-[10px] font-black uppercase tracking-widest text-rose-400">Reject Reason</p>
-                                                            <p className="text-xs font-bold text-rose-600">{order.disapproval_reason}</p>
-                                                        </div>
-                                                    )}
-                                                </div>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className={`h-9 w-9 rounded-xl transition-all ${isExpanded ? 'bg-[#F57C00]/10 text-[#F57C00]' : 'hover:bg-zinc-100 text-zinc-400'}`}
+                                                    onClick={() => toggleCard(order.id)}
+                                                >
+                                                    {isExpanded ? <ChevronUp className="size-5" /> : <ChevronDown className="size-5" />}
+                                                </Button>
                                             </div>
                                         </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        ))
+
+                                        <Collapsible open={isExpanded}>
+                                            <CollapsibleContent>
+                                                <div className="border-t border-zinc-100 bg-zinc-50/30 p-4 sm:p-6 space-y-6">
+                                                    <div className="grid gap-6 md:grid-cols-2">
+                                                        <div className="space-y-4">
+                                                            <h4 className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">Items Summary</h4>
+                                                            <div className="space-y-2">
+                                                                {order.items.map((item) => (
+                                                                    <div key={item.id} className="flex items-center justify-between rounded-xl bg-white p-3 ring-1 ring-zinc-100 shadow-sm">
+                                                                        <div className="flex items-center gap-3">
+                                                                            <div className="size-9 shrink-0 overflow-hidden rounded-lg bg-zinc-50 ring-1 ring-zinc-100">
+                                                                                {item.image_url ? (
+                                                                                    <img src={item.image_url} alt={item.name ?? 'Item'} className="h-full w-full object-cover" />
+                                                                                ) : (
+                                                                                    <div className="flex h-full w-full items-center justify-center text-[8px] font-bold uppercase text-zinc-300">Prep</div>
+                                                                                )}
+                                                                            </div>
+                                                                            <div>
+                                                                                <p className="text-xs font-bold text-[#212121]">{item.name}</p>
+                                                                                <p className="text-[10px] font-bold text-zinc-400">Quantity: {item.quantity}</p>
+                                                                            </div>
+                                                                        </div>
+                                                                        <span className="text-xs font-black text-[#212121]">{currency(item.line_total)}</span>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="space-y-4">
+                                                            <h4 className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">Delivery & Payment</h4>
+                                                            <div className="rounded-2xl bg-white p-4 ring-1 ring-zinc-100 shadow-sm space-y-4">
+                                                                <div className="flex items-start gap-3">
+                                                                    <div className="p-2 rounded-lg bg-zinc-50">
+                                                                        <MapPin className="size-4 text-zinc-400" />
+                                                                    </div>
+                                                                    <div>
+                                                                        <p className="text-[10px] font-black uppercase tracking-tight text-zinc-400">Pickup Details</p>
+                                                                        <p className="text-xs font-bold text-zinc-700 mt-0.5">{order.pickup_location} • {order.pickup_date}</p>
+                                                                        {order.table_name && (
+                                                                            <div className="mt-1 flex items-center gap-2">
+                                                                                <Badge className="bg-zinc-100 text-zinc-700 text-[9px] font-bold px-2 py-0 border-none">Table {order.table_name}</Badge>
+                                                                                <Badge className={`${order.table_session_verified ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'} text-[9px] font-bold px-2 py-0 border-none`}>
+                                                                                    {order.table_session_verified ? 'Verified' : 'Unverified'}
+                                                                                </Badge>
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+
+                                                                <div className="flex items-center justify-between border-t border-zinc-50 pt-4">
+                                                                    <div className="flex items-center gap-3">
+                                                                        <div className="p-2 rounded-lg bg-zinc-50">
+                                                                            <Receipt className={`size-4 ${order.receipt_url ? 'text-[#F57C00]' : 'text-zinc-300'}`} />
+                                                                        </div>
+                                                                        <div>
+                                                                            <p className="text-[10px] font-black uppercase tracking-tight text-zinc-400">Payment Receipt</p>
+                                                                            {order.receipt_url ? (
+                                                                                <a href={order.receipt_url} target="_blank" rel="noreferrer" className="text-xs font-bold text-[#F57C00] hover:underline">View Uploaded Image</a>
+                                                                            ) : (
+                                                                                <p className="text-xs font-bold text-zinc-300">Not Uploaded</p>
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+
+                                                                    {order.disapproval_reason && (
+                                                                        <div className="text-right">
+                                                                            <p className="text-[10px] font-black uppercase tracking-tight text-rose-400">Rejected</p>
+                                                                            <p className="text-xs font-bold text-rose-600">{order.disapproval_reason}</p>
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </CollapsibleContent>
+                                        </Collapsible>
+                                    </Card>
+                                );
+                            })}
+                        </div>
                     )}
                 </div>
 

@@ -20,7 +20,7 @@ const footerNavItems: NavItem[] = [
         href: '/',
         icon: Store,
     },
-    
+
 ];
 
 export function AppSidebar() {
@@ -41,7 +41,7 @@ export function AppSidebar() {
 
     const mainNavGroups: NavGroup[] = [
         {
-            label: 'Order Flow',
+            label: 'Orders',
             items: [
                 ...(can('orders.view')
                     ? [{ title: 'Order Queue', href: '/staff/orders', icon: ClipboardList }]
@@ -64,49 +64,44 @@ export function AppSidebar() {
             ],
         },
         {
-            label: 'Catalog & Brand',
+            label: 'Management',
             items: [
                 ...(can('menu_items.manage')
-                    ? [{ title: 'Menu Catalog', href: '/staff/menu-items', icon: Coffee }]
+                    ? [{ title: 'Catalog', href: '/staff/menu-items', icon: Coffee }]
                     : []),
-                ...(can('menu_items.manage')
-                    ? [{ title: 'Business Settings', href: '/staff/business-settings', icon: Store }]
-                    : []),
-            ],
-        },
-        {
-            label: 'Operations',
-            items: [
                 ...(can('customers.view')
                     ? [{ title: 'Customers', href: '/staff/customers', icon: Users }]
                     : []),
-                ...(can('pickup_locations.manage')
-                    ? [{ title: 'Branch Locations', href: '/staff/pickup-locations', icon: MapPin }]
-                    : []),
-                ...(can('pickup_locations.manage')
-                    ? [{ title: 'Table Management', href: '/staff/table-qr', icon: QrCode }]
-                    : []),
-                ...(can('branches.assign')
-                    ? [{ title: 'Screen Routing', href: '/staff/screens', icon: MonitorSmartphone }]
+                ...(can('sms_templates.manage')
+                    ? [{ title: 'Outreach', href: '/staff/sms-templates', icon: MessageSquareText }]
                     : []),
             ],
         },
         {
-            label: 'Insights & Messaging',
+            label: 'Reports',
             items: [
                 ...(can('reports.view')
-                    ? [{ title: 'Insights & Ops', href: '/staff/reports', icon: BarChart3 }]
-                    : []),
-                ...(can('sms_templates.manage')
-                    ? [{ title: 'Outreach Lab', href: '/staff/sms-templates', icon: MessageSquareText }]
+                    ? [{ title: 'Insights', href: '/staff/reports', icon: BarChart3 }]
                     : []),
             ],
         },
         {
-            label: 'Administration',
+            label: 'Settings',
             items: [
+                ...(can('menu_items.manage')
+                    ? [{ title: 'Business', href: '/staff/business-settings', icon: Store }]
+                    : []),
+                ...(can('pickup_locations.manage')
+                    ? [{ title: 'Branches', href: '/staff/pickup-locations', icon: MapPin }]
+                    : []),
+                ...(can('pickup_locations.manage')
+                    ? [{ title: 'Tables', href: '/staff/table-qr', icon: QrCode }]
+                    : []),
+                ...(can('branches.assign')
+                    ? [{ title: 'Screens', href: '/staff/screens', icon: MonitorSmartphone }]
+                    : []),
                 ...(can('users.manage') || can('roles.manage') || can('permissions.manage')
-                    ? [{ title: 'Gatekeeper', href: '/staff/access-control', icon: KeyRound }]
+                    ? [{ title: 'Access Control', href: '/staff/access-control', icon: KeyRound }]
                     : []),
                 ...(isSystemAdmin
                     ? [{ title: 'System Admin', href: '/__system-admin/dashboard', icon: Shield }]
