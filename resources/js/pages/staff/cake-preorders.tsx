@@ -1,8 +1,8 @@
+import { Head, Link, router, useForm } from '@inertiajs/react';
 import {
     CakeSlice,
     Clock3,
     Edit3,
-    ImagePlus,
     PackageCheck,
     Search,
     Trash2,
@@ -12,19 +12,25 @@ import {
     MoreHorizontal,
     Calendar,
     Phone,
-    User,
     Package
 } from 'lucide-react';
-import { useState, type FormEvent } from 'react';
+import { useMemo, useState, type FormEvent } from 'react';
 import InputError from '@/components/input-error';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import {
     Collapsible,
     CollapsibleContent,
-    CollapsibleTrigger,
 } from '@/components/ui/collapsible';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -35,28 +41,27 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog";
+
 import AppLayout from '@/layouts/app-layout';
-import { Head, Link, router, useForm } from '@inertiajs/react';
 import type { BreadcrumbItem } from '@/types';
 
 type CakePackageRow = {
     id: number;
+    parent_id: number | null;
+    parent_name: string | null;
     name: string;
     description: string | null;
     image_url: string | null;
-    price: number;
+    price: number | null;
     is_active: boolean;
     preorder_items_count: number;
+    sub_packages_count: number;
     updated_at: string | null;
+};
+
+type ParentPackageOption = {
+    id: number;
+    name: string;
 };
 
 type CakePreorderRow = {
@@ -113,7 +118,8 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-function currency(value: number): string {
+function currency(value: number | null | undefined): string {
+    if (value === null || value === undefined) return 'Price TBD';
     return new Intl.NumberFormat('en-ET', {
         style: 'currency',
         currency: 'ETB',
@@ -135,14 +141,15 @@ export default function CakePreorders({
     preorders,
     filters,
     statusOptions,
+    parentPackageOptions,
     canManagePackages,
-    canUpdateRequests,
     summary,
 }: {
     packages: CakePackageRow[];
     preorders: Paginated<CakePreorderRow>;
     filters: Filters;
     statusOptions: string[];
+    parentPackageOptions: ParentPackageOption[];
     canManagePackages: boolean;
     canUpdateRequests: boolean;
     summary: Summary;
@@ -164,6 +171,7 @@ export default function CakePreorders({
     });
 
     const createPackageForm = useForm({
+        parent_id: '',
         name: '',
         description: '',
         image: null as File | null,
@@ -173,12 +181,18 @@ export default function CakePreorders({
 
     const editPackageForm = useForm({
         _method: 'put',
+        parent_id: '',
         name: '',
         description: '',
         image: null as File | null,
         price: '',
         is_active: true,
     });
+
+    const editParentOptions = useMemo(
+        () => parentPackageOptions.filter((option) => option.id !== editingPackage?.id),
+        [parentPackageOptions, editingPackage?.id],
+    );
 
     const applyFilters = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -206,6 +220,7 @@ export default function CakePreorders({
             preserveScroll: true,
             onSuccess: () => {
                 createPackageForm.reset();
+                createPackageForm.setData('parent_id', '');
                 createPackageForm.setData('is_active', true);
                 setIsCreateModalOpen(false);
             },
@@ -216,10 +231,11 @@ export default function CakePreorders({
         setEditingPackage(pkg);
         editPackageForm.setData({
             _method: 'put',
+            parent_id: pkg.parent_id ? String(pkg.parent_id) : '',
             name: pkg.name,
             description: pkg.description ?? '',
             image: null,
-            price: String(pkg.price),
+            price: pkg.price !== null ? String(pkg.price) : '',
             is_active: pkg.is_active,
         });
     };
@@ -431,6 +447,23 @@ export default function CakePreorders({
                         </DialogHeader>
                         <form className="p-6 space-y-6" onSubmit={updatePackage}>
                             <div className="grid gap-6 md:grid-cols-2">
+                                <div className="space-y-2 md:col-span-2">
+                                    <Label htmlFor="edit-parent" className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">Parent Package</Label>
+                                    <select
+                                        id="edit-parent"
+                                        value={editPackageForm.data.parent_id}
+                                        onChange={(event) => editPackageForm.setData('parent_id', event.target.value)}
+                                        className="h-12 w-full rounded-xl border border-zinc-100 bg-zinc-50/50 px-4 text-sm font-bold focus:bg-white transition-all outline-none ring-offset-white focus-visible:ring-2 focus-visible:ring-zinc-950"
+                                    >
+                                        <option value="">No parent (top-level package)</option>
+                                        {editParentOptions.map((option) => (
+                                            <option key={option.id} value={String(option.id)}>
+                                                {option.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <InputError message={editPackageForm.errors.parent_id} />
+                                </div>
                                 <div className="space-y-2">
                                     <Label htmlFor="edit-name" className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">Name</Label>
                                     <Input
@@ -685,6 +718,23 @@ export default function CakePreorders({
                                     </DialogHeader>
                                     <form className="p-6 space-y-6" onSubmit={createPackage}>
                                         <div className="grid gap-6 md:grid-cols-2">
+                                            <div className="space-y-2 md:col-span-2">
+                                                <Label htmlFor="new-parent" className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">Parent Package</Label>
+                                                <select
+                                                    id="new-parent"
+                                                    value={createPackageForm.data.parent_id}
+                                                    onChange={(event) => createPackageForm.setData('parent_id', event.target.value)}
+                                                    className="h-12 w-full rounded-xl border border-zinc-100 bg-zinc-50/50 px-4 text-sm font-bold focus:bg-white transition-all outline-none ring-offset-white focus-visible:ring-2 focus-visible:ring-zinc-950"
+                                                >
+                                                    <option value="">No parent (top-level package)</option>
+                                                    {parentPackageOptions.map((option) => (
+                                                        <option key={option.id} value={String(option.id)}>
+                                                            {option.name}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                                <InputError message={createPackageForm.errors.parent_id} />
+                                            </div>
                                             <div className="space-y-2">
                                                 <Label htmlFor="new-name" className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">Name</Label>
                                                 <Input
@@ -779,6 +829,16 @@ export default function CakePreorders({
                                         <div className="min-w-0 flex-1">
                                             <h4 className="truncate text-base font-black text-[#212121]">{pkg.name}</h4>
                                             <p className="mt-1 line-clamp-2 text-xs font-medium text-zinc-500">{pkg.description || 'No description provided'}</p>
+                                            {pkg.parent_name && (
+                                                <p className="mt-2 text-[10px] font-black uppercase tracking-widest text-[#F57C00]">
+                                                    Sub-package of {pkg.parent_name}
+                                                </p>
+                                            )}
+                                            {!pkg.parent_name && pkg.sub_packages_count > 0 && (
+                                                <p className="mt-2 text-[10px] font-black uppercase tracking-widest text-zinc-400">
+                                                    {pkg.sub_packages_count} sub-package{pkg.sub_packages_count === 1 ? '' : 's'}
+                                                </p>
+                                            )}
                                         </div>
                                         <div className="text-right">
                                             <p className="text-sm font-black text-[#F57C00]">{currency(pkg.price)}</p>

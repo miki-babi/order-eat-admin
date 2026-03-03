@@ -82,7 +82,7 @@ index.form = indexForm
 
 /**
 * @see \Modules\Ordering\Http\Controllers\CakePreorderController::store
-* @see Modules/Ordering/app/Http/Controllers/CakePreorderController.php:60
+* @see Modules/Ordering/app/Http/Controllers/CakePreorderController.php:77
 * @route '/cakes/preorders'
 */
 export const store = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -97,7 +97,7 @@ store.definition = {
 
 /**
 * @see \Modules\Ordering\Http\Controllers\CakePreorderController::store
-* @see Modules/Ordering/app/Http/Controllers/CakePreorderController.php:60
+* @see Modules/Ordering/app/Http/Controllers/CakePreorderController.php:77
 * @route '/cakes/preorders'
 */
 store.url = (options?: RouteQueryOptions) => {
@@ -106,7 +106,7 @@ store.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \Modules\Ordering\Http\Controllers\CakePreorderController::store
-* @see Modules/Ordering/app/Http/Controllers/CakePreorderController.php:60
+* @see Modules/Ordering/app/Http/Controllers/CakePreorderController.php:77
 * @route '/cakes/preorders'
 */
 store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -116,7 +116,7 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \Modules\Ordering\Http\Controllers\CakePreorderController::store
-* @see Modules/Ordering/app/Http/Controllers/CakePreorderController.php:60
+* @see Modules/Ordering/app/Http/Controllers/CakePreorderController.php:77
 * @route '/cakes/preorders'
 */
 const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -126,7 +126,7 @@ const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => 
 
 /**
 * @see \Modules\Ordering\Http\Controllers\CakePreorderController::store
-* @see Modules/Ordering/app/Http/Controllers/CakePreorderController.php:60
+* @see Modules/Ordering/app/Http/Controllers/CakePreorderController.php:77
 * @route '/cakes/preorders'
 */
 storeForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({

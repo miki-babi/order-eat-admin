@@ -185,138 +185,155 @@ export default function Catering({
     return (
         <>
             <Head title="Catering Services" />
-            <div className="min-h-screen bg-[#FAFAFA] px-4 py-8 text-[#212121] md:px-8 md:py-10">
-                <div className="mx-auto w-full max-w-5xl space-y-6">
-                    <header className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-zinc-200 md:p-8">
-                        <div className="flex flex-wrap items-start justify-between gap-4">
-                            <div>
-                                <p className="text-xs font-black uppercase tracking-widest text-[#F57C00]">Special Services</p>
-                                <h1 className="mt-2 text-3xl font-black tracking-tight">Catering Request Wizard</h1>
-                                <p className="mt-2 max-w-2xl text-sm text-zinc-600">
-                                    Follow the steps to select packages, enter event/contact details, and submit your request.
-                                </p>
+            <div className="min-h-screen bg-zinc-50/50 px-4 pb-20 pt-6 text-[#212121] md:px-8 md:py-10">
+                <div className="mx-auto w-full max-w-4xl space-y-8">
+                    {/* Header: More compact and focused */}
+                    <header className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+                        <div className="space-y-1">
+                            <div className="flex items-center gap-2">
+                                <div className="h-1 w-8 rounded-full bg-[#F57C00]" />
+                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#F57C00]">{business.business_name}</p>
                             </div>
-                            <div className="flex gap-2">
-                                <Button asChild variant="outline" className="rounded-xl border-zinc-200">
-                                    <Link href="/">Main Menu</Link>
-                                </Button>
-                                <Button asChild className="rounded-xl bg-[#212121] text-white hover:bg-black">
-                                    <Link href="/cakes">Cake Preorders</Link>
-                                </Button>
-                            </div>
+                            <h1 className="text-3xl font-black tracking-tight md:text-4xl">Plan Your Event</h1>
+                        </div>
+                        <div className="flex items-center gap-3 hidden">
+                            <Button asChild variant="ghost" className="h-12 rounded-2xl px-6 text-zinc-500 hover:bg-zinc-100 md:h-11">
+                                <Link href="/">Main Menu</Link>
+                            </Button>
+                            <Button asChild className="h-12 rounded-2xl bg-zinc-900 px-6 font-bold text-white shadow-xl shadow-zinc-900/10 hover:bg-black md:h-11">
+                                <Link href="/cakes">Cakes</Link>
+                            </Button>
                         </div>
                     </header>
 
                     {flash?.success && (
-                        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700">
+                        <div className="flex items-center gap-3 rounded-2xl border border-emerald-100 bg-emerald-50/50 p-4 text-sm font-bold text-emerald-800 backdrop-blur-sm">
+                            <div className="flex size-6 items-center justify-center rounded-full bg-emerald-500 text-white">
+                                <Check className="size-4" />
+                            </div>
                             {flash.success}
                         </div>
                     )}
 
                     {flash?.error && (
-                        <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+                        <div className="rounded-[1rem] border border-red-100 bg-red-50 p-4 text-sm font-bold text-red-800 backdrop-blur-sm">
                             {flash.error}
                         </div>
                     )}
 
-                    <form className="space-y-6 rounded-3xl bg-white p-6 shadow-sm ring-1 ring-zinc-200 md:p-8" onSubmit={submit}>
-                        <section className="grid gap-2 md:grid-cols-3">
-                            {stepMeta.map((item) => {
-                                const active = item.id === step;
-                                const completed = item.id < step;
+                    {/* Step Progress: Minimalist and beautiful */}
+                    <nav className="relative flex justify-between gap-2 px-1">
+                        {stepMeta.map((item) => {
+                            const active = item.id === step;
+                            const completed = item.id < step;
 
-                                return (
-                                    <article
-                                        key={item.id}
-                                        className={`rounded-2xl border px-4 py-3 ${
-                                            active
-                                                ? 'border-[#F57C00] bg-[#FFF3E0]'
-                                                : completed
-                                                  ? 'border-emerald-200 bg-emerald-50'
-                                                  : 'border-zinc-200 bg-zinc-50'
-                                        }`}
-                                    >
-                                        <p className="text-[11px] font-black uppercase tracking-widest text-zinc-500">Step {item.id}</p>
-                                        <p className="mt-1 text-sm font-black text-zinc-900">{item.title}</p>
-                                         {/* <p className="mt-1 text-xs text-zinc-600">{item.hint}</p> */}
-                                    </article>
-                                );
-                            })}
-                        </section>
+                            return (
+                                <div
+                                    key={item.id}
+                                    className={`relative flex flex-1 flex-col gap-2 transition-all duration-500 ${active ? 'opacity-100' : completed ? 'opacity-60' : 'opacity-40'}`}
+                                >
+                                    <div className="flex items-center gap-2">
+                                        <span className={`flex size-6 items-center justify-center rounded-full text-[10px] font-black transition-all duration-300 ${active ? 'bg-[#F57C00] text-white shadow-lg shadow-[#F57C00]/20 scale-110' : completed ? 'bg-emerald-500 text-white' : 'bg-zinc-200 text-zinc-500'}`}>
+                                            {completed ? <Check className="size-3.5" /> : item.id}
+                                        </span>
+                                        <div className="h-0.5 flex-1 rounded-full bg-zinc-200 overflow-hidden">
+                                            <div
+                                                className={`h-full bg-[#F57C00] transition-all duration-500 ${active ? 'w-1/2' : completed ? 'w-full' : 'w-0'}`}
+                                            />
+                                        </div>
+                                    </div>
+                                    <span className={`text-[10px] font-black uppercase tracking-wider ${active ? 'text-zinc-900' : 'text-zinc-500'}`}>
+                                        {item.title}
+                                    </span>
+                                </div>
+                            );
+                        })}
+                    </nav>
+
+                    <form className="space-y-8" onSubmit={submit}>
 
                         {step === 1 && (
-                            <section className="space-y-5">
-                                <h2 className="flex items-center gap-2 text-sm font-black uppercase tracking-widest text-zinc-500">
-                                    <ShoppingBag className="size-4 text-[#F57C00]" />
-                                    Step 1: Select Packages
-                                </h2>
-
-                                <div>
-                                    <label className="mb-2 block text-xs font-black uppercase tracking-widest text-zinc-500">
-                                        Packages
-                                    </label>
-                                    <div className="grid gap-3 sm:grid-cols-2">
-                                        {packages.length === 0 && (
-                                            <p className="sm:col-span-2 rounded-2xl border border-dashed border-zinc-300 bg-zinc-50 px-4 py-6 text-center text-sm text-zinc-500">
-                                                No catering packages are available right now.
-                                            </p>
-                                        )}
-
-                                        {packages.map((pkg) => {
-                                            const selected = form.data.package_ids.includes(pkg.id);
-
-                                            return (
-                                                <button
-                                                    key={pkg.id}
-                                                    type="button"
-                                                    onClick={() => togglePackage(pkg.id)}
-                                                    className={`overflow-hidden rounded-2xl border text-left transition ${
-                                                        selected
-                                                            ? 'border-[#F57C00] ring-2 ring-[#F57C00]/20'
-                                                            : 'border-zinc-200 hover:border-zinc-300'
-                                                    }`}
-                                                >
-                                                    <div className="relative aspect-[16/10] overflow-hidden bg-zinc-100">
-                                                        {pkg.image_url ? (
-                                                            <img src={pkg.image_url} alt={pkg.name} className="h-full w-full object-cover" loading="lazy" />
-                                                        ) : (
-                                                            <div className="flex h-full w-full items-center justify-center text-zinc-400">
-                                                                <ImagePlus className="size-8" />
-                                                            </div>
-                                                        )}
-
-                                                        {selected && (
-                                                            <span className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-full bg-emerald-600 px-2 py-1 text-[11px] font-black text-white">
-                                                                <Check className="size-3" />
-                                                                Selected
-                                                            </span>
-                                                        )}
-                                                    </div>
-                                                    <div className="p-3">
-                                                        <p className="text-sm font-black text-zinc-900">{pkg.name}</p>
-                                                        <p className="mt-1 line-clamp-2 text-xs text-zinc-600">
-                                                            {pkg.description ?? 'Full-service catering package for your event.'}
-                                                        </p>
-                                                    </div>
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
-                                    <InputError message={form.errors.package_ids} />
+                            <section className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                <div className="mb-6">
+                                    <h2 className="text-xl font-black tracking-tight text-zinc-900">Select Packages</h2>
+                                    <p className="text-sm text-zinc-500 mt-1">Choose the catering packages that fit your event needs.</p>
                                 </div>
+
+                                <div className="space-y-4">
+                                    {packages.length === 0 && (
+                                        <div className="flex flex-col items-center justify-center rounded-[1rem] border-2 border-dashed border-zinc-200 bg-zinc-50/50 py-12 px-6 text-center">
+                                            <ShoppingBag className="size-12 text-zinc-300 mb-4" />
+                                            <p className="text-lg font-bold text-zinc-800">No packages available</p>
+                                            <p className="mt-1 text-sm text-zinc-500">Check back later for our new catering offers.</p>
+                                        </div>
+                                    )}
+
+                                    {packages.map((pkg) => {
+                                        const selected = form.data.package_ids.includes(pkg.id);
+
+                                        return (
+                                            <button
+                                                key={pkg.id}
+                                                type="button"
+                                                onClick={() => togglePackage(pkg.id)}
+                                                className={`group relative flex w-full flex-col overflow-hidden rounded-[1rem] border transition-all duration-300 sm:flex-row ${selected
+                                                    ? 'border-[#F57C00] bg-white shadow-2xl shadow-[#F57C00]/10 ring-4 ring-[#F57C00]/5'
+                                                    : 'border-zinc-200 bg-white hover:border-zinc-300 hover:shadow-lg'
+                                                    }`}
+                                            >
+                                                <div className="relative aspect-[16/9] w-full shrink-0 overflow-hidden sm:aspect-square sm:w-48">
+                                                    {pkg.image_url ? (
+                                                        <img src={pkg.image_url} alt={pkg.name} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" />
+                                                    ) : (
+                                                        <div className="flex h-full w-full items-center justify-center bg-zinc-100 text-zinc-300">
+                                                            <ImagePlus className="size-10" />
+                                                        </div>
+                                                    )}
+
+                                                    {selected && (
+                                                        <div className="absolute inset-0 bg-[#F57C00]/10 backdrop-blur-[2px] sm:hidden" />
+                                                    )}
+
+                                                    {selected && (
+                                                        <div className="absolute left-4 top-4 flex size-8 items-center justify-center rounded-full bg-[#F57C00] text-white shadow-lg ring-4 ring-white">
+                                                            <Check className="size-5 font-black" />
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                <div className="flex flex-1 flex-col justify-center p-6 text-left">
+                                                    <div className="flex items-start justify-between gap-4">
+                                                        <div className="space-y-1">
+                                                            <h3 className={`text-lg font-black tracking-tight transition-colors ${selected ? 'text-[#F57C00]' : 'text-zinc-900 group-hover:text-zinc-700'}`}>
+                                                                {pkg.name}
+                                                            </h3>
+                                                            <p className="text-sm leading-relaxed text-zinc-500">
+                                                                {pkg.description ?? 'Full-service catering package for your special event.'}
+                                                            </p>
+                                                        </div>
+                                                        <div className={`hidden size-6 shrink-0 items-center justify-center rounded-full border-2 transition-all duration-300 sm:flex ${selected ? 'border-[#F57C00] bg-[#F57C00] text-white scale-110' : 'border-zinc-200 text-transparent group-hover:border-zinc-300'}`}>
+                                                            <Check className="size-3.5" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                                <InputError message={form.errors.package_ids} />
                             </section>
                         )}
 
                         {step === 2 && (
-                            <section className="space-y-5">
-                                <h2 className="flex items-center gap-2 text-sm font-black uppercase tracking-widest text-zinc-500">
-                                    <CalendarDays className="size-4 text-[#F57C00]" />
-                                    Step 2: Event, Contact, and Notes
-                                </h2>
+                            <section className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-8">
+                                <div className="mb-6">
+                                    <h2 className="text-xl font-black tracking-tight text-zinc-900">Event & Contact</h2>
+                                    <p className="text-sm text-zinc-500 mt-1">Provide your event details and contact information.</p>
+                                </div>
 
-                                <div className="grid gap-4 md:grid-cols-2">
-                                    <div>
-                                        <label className="mb-2 flex items-center gap-2 text-xs font-black uppercase tracking-widest text-zinc-500" htmlFor="event_date">
+                                <div className="grid gap-6 md:grid-cols-2">
+                                    <div className="space-y-2">
+                                        <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-zinc-400" htmlFor="event_date">
                                             <CalendarDays className="size-3.5" />
                                             Event Date
                                         </label>
@@ -329,15 +346,15 @@ export default function Catering({
                                                 setStepError(null);
                                                 form.setData('event_date', event.target.value);
                                             }}
-                                            className="h-11 rounded-xl border-zinc-200"
+                                            className="h-14 rounded-2xl border-zinc-200 bg-white px-4 text-base shadow-sm focus:ring-[#F57C00]/20"
                                         />
                                         <InputError message={form.errors.event_date} />
                                     </div>
 
-                                    <div>
-                                        <label className="mb-2 flex items-center gap-2 text-xs font-black uppercase tracking-widest text-zinc-500" htmlFor="guest_count">
+                                    <div className="space-y-2">
+                                        <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-zinc-400" htmlFor="guest_count">
                                             <Users className="size-3.5" />
-                                            Number of Guests
+                                            Guests
                                         </label>
                                         <Input
                                             id="guest_count"
@@ -349,16 +366,17 @@ export default function Catering({
                                                 setStepError(null);
                                                 form.setData('guest_count', value === '' ? '' : Number(value));
                                             }}
-                                            className="h-11 rounded-xl border-zinc-200"
+                                            className="h-14 rounded-2xl border-zinc-200 bg-white px-4 text-base shadow-sm focus:ring-[#F57C00]/20"
+                                            placeholder="Number of guests"
                                         />
                                         <InputError message={form.errors.guest_count} />
                                     </div>
                                 </div>
 
-                                <div>
-                                    <label className="mb-2 flex items-center gap-2 text-xs font-black uppercase tracking-widest text-zinc-500" htmlFor="venue">
+                                <div className="space-y-2">
+                                    <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-zinc-400" htmlFor="venue">
                                         <MapPin className="size-3.5" />
-                                        Venue
+                                        Venue Address
                                     </label>
                                     <Input
                                         id="venue"
@@ -367,15 +385,15 @@ export default function Catering({
                                             setStepError(null);
                                             form.setData('venue', event.target.value);
                                         }}
-                                        className="h-11 rounded-xl border-zinc-200"
-                                        placeholder="Event venue/address"
+                                        className="h-14 rounded-2xl border-zinc-200 bg-white px-4 text-base shadow-sm focus:ring-[#F57C00]/20"
+                                        placeholder="Where is the event happening?"
                                     />
                                     <InputError message={form.errors.venue} />
                                 </div>
 
-                                <div className="grid gap-4 md:grid-cols-2">
-                                    <div>
-                                        <label className="mb-2 flex items-center gap-2 text-xs font-black uppercase tracking-widest text-zinc-500" htmlFor="name">
+                                <div className="grid gap-6 md:grid-cols-2">
+                                    <div className="space-y-2">
+                                        <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-zinc-400" htmlFor="name">
                                             <User className="size-3.5" />
                                             Full Name
                                         </label>
@@ -386,13 +404,14 @@ export default function Catering({
                                                 setStepError(null);
                                                 form.setData('name', event.target.value);
                                             }}
-                                            className="h-11 rounded-xl border-zinc-200"
+                                            className="h-14 rounded-2xl border-zinc-200 bg-white px-4 text-base shadow-sm focus:ring-[#F57C00]/20"
+                                            placeholder="Your name"
                                         />
                                         <InputError message={form.errors.name} />
                                     </div>
 
-                                    <div>
-                                        <label className="mb-2 flex items-center gap-2 text-xs font-black uppercase tracking-widest text-zinc-500" htmlFor="phone">
+                                    <div className="space-y-2">
+                                        <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-zinc-400" htmlFor="phone">
                                             <Phone className="size-3.5" />
                                             Phone Number
                                         </label>
@@ -403,27 +422,27 @@ export default function Catering({
                                                 setStepError(null);
                                                 form.setData('phone', event.target.value);
                                             }}
-                                            className="h-11 rounded-xl border-zinc-200"
-                                            placeholder="+2519XXXXXXXX"
+                                            className="h-14 rounded-2xl border-zinc-200 bg-white px-4 text-base shadow-sm focus:ring-[#F57C00]/20"
+                                            placeholder="+251 ..."
                                         />
                                         <InputError message={form.errors.phone} />
                                     </div>
                                 </div>
 
-                                <div>
-                                    <label className="mb-2 block text-xs font-black uppercase tracking-widest text-zinc-500" htmlFor="special_instructions">
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black uppercase tracking-wider text-zinc-400" htmlFor="special_instructions">
                                         Special Instructions
                                     </label>
                                     <textarea
                                         id="special_instructions"
-                                        rows={6}
+                                        rows={4}
                                         value={form.data.special_instructions}
                                         onChange={(event) => {
                                             setStepError(null);
                                             form.setData('special_instructions', event.target.value);
                                         }}
-                                        className="w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm focus:border-[#F57C00] focus:outline-none focus:ring-2 focus:ring-[#F57C00]/15"
-                                        placeholder="Cuisine preferences, setup requirements, service duration, and other details..."
+                                        className="w-full rounded-[2rem] border border-zinc-200 bg-white px-6 py-4 text-base shadow-sm focus:border-[#F57C00] focus:outline-none focus:ring-4 focus:ring-[#F57C00]/10 placeholder:text-zinc-300"
+                                        placeholder="Any specific needs or preferences?"
                                     />
                                     <InputError message={form.errors.special_instructions} />
                                 </div>
@@ -431,92 +450,130 @@ export default function Catering({
                         )}
 
                         {step === 3 && (
-                            <section className="space-y-5">
-                                <h2 className="flex items-center gap-2 text-sm font-black uppercase tracking-widest text-zinc-500">
-                                    <ShoppingBag className="size-4 text-[#F57C00]" />
-                                    Step 3: Review and Submit
-                                </h2>
+                            <section className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-8">
+                                <div className="mb-6">
+                                    <h2 className="text-xl font-black tracking-tight text-zinc-900">Review Request</h2>
+                                    <p className="text-sm text-zinc-500 mt-1">Please double check your details before submitting.</p>
+                                </div>
 
-                                <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-4">
-                                    <p className="text-xs font-black uppercase tracking-widest text-zinc-500">Selected Packages</p>
-                                    <div className="mt-3 space-y-2">
-                                        {selectedPackages.map((pkg) => (
-                                            <div key={pkg.id} className="flex items-start justify-between gap-3 text-sm">
-                                                <span className="font-semibold text-zinc-700">{pkg.name}</span>
+                                <div className="space-y-6">
+                                    <div className="overflow-hidden rounded-[2rem] border border-zinc-100 bg-white shadow-sm">
+                                        <div className="bg-zinc-50/50 px-6 py-4 border-b border-zinc-100">
+                                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#F57C00]">Selected Packages</p>
+                                        </div>
+                                        <div className="p-6">
+                                            <div className="flex flex-wrap gap-2">
+                                                {selectedPackages.map((pkg) => (
+                                                    <span key={pkg.id} className="inline-flex items-center rounded-full bg-zinc-100 px-4 py-2 text-sm font-bold text-zinc-800">
+                                                        {pkg.name}
+                                                    </span>
+                                                ))}
                                             </div>
-                                        ))}
+                                        </div>
                                     </div>
+
+                                    <div className="grid gap-6 md:grid-cols-2">
+                                        <div className="overflow-hidden rounded-[2rem] border border-zinc-100 bg-white shadow-sm">
+                                            <div className="bg-zinc-50/50 px-6 py-4 border-b border-zinc-100">
+                                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#F57C00]">Event Details</p>
+                                            </div>
+                                            <div className="p-6 space-y-3">
+                                                <div className="flex items-center gap-3 text-sm">
+                                                    <CalendarDays className="size-4 text-zinc-400" />
+                                                    <span className="font-medium">{form.data.event_date || 'N/A'}</span>
+                                                </div>
+                                                <div className="flex items-center gap-3 text-sm">
+                                                    <Users className="size-4 text-zinc-400" />
+                                                    <span className="font-medium">{form.data.guest_count || 'N/A'} Guests</span>
+                                                </div>
+                                                <div className="flex items-center gap-3 text-sm">
+                                                    <MapPin className="size-4 text-zinc-400" />
+                                                    <span className="font-medium line-clamp-1">{form.data.venue || 'N/A'}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="overflow-hidden rounded-[2rem] border border-zinc-100 bg-white shadow-sm">
+                                            <div className="bg-zinc-50/50 px-6 py-4 border-b border-zinc-100">
+                                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#F57C00]">Contact Info</p>
+                                            </div>
+                                            <div className="p-6 space-y-3">
+                                                <div className="flex items-center gap-3 text-sm">
+                                                    <User className="size-4 text-zinc-400" />
+                                                    <span className="font-medium">{form.data.name || 'N/A'}</span>
+                                                </div>
+                                                <div className="flex items-center gap-3 text-sm">
+                                                    <Phone className="size-4 text-zinc-400" />
+                                                    <span className="font-medium">{form.data.phone || 'N/A'}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {form.data.special_instructions && (
+                                        <div className="overflow-hidden rounded-[2rem] border border-zinc-100 bg-white shadow-sm">
+                                            <div className="bg-zinc-50/50 px-6 py-4 border-b border-zinc-100">
+                                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#F57C00]">Instructions</p>
+                                            </div>
+                                            <div className="p-6">
+                                                <p className="text-sm text-zinc-600 leading-relaxed whitespace-pre-wrap">
+                                                    {form.data.special_instructions}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
-
-                                <div className="grid gap-4 md:grid-cols-2">
-                                    <article className="rounded-2xl border border-zinc-200 bg-zinc-50 p-4">
-                                        <p className="text-xs font-black uppercase tracking-widest text-zinc-500">Event</p>
-                                        <p className="mt-2 text-sm text-zinc-700">Date: {form.data.event_date || 'N/A'}</p>
-                                        <p className="text-sm text-zinc-700">Guests: {form.data.guest_count || 'N/A'}</p>
-                                        <p className="text-sm text-zinc-700">Venue: {form.data.venue.trim() !== '' ? form.data.venue : 'Not specified'}</p>
-                                    </article>
-
-                                    <article className="rounded-2xl border border-zinc-200 bg-zinc-50 p-4">
-                                        <p className="text-xs font-black uppercase tracking-widest text-zinc-500">Contact</p>
-                                        <p className="mt-2 text-sm font-semibold text-zinc-800">{form.data.name || 'N/A'}</p>
-                                        <p className="text-sm text-zinc-700">{form.data.phone || 'N/A'}</p>
-                                    </article>
-                                </div>
-
-                                <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-4 text-sm">
-                                    <p className="text-xs font-black uppercase tracking-widest text-zinc-500">Special Instructions</p>
-                                    <p className="mt-2 text-zinc-700">
-                                        {form.data.special_instructions.trim() !== '' ? form.data.special_instructions : 'No extra instructions.'}
-                                    </p>
-                                </div>
-
                             </section>
                         )}
 
                         {stepError && (
-                            <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+                            <div className="animate-in fade-in zoom-in-95 rounded-2xl border border-red-100 bg-red-50 p-4 text-sm font-bold text-red-800">
                                 {stepError}
                             </div>
                         )}
 
-                        <section className="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 pt-4">
+                        <section className="flex items-center justify-between gap-4 pt-4 px-8">
                             <div>
                                 {step > 1 && (
                                     <Button
                                         type="button"
-                                        variant="outline"
-                                        className="rounded-xl border-zinc-200"
+                                        variant="ghost"
+                                        className="h-14 rounded-2xl px-8 font-bold text-zinc-500 hover:bg-zinc-100"
                                         onClick={() => {
                                             setStepError(null);
                                             setStep(step === 3 ? 2 : 1);
                                         }}
                                     >
-                                        <ChevronLeft className="mr-1 size-4" />
+                                        <ChevronLeft className="mr-2 size-5" />
                                         Back
                                     </Button>
                                 )}
                             </div>
 
-                            <div className="ml-auto flex gap-2">
+                            <div className="flex-1 sm:flex-initial flex justify-end">
                                 {step === 1 && (
-                                    <Button type="button" className="rounded-xl bg-[#212121] text-white hover:bg-black" onClick={goToStepTwo}>
-                                        Next
-                                        <ChevronRight className="ml-1 size-4" />
+                                    <Button type="button"
+                                        className="h-10 rounded-[1rem]  px-6 text-sm font-bold text-white bg-orange-600 hover:bg-orange-700 dark:bg-orange-500 dark:hover:bg-orange-600"
+                                        onClick={goToStepTwo}>
+                                        Continue
+                                        <ChevronRight className="ml-2 size-5" />
                                     </Button>
                                 )}
                                 {step === 2 && (
-                                    <Button type="button" className="rounded-xl bg-[#212121] text-white hover:bg-black" onClick={goToStepThree}>
-                                        Next
-                                        <ChevronRight className="ml-1 size-4" />
+                                    <Button type="button"
+                                        className="h-10 rounded-[1rem]  px-6 text-sm font-bold text-white bg-orange-600 hover:bg-orange-700 dark:bg-orange-500 dark:hover:bg-orange-600"
+                                        onClick={goToStepThree}>
+                                        Review Detail
+                                        <ChevronRight className="ml-2 size-5" />
                                     </Button>
                                 )}
                                 {step === 3 && (
                                     <Button
                                         type="submit"
-                                        className="rounded-xl bg-[#F57C00] text-white hover:bg-[#E65100]"
+                                        className="h-10 rounded-[1rem]  px-6 text-sm font-bold text-white bg-orange-600 hover:bg-orange-700 dark:bg-orange-500 dark:hover:bg-orange-600"
                                         disabled={form.processing}
                                     >
-                                        {form.processing ? 'Submitting Request...' : 'Submit Catering Request'}
+                                        {form.processing ? 'Starting Magic...' : 'Submit Request'}
                                     </Button>
                                 )}
                             </div>

@@ -13,6 +13,9 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
+    SidebarMenuSub,
+    SidebarMenuSubItem,
+    SidebarMenuSubButton,
 } from '@/components/ui/sidebar';
 import { useCurrentUrl } from '@/hooks/use-current-url';
 import type { NavGroup, NavItem } from '@/types';
@@ -27,7 +30,64 @@ export function NavMain({ groups = [] }: { groups: NavGroup[] }) {
     const renderItems = (items: NavItem[]) => (
         <SidebarMenu className="gap-1">
             {items.map((item) => {
-                const active = isCurrentUrl(item.href);
+                const hasChildren = item.items && item.items.length > 0;
+                const active = item.href ? isCurrentUrl(item.href) : false;
+                const anyChildActive = hasChildren ? item.items!.some(child => child.href && isCurrentUrl(child.href)) : false;
+
+                if (hasChildren) {
+                    return (
+                        <SidebarMenuItem key={item.title}>
+                            <Collapsible asChild defaultOpen={anyChildActive} className="group/submenu">
+                                <>
+                                    <CollapsibleTrigger asChild>
+                                        <SidebarMenuButton
+                                            tooltip={{ children: item.title }}
+                                            className="h-11 rounded-xl px-4 transition-all duration-200 group/nav-item text-zinc-500 hover:bg-zinc-100/80 hover:text-[#F57C00]"
+                                        >
+                                            <div className="flex items-center gap-3 w-full">
+                                                {item.icon && (
+                                                    <item.icon className="size-4.5 group-hover/nav-item:scale-110 transition-transform duration-200" />
+                                                )}
+                                                <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-600 group-hover/nav-item:text-[#F57C00] flex-1 text-left">
+                                                    {item.title}
+                                                </span>
+                                                <ChevronRight className="size-3.5 ml-auto transition-transform duration-200 group-data-[state=open]/submenu:rotate-90" />
+                                            </div>
+                                        </SidebarMenuButton>
+                                    </CollapsibleTrigger>
+                                    <CollapsibleContent>
+                                        <SidebarMenuSub className="ml-4 mt-1 border-l border-zinc-100 pl-2">
+                                            {item.items?.map((subItem) => {
+                                                const subActive = subItem.href ? isCurrentUrl(subItem.href) : false;
+                                                return (
+                                                    <SidebarMenuSubItem key={subItem.title}>
+                                                        <SidebarMenuSubButton
+                                                            asChild
+                                                            isActive={subActive}
+                                                            className={`h-9 rounded-lg px-3 transition-all duration-200 ${subActive
+                                                                ? 'bg-zinc-100 text-[#F57C00] font-bold shadow-xs'
+                                                                : 'text-zinc-500 hover:bg-zinc-50 hover:text-[#F57C00]'
+                                                                }`}
+                                                        >
+                                                            <Link href={subItem.href || '#'} prefetch className="flex items-center gap-3">
+                                                                {subItem.icon && (
+                                                                    <subItem.icon className={`size-3.5 ${subActive ? 'text-[#F57C00]' : ''}`} />
+                                                                )}
+                                                                <span className="text-[10px] font-bold uppercase tracking-wide">
+                                                                    {subItem.title}
+                                                                </span>
+                                                            </Link>
+                                                        </SidebarMenuSubButton>
+                                                    </SidebarMenuSubItem>
+                                                );
+                                            })}
+                                        </SidebarMenuSub>
+                                    </CollapsibleContent>
+                                </>
+                            </Collapsible>
+                        </SidebarMenuItem>
+                    );
+                }
 
                 return (
                     <SidebarMenuItem key={item.title}>
@@ -36,11 +96,11 @@ export function NavMain({ groups = [] }: { groups: NavGroup[] }) {
                             isActive={active}
                             tooltip={{ children: item.title }}
                             className={`h-11 rounded-xl px-4 transition-all duration-200 group/nav-item ${active
-                                    ? 'bg-zinc-900 text-white shadow-lg shadow-zinc-900/10'
-                                    : 'text-zinc-500 hover:bg-zinc-100/80 hover:text-[#F57C00]'
+                                ? 'bg-zinc-900 text-white shadow-lg shadow-zinc-900/10'
+                                : 'text-zinc-500 hover:bg-zinc-100/80 hover:text-[#F57C00]'
                                 }`}
                         >
-                            <Link href={item.href} prefetch className="flex items-center gap-3">
+                            <Link href={item.href || '#'} prefetch className="flex items-center gap-3">
                                 {item.icon && (
                                     <item.icon
                                         className={`size-4.5 transition-transform duration-200 ${active ? 'text-[#F57C00]' : 'group-hover/nav-item:scale-110'

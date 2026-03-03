@@ -9,10 +9,18 @@ use App\Models\User;
 test('customer can submit a cake preorder with selected packages', function () {
     config(['services.sms_ethiopia.enabled' => false]);
 
-    $classic = CakePackage::query()->create([
-        'name' => 'Classic Chocolate',
-        'description' => 'Chocolate sponge with ganache.',
-        'price' => 1500,
+    $birthday = CakePackage::query()->create([
+        'name' => 'Birthday Collection',
+        'description' => 'Top-level package for birthday events.',
+        'price' => 1600,
+        'is_active' => true,
+    ]);
+
+    $youngBoys = CakePackage::query()->create([
+        'parent_id' => $birthday->id,
+        'name' => 'Young Birthday Boys',
+        'description' => 'Colorful cake style for young boys.',
+        'price' => 1800,
         'is_active' => true,
     ]);
 
@@ -30,7 +38,7 @@ test('customer can submit a cake preorder with selected packages', function () {
         'special_instructions' => 'Please add gold ribbon style.',
         'items' => [
             [
-                'cake_package_id' => $classic->id,
+                'cake_package_id' => $youngBoys->id,
                 'quantity' => 1,
                 'size' => 'Medium',
                 'servings' => 12,
@@ -54,7 +62,7 @@ test('customer can submit a cake preorder with selected packages', function () {
     expect(CakePreorder::query()->count())->toBe(1);
     expect(CakePreorder::query()->first()?->items()->count())->toBe(2);
     $this->assertDatabaseHas('cake_preorder_items', [
-        'cake_package_id' => $classic->id,
+        'cake_package_id' => $youngBoys->id,
         'size' => 'Medium',
         'servings' => 12,
     ]);
@@ -63,6 +71,46 @@ test('customer can submit a cake preorder with selected packages', function () {
         'phone' => '+251911000222',
         'status' => 'failed',
     ]);
+});
+
+test('customer cannot submit preorder directly for a package that has active sub-packages', function () {
+    config(['services.sms_ethiopia.enabled' => false]);
+
+    $birthday = CakePackage::query()->create([
+        'name' => 'Birthday Collection',
+        'description' => 'Top-level package for birthday events.',
+        'price' => 1600,
+        'is_active' => true,
+    ]);
+
+    CakePackage::query()->create([
+        'parent_id' => $birthday->id,
+        'name' => 'Young Birthday Girls',
+        'description' => 'Style for young birthday girls.',
+        'price' => 1850,
+        'is_active' => true,
+    ]);
+
+    $response = $this->post(route('cakes.preorders.store'), [
+        'name' => 'Miki Customer',
+        'phone' => '0911222333',
+        'needed_date' => now()->addDays(4)->toDateString(),
+        'items' => [
+            [
+                'cake_package_id' => $birthday->id,
+                'quantity' => 1,
+                'size' => 'Medium',
+                'servings' => 10,
+                'specification' => 'Simple design',
+            ],
+        ],
+    ]);
+
+    $response
+        ->assertRedirect()
+        ->assertSessionHasErrors('items');
+
+    expect(CakePreorder::query()->count())->toBe(0);
 });
 
 test('customer can submit catering request and estimated total is saved', function () {

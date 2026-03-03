@@ -3,6 +3,7 @@ import { BarChart3, ClipboardList, Coffee, ConciergeBell, KeyRound, MapPin, Mess
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
+import { toUrl } from '@/lib/utils';
 import {
     Sidebar,
     SidebarContent,
@@ -44,16 +45,16 @@ export function AppSidebar() {
             label: 'Orders',
             items: [
                 ...(can('orders.view')
-                    ? [{ title: 'Order Queue', href: '/staff/orders', icon: ClipboardList }]
-                    : []),
-                ...(can('orders.view')
-                    ? [{ title: 'Waiter Board', href: '/staff/waiter-board', icon: ConciergeBell }]
-                    : []),
-                ...(can('orders.view')
-                    ? [{ title: 'Kitchen Board', href: '/staff/kitchen-board', icon: UtensilsCrossed }]
-                    : []),
-                ...(can('orders.view')
-                    ? [{ title: 'Cashier Board', href: '/staff/cashier-board', icon: Wallet }]
+                    ? [{
+                        title: 'Kitchen Display',
+                        icon: MonitorSmartphone,
+                        items: [
+                            { title: 'Order', href: '/staff/orders', icon: ClipboardList },
+                            { title: 'Kitchen Board', href: '/staff/kitchen-board', icon: UtensilsCrossed },
+                            { title: 'Waiter Board', href: '/staff/waiter-board', icon: ConciergeBell },
+                            { title: 'Cashier Board', href: '/staff/cashier-board', icon: Wallet },
+                        ]
+                    }]
                     : []),
                 ...(can('orders.view')
                     ? [{ title: 'Cake Preorders', href: '/staff/cake-preorders', icon: Coffee }]
@@ -111,9 +112,20 @@ export function AppSidebar() {
     ];
     const mainNavItems = mainNavGroups.flatMap((group) => group.items);
 
+    const findFirstHref = (items: NavItem[]): string => {
+        for (const item of items) {
+            if (item.href) return toUrl(item.href);
+            if (item.items && item.items.length > 0) {
+                const nestedHref = findFirstHref(item.items);
+                if (nestedHref !== '/') return nestedHref;
+            }
+        }
+        return '/';
+    };
+
     const homeHref = isSystemAdmin
         ? '/__system-admin/dashboard'
-        : mainNavItems[0]?.href ?? '/';
+        : findFirstHref(mainNavItems);
 
     return (
         <Sidebar collapsible="icon" variant="inset" className="bg-white/50 backdrop-blur-xl border-r border-zinc-100">

@@ -28,15 +28,32 @@ class CakePreorderController extends Controller
     public function index(Request $request, CustomerIdentityService $customerIdentityService): Response
     {
         $packages = CakePackage::query()
+            ->topLevel()
             ->where('is_active', true)
+            ->with([
+                'subPackages' => fn ($query) => $query
+                    ->where('is_active', true)
+                    ->orderBy('name'),
+            ])
             ->orderBy('name')
             ->get()
             ->map(fn (CakePackage $package) => [
                 'id' => $package->id,
+                'parent_id' => null,
                 'name' => $package->name,
                 'description' => $package->description,
                 'image_url' => $this->toPublicAssetUrl($package->image_url),
                 'price' => (float) $package->price,
+                'sub_packages' => $package->subPackages
+                    ->map(fn (CakePackage $subPackage) => [
+                        'id' => $subPackage->id,
+                        'parent_id' => $subPackage->parent_id,
+                        'name' => $subPackage->name,
+                        'description' => $subPackage->description,
+                        'image_url' => $this->toPublicAssetUrl($subPackage->image_url),
+                        'price' => (float) $subPackage->price,
+                    ])
+                    ->values(),
             ])
             ->values();
 
@@ -68,7 +85,7 @@ class CakePreorderController extends Controller
         $packageIds = $items->pluck('cake_package_id')->unique()->values();
 
         $packages = CakePackage::query()
-            ->where('is_active', true)
+            ->orderableForCustomer()
             ->whereIn('id', $packageIds)
             ->get()
             ->keyBy('id');
@@ -105,7 +122,7 @@ class CakePreorderController extends Controller
                     'quantity' => $item['quantity'],
                     'size' => $item['size'],
                     'servings' => $item['servings'],
-                    'unit_price' => $packages[$item['cake_package_id']]->price,
+                    'unit_price' => $packages[$item['cake_package_id']]->price ?? 0,
                     'specification' => $item['specification'] ?? null,
                 ])->all(),
             );

@@ -82,7 +82,7 @@ index.form = indexForm
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\CakePreorderController::status
-* @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:177
+* @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:212
 * @route '/staff/cake-preorders/{cakePreorder}/status'
 */
 export const status = (args: { cakePreorder: number | { id: number } } | [cakePreorder: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
@@ -97,7 +97,7 @@ status.definition = {
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\CakePreorderController::status
-* @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:177
+* @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:212
 * @route '/staff/cake-preorders/{cakePreorder}/status'
 */
 status.url = (args: { cakePreorder: number | { id: number } } | [cakePreorder: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -130,7 +130,7 @@ status.url = (args: { cakePreorder: number | { id: number } } | [cakePreorder: n
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\CakePreorderController::status
-* @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:177
+* @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:212
 * @route '/staff/cake-preorders/{cakePreorder}/status'
 */
 status.patch = (args: { cakePreorder: number | { id: number } } | [cakePreorder: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
@@ -140,7 +140,7 @@ status.patch = (args: { cakePreorder: number | { id: number } } | [cakePreorder:
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\CakePreorderController::status
-* @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:177
+* @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:212
 * @route '/staff/cake-preorders/{cakePreorder}/status'
 */
 const statusForm = (args: { cakePreorder: number | { id: number } } | [cakePreorder: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -155,7 +155,7 @@ const statusForm = (args: { cakePreorder: number | { id: number } } | [cakePreor
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\CakePreorderController::status
-* @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:177
+* @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:212
 * @route '/staff/cake-preorders/{cakePreorder}/status'
 */
 statusForm.patch = (args: { cakePreorder: number | { id: number } } | [cakePreorder: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({

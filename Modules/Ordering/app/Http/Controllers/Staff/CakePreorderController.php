@@ -27,19 +27,35 @@ class CakePreorderController extends Controller
         $status = is_string($request->input('status')) ? $request->input('status') : null;
 
         $packages = CakePackage::query()
-            ->withCount('preorderItems')
+            ->with('parent:id,name')
+            ->withCount(['preorderItems', 'subPackages'])
+            ->orderByRaw('CASE WHEN parent_id IS NULL THEN 0 ELSE 1 END')
+            ->orderBy('parent_id')
             ->orderByDesc('is_active')
             ->orderBy('name')
             ->get()
-            ->map(fn (CakePackage $package) => [
+            ->map(fn(CakePackage $package) => [
                 'id' => $package->id,
+                'parent_id' => $package->parent_id,
+                'parent_name' => $package->parent?->name,
                 'name' => $package->name,
                 'description' => $package->description,
                 'image_url' => $this->toPublicAssetUrl($package->image_url),
-                'price' => (float) $package->price,
+                'price' => $package->price !== null ? (float) $package->price : null,
                 'is_active' => (bool) $package->is_active,
                 'preorder_items_count' => (int) $package->preorder_items_count,
+                'sub_packages_count' => (int) $package->sub_packages_count,
                 'updated_at' => $package->updated_at?->toDateTimeString(),
+            ])
+            ->values();
+
+        $parentPackageOptions = CakePackage::query()
+            ->topLevel()
+            ->orderBy('name')
+            ->get()
+            ->map(fn(CakePackage $package) => [
+                'id' => $package->id,
+                'name' => $package->name,
             ])
             ->values();
 
@@ -57,15 +73,15 @@ class CakePreorderController extends Controller
                                 ->where('name', 'like', "%{$search}%")
                                 ->orWhere('phone', 'like', "%{$search}%");
                         })
-                        ->orWhereHas('items.package', fn ($packageQuery) => $packageQuery->where('name', 'like', "%{$search}%"));
+                        ->orWhereHas('items.package', fn($packageQuery) => $packageQuery->where('name', 'like', "%{$search}%"));
                 });
             })
-            ->when($status && in_array($status, CakePreorder::statuses(), true), fn ($query) => $query->where('status', $status))
+            ->when($status && in_array($status, CakePreorder::statuses(), true), fn($query) => $query->where('status', $status))
             ->orderBy('needed_date')
             ->orderByDesc('created_at')
             ->paginate(20)
             ->withQueryString()
-            ->through(fn (CakePreorder $preorder) => [
+            ->through(fn(CakePreorder $preorder) => [
                 'id' => $preorder->id,
                 'customer_name' => $preorder->customer?->name,
                 'customer_phone' => $preorder->customer?->phone,
@@ -74,7 +90,7 @@ class CakePreorderController extends Controller
                 'special_instructions' => $preorder->special_instructions,
                 'total_amount' => (float) $preorder->total_amount,
                 'created_at' => $preorder->created_at?->toDateTimeString(),
-                'items' => $preorder->items->map(fn ($item) => [
+                'items' => $preorder->items->map(fn($item) => [
                     'id' => $item->id,
                     'package_name' => $item->package?->name,
                     'quantity' => $item->quantity,
@@ -96,6 +112,7 @@ class CakePreorderController extends Controller
             'statusOptions' => CakePreorder::statuses(),
             'canManagePackages' => $user->hasPermission('menu_items.manage'),
             'canUpdateRequests' => $user->hasPermission('orders.update'),
+            'parentPackageOptions' => $parentPackageOptions,
             'summary' => [
                 'total_packages' => CakePackage::query()->count(),
                 'active_packages' => CakePackage::query()->where('is_active', true)->count(),
@@ -114,6 +131,7 @@ class CakePreorderController extends Controller
         $imagePath = $request->file('image')?->store('cake-packages', 'public');
 
         CakePackage::query()->create([
+            'parent_id' => $validated['parent_id'] ?? null,
             'name' => $validated['name'],
             'description' => $validated['description'] ?? null,
             'image_url' => $imagePath,
@@ -130,6 +148,15 @@ class CakePreorderController extends Controller
     public function updatePackage(UpdateCakePackageRequest $request, CakePackage $cakePackage): RedirectResponse
     {
         $validated = $request->validated();
+
+        if (($validated['parent_id'] ?? null) !== null && $cakePackage->subPackages()->exists()) {
+            return back()
+                ->withErrors([
+                    'parent_id' => 'Packages with sub-packages cannot be moved under another package.',
+                ])
+                ->withInput();
+        }
+
         $imagePath = $cakePackage->image_url;
 
         if ($request->hasFile('image')) {
@@ -141,6 +168,7 @@ class CakePreorderController extends Controller
         }
 
         $cakePackage->update([
+            'parent_id' => $validated['parent_id'] ?? null,
             'name' => $validated['name'],
             'description' => $validated['description'] ?? null,
             'image_url' => $imagePath,
@@ -156,6 +184,13 @@ class CakePreorderController extends Controller
      */
     public function destroyPackage(CakePackage $cakePackage): RedirectResponse
     {
+        if ($cakePackage->subPackages()->exists()) {
+            $cakePackage->update(['is_active' => false]);
+            $cakePackage->subPackages()->update(['is_active' => false]);
+
+            return back()->with('success', 'Cake package has sub-packages and was deactivated with all its sub-packages.');
+        }
+
         if ($cakePackage->preorderItems()->exists()) {
             $cakePackage->update(['is_active' => false]);
 
