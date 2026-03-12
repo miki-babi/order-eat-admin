@@ -1,3 +1,4 @@
+import { Head, Link, router, useForm } from '@inertiajs/react';
 import {
     Clock3,
     Search,
@@ -16,7 +17,7 @@ import {
 import { useState, type FormEvent } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import {
     Collapsible,
     CollapsibleContent,
@@ -31,7 +32,6 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
-import { Head, Link, router, useForm } from '@inertiajs/react';
 import type { BreadcrumbItem } from '@/types';
 
 type CateringRequestRow = {
@@ -82,14 +82,14 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-function currency(value: number | null | undefined): string {
-    if (value === null || value === undefined) return 'Price TBD';
-    return new Intl.NumberFormat('en-ET', {
-        style: 'currency',
-        currency: 'ETB',
-        maximumFractionDigits: 2,
-    }).format(value);
-}
+// function currency(value: number | null | undefined): string {
+//     if (value === null || value === undefined) return 'Price TBD';
+//     return new Intl.NumberFormat('en-ET', {
+//         style: 'currency',
+//         currency: 'ETB',
+//         maximumFractionDigits: 2,
+//     }).format(value);
+// }
 
 function badgeStyle(status: string | null): string {
     const s = status?.toLowerCase() || '';
@@ -104,8 +104,6 @@ export default function CateringRequests({
     requests,
     filters,
     statusOptions,
-    canManagePackages,
-    canUpdateRequests,
     summary,
 }: {
     requests: Paginated<CateringRequestRow>;

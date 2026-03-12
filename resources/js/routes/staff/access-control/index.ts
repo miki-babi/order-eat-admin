@@ -1,6 +1,6 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition } from './../../../wayfinder'
-import roles from './roles'
 import permissions from './permissions'
+import roles from './roles'
 import users from './users'
 /**
 * @see \Modules\AccessControl\Http\Controllers\Staff\AccessControlController::index

@@ -196,7 +196,7 @@ function StatCard({
     label: string;
     value: string;
     sub?: string;
-    icon?: any;
+    icon?: React.ComponentType<{ className?: string }>;
     trend?: {
         value: number;
         label: string;

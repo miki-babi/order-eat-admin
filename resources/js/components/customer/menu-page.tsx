@@ -9,16 +9,15 @@ import {
     MapPin,
     Search,
     ShoppingCart,
-    SparkleIcon,
     Upload,
     X,
     Plus,
     Minus,
 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { FeedbackModal } from '@/components/customer/feedback-modal';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
-import { FeedbackModal } from '@/components/customer/feedback-modal';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
@@ -91,12 +90,7 @@ type OrderForm = {
     }[];
 };
 
-const steps = [
-    '1. Browse Menu',
-    '2. Review Cart',
-    '3. Pickup Details',
-    '4. Receipt Upload',
-];
+
 
 type TelegramMiniAppUser = {
     id?: number | string;
@@ -373,7 +367,6 @@ export default function CustomerMenuPage({
     customerPrefill,
     filters,
     forcedChannel,
-    staffRoute,
 }: CustomerMenuPageProps) {
     const { auth, flash } = usePage<SharedProps>().props;
     const baseChannel = forcedChannel ?? filters.channel ?? 'web';

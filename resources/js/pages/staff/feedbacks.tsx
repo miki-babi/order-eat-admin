@@ -1,12 +1,12 @@
-import { Head, Link, router } from '@inertiajs/react';
-import { MessageSquare, Star, User, Calendar, ExternalLink, History } from 'lucide-react';
+import { Head,  router } from '@inertiajs/react';
+import { format } from 'date-fns';
+import { MessageSquare,  User, Calendar,  History } from 'lucide-react';
+import { CustomerHistoryModal, type SelectedCustomer } from '@/components/staff/customer-history-modal';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
-import { Button } from '@/components/ui/button';
 import type { BreadcrumbItem } from '@/types';
-import { Badge } from '@/components/ui/badge';
-import { format } from 'date-fns';
-import { CustomerHistoryModal, type SelectedCustomer } from '@/components/staff/customer-history-modal';
 
 type PaginationData<T> = {
     data: T[];
@@ -33,13 +33,13 @@ type Feedback = {
     };
 };
 
-function currency(value: number): string {
-    return new Intl.NumberFormat('en-ET', {
-        style: 'currency',
-        currency: 'ETB',
-        maximumFractionDigits: 2,
-    }).format(value);
-}
+// function currency(value: number): string {
+//     return new Intl.NumberFormat('en-ET', {
+//         style: 'currency',
+//         currency: 'ETB',
+//         maximumFractionDigits: 2,
+//     }).format(value);
+// }
 
 const breadcrumbs: BreadcrumbItem[] = [
     {

@@ -14,8 +14,7 @@ import {
     Package,
     ArrowRight
 } from 'lucide-react';
-import { useMemo, useState, type FormEvent } from 'react';
-import InputError from '@/components/input-error';
+import {  useState, type FormEvent } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -129,12 +128,9 @@ function badgeStyle(status: string | null): string {
 }
 
 export default function CakePreorders({
-    packages,
     preorders,
     filters,
     statusOptions,
-    parentPackageOptions,
-    canManagePackages,
     summary,
 }: {
     packages: CakePackageRow[];

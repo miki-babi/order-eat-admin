@@ -1,8 +1,9 @@
+import { Head, Link, useForm,  router } from '@inertiajs/react';
+
 import {
     ChevronDown,
     ChevronUp,
     MoreHorizontal,
-    ArrowRight,
     ChevronLeft,
     ChevronRight,
     ClipboardList,
@@ -13,12 +14,11 @@ import {
     Search,
     MapPin,
     RotateCcw,
-    ThumbsDown
 } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import {
     Collapsible,
     CollapsibleContent,
@@ -42,9 +42,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
-import { Head, Link, useForm, usePage, router } from '@inertiajs/react';
 import type { BreadcrumbItem } from '@/types';
 
 type OrderItem = {

@@ -1,6 +1,6 @@
+import { Clock3, MapPin, Package, Store } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Clock3, MapPin, Package, Store } from 'lucide-react';
 
 export type SourceChannel = 'web' | 'telegram' | 'table';
 

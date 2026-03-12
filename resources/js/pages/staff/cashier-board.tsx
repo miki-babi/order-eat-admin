@@ -1,6 +1,6 @@
 import { Head, router } from '@inertiajs/react';
 import { CheckCircle2, ReceiptText, Wallet } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

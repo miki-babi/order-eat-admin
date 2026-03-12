@@ -1,14 +1,13 @@
 import { Head, Link, router, useForm } from '@inertiajs/react';
-import { ChevronLeft, ChevronRight, Clock3, MapPin, MessageSquare, Package, Search, Store, TrendingUp, Users } from 'lucide-react';
+import { ChevronLeft, ChevronRight,  MessageSquare,Search,  TrendingUp, Users } from 'lucide-react';
 import { useMemo, useRef, useState, type FormEvent } from 'react';
+import { CustomerHistoryModal, type SelectedCustomer } from '@/components/staff/customer-history-modal';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
-import { CustomerHistoryModal, type SelectedCustomer } from '@/components/staff/customer-history-modal';
 import type { BreadcrumbItem } from '@/types';
 
 type CustomerRow = {
@@ -36,7 +35,7 @@ type Paginated<T> = {
     to: number | null;
 };
 
-type SourceChannel = 'web' | 'telegram' | 'table';
+// type SourceChannel = 'web' | 'telegram' | 'table';
 
 type Summary = {
     total_customers: number;
@@ -71,29 +70,29 @@ function currency(value: number): string {
     }).format(value);
 }
 
-function sourceChannelLabel(channel: SourceChannel): string {
-    if (channel === 'telegram') {
-        return 'Telegram';
-    }
+// function sourceChannelLabel(channel: SourceChannel): string {
+//     if (channel === 'telegram') {
+//         return 'Telegram';
+//     }
 
-    if (channel === 'table') {
-        return 'Table';
-    }
+//     if (channel === 'table') {
+//         return 'Table';
+//     }
 
-    return 'Web';
-}
+//     return 'Web';
+// }
 
-function sourceBadgeClass(channel: SourceChannel): string {
-    if (channel === 'telegram') {
-        return 'bg-sky-50 text-sky-700 ring-1 ring-sky-200';
-    }
+// function sourceBadgeClass(channel: SourceChannel): string {
+//     if (channel === 'telegram') {
+//         return 'bg-sky-50 text-sky-700 ring-1 ring-sky-200';
+//     }
 
-    if (channel === 'table') {
-        return 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200';
-    }
+//     if (channel === 'table') {
+//         return 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200';
+//     }
 
-    return 'bg-zinc-100 text-zinc-700 ring-1 ring-zinc-200';
-}
+//     return 'bg-zinc-100 text-zinc-700 ring-1 ring-zinc-200';
+// }
 
 export default function StaffCustomers({
     customers,

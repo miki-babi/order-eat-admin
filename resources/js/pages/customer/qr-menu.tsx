@@ -1,12 +1,9 @@
 import { Head, Link, useForm } from '@inertiajs/react';
 import {
-    CheckCircle2,
     ChevronLeft,
     ChevronRight,
-    QrCode,
     Search,
     ShoppingCart,
-    SparkleIcon,
     Store,
     Table2,
     X,
@@ -14,10 +11,10 @@ import {
     Minus,
 } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { FeedbackModal } from '@/components/customer/feedback-modal';
 import InputError from '@/components/input-error';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { FeedbackModal } from '@/components/customer/feedback-modal';
 import { Input } from '@/components/ui/input';
 
 type MenuItem = {
