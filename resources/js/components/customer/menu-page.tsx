@@ -465,18 +465,18 @@ export default function CustomerMenuPage({
         setCanScrollFeaturedNext(carousel.scrollLeft < maxScrollLeft - 4);
     }, []);
 
-    const scrollFeaturedCarousel = useCallback((direction: -1 | 1) => {
-        const carousel = featuredCarouselRef.current;
+    // const scrollFeaturedCarousel = useCallback((direction: -1 | 1) => {
+    //     const carousel = featuredCarouselRef.current;
 
-        if (!carousel) {
-            return;
-        }
+    //     if (!carousel) {
+    //         return;
+    //     }
 
-        carousel.scrollBy({
-            left: carousel.clientWidth * 0.85 * direction,
-            behavior: 'smooth',
-        });
-    }, []);
+    //     carousel.scrollBy({
+    //         left: carousel.clientWidth * 0.85 * direction,
+    //         behavior: 'smooth',
+    //     });
+    // }, []);
 
     const autoAdvanceFeaturedCarousel = useCallback(() => {
         const carousel = featuredCarouselRef.current;
@@ -1143,11 +1143,11 @@ export default function CustomerMenuPage({
                                                     <button
                                                         type="button"
                                                         className="flex h-8 w-8 items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-600 transition-colors hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800"
-                                                        onClick={() =>
-                                                            scrollFeaturedCarousel(
-                                                                -1,
-                                                            )
-                                                        }
+                                                        // onClick={() =>
+                                                            // scrollFeaturedCarousel(
+                                                            //     -1,
+                                                            // )
+                                                        // }
                                                         disabled={
                                                             !canScrollFeaturedPrev
                                                         }
@@ -1158,11 +1158,11 @@ export default function CustomerMenuPage({
                                                     <button
                                                         type="button"
                                                         className="flex h-8 w-8 items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-600 transition-colors hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800"
-                                                        onClick={() =>
-                                                            scrollFeaturedCarousel(
-                                                                1,
-                                                            )
-                                                        }
+                                                        // onClick={() =>
+                                                        //     scrollFeaturedCarousel(
+                                                        //         1,
+                                                        //     )
+                                                        // }
                                                         disabled={
                                                             !canScrollFeaturedNext
                                                         }
