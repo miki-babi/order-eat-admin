@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../wayfinder'
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\OrderController::index
-* @see Modules/Ordering/app/Http/Controllers/Staff/OrderController.php:26
+* @see Modules/Ordering/app/Http/Controllers/Staff/OrderController.php:27
 * @route '/staff/orders'
 */
 export const index = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ index.definition = {
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\OrderController::index
-* @see Modules/Ordering/app/Http/Controllers/Staff/OrderController.php:26
+* @see Modules/Ordering/app/Http/Controllers/Staff/OrderController.php:27
 * @route '/staff/orders'
 */
 index.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ index.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\OrderController::index
-* @see Modules/Ordering/app/Http/Controllers/Staff/OrderController.php:26
+* @see Modules/Ordering/app/Http/Controllers/Staff/OrderController.php:27
 * @route '/staff/orders'
 */
 index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -35,7 +35,7 @@ index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\OrderController::index
-* @see Modules/Ordering/app/Http/Controllers/Staff/OrderController.php:26
+* @see Modules/Ordering/app/Http/Controllers/Staff/OrderController.php:27
 * @route '/staff/orders'
 */
 index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -45,7 +45,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\OrderController::index
-* @see Modules/Ordering/app/Http/Controllers/Staff/OrderController.php:26
+* @see Modules/Ordering/app/Http/Controllers/Staff/OrderController.php:27
 * @route '/staff/orders'
 */
 const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -55,7 +55,7 @@ const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => (
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\OrderController::index
-* @see Modules/Ordering/app/Http/Controllers/Staff/OrderController.php:26
+* @see Modules/Ordering/app/Http/Controllers/Staff/OrderController.php:27
 * @route '/staff/orders'
 */
 indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -65,7 +65,7 @@ indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\OrderController::index
-* @see Modules/Ordering/app/Http/Controllers/Staff/OrderController.php:26
+* @see Modules/Ordering/app/Http/Controllers/Staff/OrderController.php:27
 * @route '/staff/orders'
 */
 indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -82,7 +82,7 @@ index.form = indexForm
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\OrderController::update
-* @see Modules/Ordering/app/Http/Controllers/Staff/OrderController.php:176
+* @see Modules/Ordering/app/Http/Controllers/Staff/OrderController.php:178
 * @route '/staff/orders/{order}'
 */
 export const update = (args: { order: number | { id: number } } | [order: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
@@ -97,7 +97,7 @@ update.definition = {
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\OrderController::update
-* @see Modules/Ordering/app/Http/Controllers/Staff/OrderController.php:176
+* @see Modules/Ordering/app/Http/Controllers/Staff/OrderController.php:178
 * @route '/staff/orders/{order}'
 */
 update.url = (args: { order: number | { id: number } } | [order: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -130,7 +130,7 @@ update.url = (args: { order: number | { id: number } } | [order: number | { id: 
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\OrderController::update
-* @see Modules/Ordering/app/Http/Controllers/Staff/OrderController.php:176
+* @see Modules/Ordering/app/Http/Controllers/Staff/OrderController.php:178
 * @route '/staff/orders/{order}'
 */
 update.patch = (args: { order: number | { id: number } } | [order: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
@@ -140,7 +140,7 @@ update.patch = (args: { order: number | { id: number } } | [order: number | { id
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\OrderController::update
-* @see Modules/Ordering/app/Http/Controllers/Staff/OrderController.php:176
+* @see Modules/Ordering/app/Http/Controllers/Staff/OrderController.php:178
 * @route '/staff/orders/{order}'
 */
 const updateForm = (args: { order: number | { id: number } } | [order: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -155,7 +155,7 @@ const updateForm = (args: { order: number | { id: number } } | [order: number | 
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\OrderController::update
-* @see Modules/Ordering/app/Http/Controllers/Staff/OrderController.php:176
+* @see Modules/Ordering/app/Http/Controllers/Staff/OrderController.php:178
 * @route '/staff/orders/{order}'
 */
 updateForm.patch = (args: { order: number | { id: number } } | [order: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({

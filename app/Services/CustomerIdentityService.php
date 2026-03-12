@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Models\Customer;
 use App\Models\CustomerToken;
+use App\Models\CakePreorder;
+use App\Models\CateringServiceRequest;
 use App\Models\Order;
 use App\Models\SmsLog;
 use Illuminate\Http\Request;
@@ -259,6 +261,14 @@ class CustomerIdentityService
         }
 
         Order::query()
+            ->where('customer_id', $source->id)
+            ->update(['customer_id' => $target->id]);
+
+        CakePreorder::query()
+            ->where('customer_id', $source->id)
+            ->update(['customer_id' => $target->id]);
+
+        CateringServiceRequest::query()
             ->where('customer_id', $source->id)
             ->update(['customer_id' => $target->id]);
 

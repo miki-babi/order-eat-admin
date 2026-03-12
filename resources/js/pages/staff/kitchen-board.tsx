@@ -1,6 +1,6 @@
 import { Head, router } from '@inertiajs/react';
 import { CheckCircle2, ChefHat, LoaderCircle, TimerReset } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -99,6 +99,15 @@ export default function KitchenBoard({
     summary: Summary;
 }) {
     const [processingStatusId, setProcessingStatusId] = useState<number | null>(null);
+    useEffect(() => {
+        const interval = setInterval(() => {
+            router.reload({
+                only: ['orderStatuses', 'summary'],
+            });
+        }, 10000);
+
+        return () => clearInterval(interval);
+    }, []);
 
     const selectScreen = (screenId: number) => {
         router.get(

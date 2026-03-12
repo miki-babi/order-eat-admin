@@ -983,7 +983,7 @@ export default function SmsTemplates({
 
                                     <button
                                         type="button"
-                                        className={`rounded-2xl border p-5 text-left transition-all ${
+                                        className={`rounded-2xl border p-5 text-left transition-all hidden ${
                                             promoForm.data.platform === 'telegram'
                                                 ? 'border-[#F57C00] bg-[#F57C00]/5 shadow-sm'
                                                 : 'border-zinc-200 bg-white hover:border-[#F57C00]/30'
@@ -1958,7 +1958,7 @@ export default function SmsTemplates({
                     </CardContent>
                 </Card>
 
-                <div className="grid gap-8 lg:grid-cols-2">
+                <div className="grid gap-8 lg:grid-cols-2 hidden">
                     {/* 📌 Gatekeeper (Filter Management) */}
                     <Card className="border-none shadow-md ring-1 ring-zinc-200">
                         <CardHeader className="border-b border-zinc-100 py-5">
@@ -2023,7 +2023,7 @@ export default function SmsTemplates({
                     </Card>
 
                     {/* 📌 Mass Upload */}
-                    <Card className="border-none shadow-md ring-1 ring-zinc-200">
+                    <Card className="border-none shadow-md ring-1 ring-zinc-200 hidden">
                         <CardHeader className="border-b border-zinc-100 py-5">
                             <CardTitle className="flex items-center gap-2 text-sm font-black uppercase tracking-widest text-[#212121]">
                                 <UploadCloud className="size-4 text-[#F57C00]" />
@@ -2063,7 +2063,7 @@ export default function SmsTemplates({
                 </div>
 
                 {/* 📌 Filter Journal */}
-                <Card className="border-none shadow-md ring-1 ring-zinc-200">
+                <Card className="border-none shadow-md ring-1 ring-zinc-200 hidden">
                     <CardHeader className="border-b border-zinc-100 bg-zinc-50/50 py-5">
                         <CardTitle className="flex items-center gap-2 text-sm font-black uppercase tracking-widest text-[#212121]">
                             <Users className="size-4 text-[#F57C00]" />

@@ -5,6 +5,7 @@ namespace Modules\Ordering\Http\Controllers\Staff;
 use App\Http\Controllers\Controller;
 use Modules\Ordering\Http\Requests\Staff\UpdateOrderRequest;
 use App\Models\Order;
+use App\Models\Feedback;
 use App\Models\PickupLocation;
 use App\Support\BranchAccess;
 use App\Services\SmsEthiopiaService;
@@ -166,6 +167,7 @@ class OrderController extends Controller
                 'pending_orders' => (clone $statsBase)->where('order_status', 'pending')->count(),
                 'pending_receipts' => (clone $statsBase)->where('receipt_status', 'pending')->count(),
                 'ready_orders' => (clone $statsBase)->where('order_status', 'ready')->count(),
+                'complaints' => Feedback::where('rating', 'unsatisfied')->count(),
             ],
         ]);
     }

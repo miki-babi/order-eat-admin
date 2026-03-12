@@ -1,8 +1,24 @@
-import { Head, useForm, usePage } from '@inertiajs/react';
-import { ArrowRight, CheckCircle2, ChevronLeft, ChevronRight, Clock3, ExternalLink, MapPin, Search, ShoppingCart, SparkleIcon, Upload, X } from 'lucide-react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import {
+    ArrowRight,
+    CheckCircle2,
+    ChevronLeft,
+    ChevronRight,
+    Clock3,
+    ExternalLink,
+    MapPin,
+    Search,
+    ShoppingCart,
+    SparkleIcon,
+    Upload,
+    X,
+    Plus,
+    Minus,
+} from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
+import { FeedbackModal } from '@/components/customer/feedback-modal';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
@@ -103,7 +119,9 @@ function telegramWebApp(): TelegramWebApp | null {
         return null;
     }
 
-    const telegram = (window as Window & { Telegram?: { WebApp?: TelegramWebApp } }).Telegram;
+    const telegram = (
+        window as Window & { Telegram?: { WebApp?: TelegramWebApp } }
+    ).Telegram;
 
     return telegram?.WebApp ?? null;
 }
@@ -132,7 +150,9 @@ function telegramInitDataFromLocation(): string | null {
         return normalized === '' ? null : normalized;
     };
 
-    return extractFrom(window.location.search) ?? extractFrom(window.location.hash);
+    return (
+        extractFrom(window.location.search) ?? extractFrom(window.location.hash)
+    );
 }
 
 function isTelegramMiniAppContext(defaultChannel: string): boolean {
@@ -173,13 +193,17 @@ function normalizeTelegramUsername(value: unknown): string | null {
     return normalized === '' ? null : normalized;
 }
 
-function telegramDisplayName(user: TelegramMiniAppUser | undefined): string | null {
+function telegramDisplayName(
+    user: TelegramMiniAppUser | undefined,
+): string | null {
     if (!user) {
         return null;
     }
 
-    const firstName = typeof user.first_name === 'string' ? user.first_name.trim() : '';
-    const lastName = typeof user.last_name === 'string' ? user.last_name.trim() : '';
+    const firstName =
+        typeof user.first_name === 'string' ? user.first_name.trim() : '';
+    const lastName =
+        typeof user.last_name === 'string' ? user.last_name.trim() : '';
     const combined = `${firstName} ${lastName}`.trim();
 
     if (combined !== '') {
@@ -206,7 +230,10 @@ function currency(value: number): string {
     }).format(value);
 }
 
-function sanitizeCartPayload(raw: unknown, allowedMenuItemIds: Set<number>): Record<number, number> {
+function sanitizeCartPayload(
+    raw: unknown,
+    allowedMenuItemIds: Set<number>,
+): Record<number, number> {
     if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
         return {};
     }
@@ -215,9 +242,14 @@ function sanitizeCartPayload(raw: unknown, allowedMenuItemIds: Set<number>): Rec
 
     Object.entries(raw).forEach(([rawItemId, rawQuantity]) => {
         const itemId = Number(rawItemId);
-        const quantity = typeof rawQuantity === 'number' ? rawQuantity : Number(rawQuantity);
+        const quantity =
+            typeof rawQuantity === 'number' ? rawQuantity : Number(rawQuantity);
 
-        if (!Number.isInteger(itemId) || itemId < 1 || !allowedMenuItemIds.has(itemId)) {
+        if (
+            !Number.isInteger(itemId) ||
+            itemId < 1 ||
+            !allowedMenuItemIds.has(itemId)
+        ) {
             return;
         }
 
@@ -231,7 +263,10 @@ function sanitizeCartPayload(raw: unknown, allowedMenuItemIds: Set<number>): Rec
     return sanitized;
 }
 
-function loadPersistedCart(storageKey: string, allowedMenuItemIds: Set<number>): Record<number, number> {
+function loadPersistedCart(
+    storageKey: string,
+    allowedMenuItemIds: Set<number>,
+): Record<number, number> {
     if (typeof window === 'undefined') {
         return {};
     }
@@ -309,7 +344,10 @@ function persistStep(storageKey: string, step: number): void {
     }
 
     try {
-        window.localStorage.setItem(storageKey, JSON.stringify(sanitizeStepValue(step)));
+        window.localStorage.setItem(
+            storageKey,
+            JSON.stringify(sanitizeStepValue(step)),
+        );
     } catch {
         // Ignore storage write failures to avoid blocking checkout.
     }
@@ -335,9 +373,10 @@ export default function CustomerMenuPage({
     customerPrefill,
     filters,
     forcedChannel,
+    staffRoute,
 }: CustomerMenuPageProps) {
     const { auth, flash } = usePage<SharedProps>().props;
-    const baseChannel = forcedChannel ?? (filters.channel ?? 'web');
+    const baseChannel = forcedChannel ?? filters.channel ?? 'web';
     const channel = isTelegramMiniAppContext(baseChannel)
         ? 'telegram'
         : baseChannel;
@@ -352,15 +391,17 @@ export default function CustomerMenuPage({
     const [isSearchInputVisible, setIsSearchInputVisible] = useState(
         () => (filters.search ?? '').trim() !== '',
     );
-    const [activeCategory, setActiveCategory] = useState(filters.category ?? 'all');
+    const [activeCategory, setActiveCategory] = useState(
+        filters.category ?? 'all',
+    );
     const [hideTopChrome, setHideTopChrome] = useState(false);
     const [hideBottomActions, setHideBottomActions] = useState(false);
     const hasSyncedTelegramIdentity = useRef(false);
     const lastScrollY = useRef(0);
     const searchInputRef = useRef<HTMLInputElement | null>(null);
     const featuredCarouselRef = useRef<HTMLDivElement | null>(null);
-    const [cart, setCart] = useState<Record<number, number>>(
-        () => loadPersistedCart(cartStorageKey, allowedMenuItemIds),
+    const [cart, setCart] = useState<Record<number, number>>(() =>
+        loadPersistedCart(cartStorageKey, allowedMenuItemIds),
     );
     const [canScrollFeaturedPrev, setCanScrollFeaturedPrev] = useState(false);
     const [canScrollFeaturedNext, setCanScrollFeaturedNext] = useState(false);
@@ -392,7 +433,8 @@ export default function CustomerMenuPage({
         () =>
             menuItems.filter((item) => {
                 const matchesCategory =
-                    activeCategory === 'all' || (item.category ?? 'Uncategorized') === activeCategory;
+                    activeCategory === 'all' ||
+                    (item.category ?? 'Uncategorized') === activeCategory;
                 const lower = search.toLowerCase();
                 const matchesSearch =
                     !lower ||
@@ -456,7 +498,9 @@ export default function CustomerMenuPage({
             return;
         }
 
-        const firstSlide = carousel.querySelector<HTMLElement>('[data-featured-slide="true"]');
+        const firstSlide = carousel.querySelector<HTMLElement>(
+            '[data-featured-slide="true"]',
+        );
         const slideWidth = firstSlide?.offsetWidth ?? 0;
         const gap = 16;
         const fallbackStep = carousel.clientWidth * 0.85;
@@ -500,11 +544,20 @@ export default function CustomerMenuPage({
             .filter((entry): entry is CartEntry => Boolean(entry));
     }, [cart, menuById]);
 
-    const cartCount = cartItems.reduce((carry, item) => carry + item.quantity, 0);
-    const cartTotal = cartItems.reduce((carry, item) => carry + item.lineTotal, 0);
+    const cartCount = cartItems.reduce(
+        (carry, item) => carry + item.quantity,
+        0,
+    );
+    const cartTotal = cartItems.reduce(
+        (carry, item) => carry + item.lineTotal,
+        0,
+    );
 
     useEffect(() => {
-        persistCart(cartStorageKey, sanitizeCartPayload(cart, allowedMenuItemIds));
+        persistCart(
+            cartStorageKey,
+            sanitizeCartPayload(cart, allowedMenuItemIds),
+        );
     }, [cart, cartStorageKey, allowedMenuItemIds]);
 
     useEffect(() => {
@@ -579,7 +632,8 @@ export default function CustomerMenuPage({
 
             window.requestAnimationFrame(() => {
                 const currentY = window.scrollY || 0;
-                const isDesktop = window.matchMedia('(min-width: 768px)').matches;
+                const isDesktop =
+                    window.matchMedia('(min-width: 768px)').matches;
 
                 if (isDesktop) {
                     setHideTopChrome(false);
@@ -632,7 +686,11 @@ export default function CustomerMenuPage({
         let injectedScript: HTMLScriptElement | null = null;
 
         const syncFromInitData = (initData: string) => {
-            if (initData === '' || hasSyncedTelegramIdentity.current || isDisposed) {
+            if (
+                initData === '' ||
+                hasSyncedTelegramIdentity.current ||
+                isDisposed
+            ) {
                 return;
             }
 
@@ -675,23 +733,29 @@ export default function CustomerMenuPage({
                         ...current,
                         channel: 'telegram',
                         customer_token:
-                            typeof payload.customer?.customer_token === 'string' && payload.customer.customer_token !== ''
+                            typeof payload.customer?.customer_token ===
+                                'string' &&
+                            payload.customer.customer_token !== ''
                                 ? payload.customer.customer_token
                                 : current.customer_token,
                         name:
-                            typeof payload.customer?.name === 'string' && payload.customer.name.trim() !== ''
+                            typeof payload.customer?.name === 'string' &&
+                            payload.customer.name.trim() !== ''
                                 ? payload.customer.name
                                 : current.name,
                         phone:
-                            typeof payload.customer?.phone === 'string' && payload.customer.phone.trim() !== ''
+                            typeof payload.customer?.phone === 'string' &&
+                            payload.customer.phone.trim() !== ''
                                 ? payload.customer.phone
                                 : current.phone,
                         telegram_id:
-                            typeof payload.customer?.telegram_id === 'number' && payload.customer.telegram_id > 0
+                            typeof payload.customer?.telegram_id === 'number' &&
+                            payload.customer.telegram_id > 0
                                 ? payload.customer.telegram_id
                                 : current.telegram_id,
                         telegram_username:
-                            typeof payload.customer?.telegram_username === 'string'
+                            typeof payload.customer?.telegram_username ===
+                            'string'
                                 ? payload.customer.telegram_username
                                 : current.telegram_username,
                     }));
@@ -719,7 +783,8 @@ export default function CustomerMenuPage({
                     ...current,
                     channel: 'telegram',
                     telegram_id: telegramId,
-                    telegram_username: telegramUsername ?? current.telegram_username,
+                    telegram_username:
+                        telegramUsername ?? current.telegram_username,
                 }));
             }
 
@@ -727,10 +792,14 @@ export default function CustomerMenuPage({
                 form.setData('name', displayName);
             }
 
-            const initDataFromWebApp = typeof webApp.initData === 'string' ? webApp.initData.trim() : '';
-            const initData = initDataFromWebApp !== ''
-                ? initDataFromWebApp
-                : (telegramInitDataFromLocation() ?? '');
+            const initDataFromWebApp =
+                typeof webApp.initData === 'string'
+                    ? webApp.initData.trim()
+                    : '';
+            const initData =
+                initDataFromWebApp !== ''
+                    ? initDataFromWebApp
+                    : (telegramInitDataFromLocation() ?? '');
 
             syncFromInitData(initData);
         };
@@ -789,7 +858,10 @@ export default function CustomerMenuPage({
         form.data.pickup_location_id;
 
     const selectedPickupLocation = useMemo(
-        () => pickupLocations.find((location) => location.id === form.data.pickup_location_id) ?? null,
+        () =>
+            pickupLocations.find(
+                (location) => location.id === form.data.pickup_location_id,
+            ) ?? null,
         [pickupLocations, form.data.pickup_location_id],
     );
 
@@ -804,10 +876,10 @@ export default function CustomerMenuPage({
             items: itemsPayload,
             receipt: form.data.receipt
                 ? {
-                    name: form.data.receipt.name,
-                    size: form.data.receipt.size,
-                    type: form.data.receipt.type,
-                }
+                      name: form.data.receipt.name,
+                      size: form.data.receipt.size,
+                      type: form.data.receipt.type,
+                  }
                 : null,
         };
 
@@ -830,7 +902,10 @@ export default function CustomerMenuPage({
                 console.log('[Order Submit] request started');
             },
             onProgress: (event) => {
-                console.log('[Order Submit] upload progress', event?.percentage ?? 0);
+                console.log(
+                    '[Order Submit] upload progress',
+                    event?.percentage ?? 0,
+                );
             },
             onSuccess: () => {
                 clearPersistedCart(cartStorageKey);
@@ -840,7 +915,10 @@ export default function CustomerMenuPage({
                 console.log('[Order Submit] success');
             },
             onError: (errors) => {
-                console.error('[Order Submit] validation or server error', errors);
+                console.error(
+                    '[Order Submit] validation or server error',
+                    errors,
+                );
 
                 if (errors.items) {
                     setStep(2);
@@ -852,7 +930,12 @@ export default function CustomerMenuPage({
                     return;
                 }
 
-                if (errors.name || errors.phone || errors.pickup_date || errors.pickup_location_id) {
+                if (
+                    errors.name ||
+                    errors.phone ||
+                    errors.pickup_date ||
+                    errors.pickup_location_id
+                ) {
                     setStep(3);
                 }
             },
@@ -865,9 +948,7 @@ export default function CustomerMenuPage({
     return (
         <>
             <Head title="Cafe Menu" />
-            <div className="min-h-screen bg-[#FAFAFA] text-[#212121]">
-
-
+            <div className="min-h-screen bg-zinc-50 text-zinc-900 transition-colors duration-300 dark:bg-zinc-950 dark:text-zinc-100">
                 {/* Cart Floating Action Button */}
                 {step === 1 && cartCount > 0 && (
                     <button
@@ -875,20 +956,45 @@ export default function CustomerMenuPage({
                             setStep(2);
                             window.scrollTo({ top: 0, behavior: 'smooth' });
                         }}
-                        className={`fixed bottom-24 right-6 z-[60] flex h-16 w-16 items-center justify-center rounded-full bg-[#212121] text-white shadow-[0_20px_50px_rgba(0,0,0,0.3)] ring-4 ring-white transition-all duration-300 cursor-pointer hover:scale-110 active:scale-95 md:bottom-12 md:right-12 md:translate-y-0 md:opacity-100 md:pointer-events-auto ${hideBottomActions ? 'translate-y-[140%] opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}`}
+                        className={`fixed right-6 bottom-24 z-[60] flex h-16 w-16 cursor-pointer items-center justify-center rounded-full bg-zinc-900 text-zinc-50 shadow-xl ring-4 ring-white transition-all duration-300 hover:scale-110 active:scale-95 md:right-12 md:bottom-12 dark:bg-zinc-100 dark:text-zinc-900 dark:ring-zinc-800 ${hideBottomActions ? 'pointer-events-none translate-y-[140%] opacity-0' : 'translate-y-0 opacity-100'}`}
                     >
                         <div className="relative">
-                            <ShoppingCart className="size-7" />
-                            <span className="absolute -top-3 -right-3 flex h-6 w-6 items-center justify-center rounded-full bg-[#F57C00] text-[11px] font-black text-white shadow-md ring-2 ring-white animate-in zoom-in-50 duration-300">
+                            <ShoppingCart
+                                className="size-6"
+                                strokeWidth={2.5}
+                            />
+                            <span className="absolute -top-3 -right-3 flex h-6 w-6 items-center justify-center rounded-full bg-orange-600 text-[11px] font-bold text-white shadow-md ring-2 ring-white transition-colors dark:bg-orange-500 dark:ring-zinc-900">
                                 {cartCount}
                             </span>
                         </div>
                     </button>
                 )}
 
-                <main className="mx-auto w-full max-w-7xl px-4 py-8 md:px-8 pb-32 md:pb-12">
+                <main className="mx-auto w-full max-w-7xl px-4 py-8 pb-32 md:px-8 md:pb-12">
+                    <div className="mb-6 grid hidden gap-4 md:grid-cols-2">
+                        <Link
+                            href="/cakes"
+                            className="rounded-2xl border border-zinc-200 bg-white p-4 text-sm font-bold text-zinc-900 shadow-sm transition-all hover:border-orange-500/40 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100"
+                        >
+                            Cake Preordering
+                            <p className="mt-2 text-xs font-medium text-zinc-500 dark:text-zinc-400">
+                                Browse cakes and submit customized preorders.
+                            </p>
+                        </Link>
+                        <Link
+                            href="/catering"
+                            className="rounded-2xl border border-zinc-200 bg-white p-4 text-sm font-bold text-zinc-900 shadow-sm transition-all hover:border-orange-500/40 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100"
+                        >
+                            Catering Services
+                            <p className="mt-2 text-xs font-medium text-zinc-500 dark:text-zinc-400">
+                                Explore catering packages and request event
+                                support.
+                            </p>
+                        </Link>
+                    </div>
+
                     {/* Material Step Tracker */}
-                    <div className={`sticky top-[0px] z-40 mb-6 overflow-hidden rounded-2xl bg-white p-1.5 shadow-lg ring-1 ring-zinc-100 transition-all duration-300 md:relative md:top-0 md:bg-white md:p-1 md:shadow-md md:translate-y-0 md:opacity-100 md:pointer-events-auto ${hideTopChrome ? '-translate-y-[130%] opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}`}>
+                    {/* <div className={`sticky top-0 z-40 mb-8 overflow-hidden rounded-2xl bg-white p-1 shadow-md ring-1 ring-zinc-100 transition-all duration-300 dark:bg-zinc-900 dark:ring-zinc-800 md:relative md:top-0 ${hideTopChrome ? '-translate-y-[130%] opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}`}>
                         <div className="flex flex-row items-center gap-1">
                             {steps.map((label, index) => {
                                 const isActive = step === index + 1;
@@ -896,24 +1002,24 @@ export default function CustomerMenuPage({
                                 return (
                                     <div
                                         key={label}
-                                        className={`flex flex-1 items-center justify-center rounded-xl px-2 py-2.5 transition-all duration-500 md:px-4 md:py-3 ${isActive
-                                            ? 'bg-[#FFF3E0] text-[#F57C00] shadow-sm'
+                                        className={`flex flex-1 items-center justify-center rounded-xl px-2 py-3 transition-all duration-500 dark:bg-transparent ${isActive
+                                            ? 'bg-orange-50 text-orange-600 shadow-sm dark:bg-orange-950/20 dark:text-orange-400'
                                             : 'bg-transparent'
                                             }`}
                                     >
                                         <div
-                                            className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10px] font-black transition-all duration-500 ${isActive
-                                                ? 'bg-[#F57C00] text-white shadow-md shadow-[#F57C00]/20 scale-110'
+                                            className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10px] font-bold transition-all duration-500 ${isActive
+                                                ? 'bg-orange-600 text-white shadow-md shadow-orange-600/20 scale-110 dark:bg-orange-500 dark:shadow-orange-500/10'
                                                 : isCompleted
-                                                    ? 'bg-[#2E7D32] text-white'
-                                                    : 'bg-zinc-100 text-zinc-400'
+                                                    ? 'bg-emerald-600 text-white dark:bg-emerald-500'
+                                                    : 'bg-zinc-100 text-zinc-400 dark:bg-zinc-800 dark:text-zinc-600'
                                                 } ${isActive ? 'mr-2' : 'md:mr-3'}`}
                                         >
                                             {isCompleted ? <CheckCircle2 className="size-4" strokeWidth={3} /> : index + 1}
                                         </div>
                                         <span
-                                            className={`text-[11px] font-black uppercase tracking-tight md:text-sm md:normal-case md:tracking-normal ${isActive ? 'block' : 'hidden md:block'
-                                                } ${isActive ? 'text-[#F57C00]' : 'text-zinc-500'}`}
+                                            className={`text-[11px] font-bold uppercase tracking-tight md:text-sm md:normal-case md:tracking-normal ${isActive ? 'block' : 'hidden md:block'
+                                                } ${isActive ? 'text-orange-600 dark:text-orange-400' : 'text-zinc-500 dark:text-zinc-400'}`}
                                         >
                                             {label.split('. ')[1]}
                                         </span>
@@ -921,30 +1027,32 @@ export default function CustomerMenuPage({
                                 );
                             })}
                         </div>
+                    </div> */}
 
-                    </div>
-
-                    <div className={`sticky top-[0px] z-60 mb-10 overflow-hidden rounded-2xl bg-white p-1.5 shadow-lg ring-1 ring-zinc-100 transition-all duration-300 md:relative md:top-0 md:bg-white md:p-1 md:shadow-md md:translate-y-0 md:opacity-100 md:pointer-events-auto ${step === 1 ? 'block' : 'hidden'} ${hideTopChrome ? '-translate-y-[160%] opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}`}>
-
-                        <div className=" flex scrollable gap-3 p-2 transition-all duration-300">
+                    <div
+                        className={`sticky top-0 z-60 mb-8 overflow-hidden bg-white/80 py-2 backdrop-blur-xl transition-all duration-300 md:relative md:top-0 dark:bg-zinc-950/80 ${step === 1 ? 'block' : 'hidden'} ${hideTopChrome ? 'pointer-events-none -translate-y-[160%] opacity-0' : 'translate-y-0 opacity-100'}`}
+                    >
+                        <div className="scrollable flex gap-3 px-1 transition-all duration-300">
                             <button
                                 type="button"
-                                className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 shadow-sm ${activeCategory === 'all'
-                                    ? 'bg-[#F57C00] text-white shadow-[#F57C00]/20 scale-105'
-                                    : 'bg-white text-[#757575] hover:bg-[#F5F5F5] ring-1 ring-zinc-200'
-                                    }`}
+                                className={`rounded-2xl px-6 py-2.5 text-sm font-bold transition-all duration-300 ${
+                                    activeCategory === 'all'
+                                        ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900'
+                                        : 'bg-white text-zinc-500 ring-1 ring-zinc-200 hover:bg-zinc-50 dark:bg-zinc-900 dark:text-zinc-400 dark:ring-zinc-800 dark:hover:bg-zinc-800'
+                                }`}
                                 onClick={() => setActiveCategory('all')}
                             >
-                                All 
+                                All
                             </button>
                             {categories.map((category) => (
                                 <button
                                     key={category}
                                     type="button"
-                                    className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 shadow-sm ${activeCategory === category
-                                        ? 'bg-[#F57C00] text-white shadow-[#F57C00]/20 scale-105'
-                                        : 'bg-white text-[#757575] hover:bg-[#F5F5F5] ring-1 ring-zinc-200'
-                                        }`}
+                                    className={`whitespace-nowrap rounded-2xl px-6 py-2.5 text-sm font-bold transition-all duration-300 ${
+                                        activeCategory === category
+                                            ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900'
+                                            : 'bg-white text-zinc-500 ring-1 ring-zinc-200 hover:bg-zinc-50 dark:bg-zinc-900 dark:text-zinc-400 dark:ring-zinc-800 dark:hover:bg-zinc-800'
+                                    }`}
                                     onClick={() => setActiveCategory(category)}
                                 >
                                     {category}
@@ -956,35 +1064,46 @@ export default function CustomerMenuPage({
                     <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
                         <section className="min-w-0 space-y-6">
                             {flash?.success && (
-                                <div className="animate-in fade-in slide-in-from-top-4 rounded-xl border-l-4 border-[#2E7D32] bg-green-50 px-5 py-4 text-sm font-medium text-[#1B5E20] shadow-sm transition-all duration-500">
+                                <div className="animate-in rounded-xl border-l-4 border-[#2E7D32] bg-green-50 px-5 py-4 text-sm font-medium text-[#1B5E20] shadow-sm transition-all duration-500 fade-in slide-in-from-top-4">
                                     {flash.success}
                                 </div>
                             )}
                             {flash?.error && (
-                                <div className="animate-in fade-in slide-in-from-top-4 rounded-xl border-l-4 border-[#C62828] bg-red-50 px-5 py-4 text-sm font-medium text-[#B71C1C] shadow-sm transition-all duration-500">
+                                <div className="animate-in rounded-xl border-l-4 border-[#C62828] bg-red-50 px-5 py-4 text-sm font-medium text-[#B71C1C] shadow-sm transition-all duration-500 fade-in slide-in-from-top-4">
                                     {flash.error}
                                 </div>
                             )}
 
                             {step === 1 && (
-                                <div className="space-y-8 animate-in fade-in duration-500">
+                                <div className="animate-in space-y-8 duration-500 fade-in">
                                     {/* Search & Filters */}
-                                    <div className="space-y-6 flex items-center justify-end gap-4">
+                                    <div className="flex items-center justify-end gap-4 space-y-0">
                                         {isSearchInputVisible ? (
-                                            <div className="group relative transition-all duration-300 focus-within:ring-2 focus-within:ring-[#F57C00]/20 rounded-2xl">
-                                                <Search className="absolute top-1/2 left-5 size-5 -translate-y-1/2 text-[#757575] group-focus-within:text-[#F57C00] transition-colors duration-300" />
+                                            <div className="group relative w-full max-w-md rounded-2xl transition-all duration-300 focus-within:ring-2 focus-within:ring-orange-500/20">
+                                                <Search className="absolute top-1/2 left-5 size-5 -translate-y-1/2 text-zinc-400 transition-colors duration-300 group-focus-within:text-orange-500" />
                                                 <Input
                                                     ref={searchInputRef}
-                                                    className="h-14 rounded-2xl border-none pl-14 pr-14 text-base shadow-sm ring-1 ring-zinc-200 transition-all duration-300 focus:ring-2 focus:ring-[#F57C00] placeholder:text-[#9E9E9E]"
+                                                    className="h-14 rounded-2xl border-none bg-white pr-14 pl-14 text-base shadow-sm ring-1 ring-zinc-200 transition-all duration-300 placeholder:text-zinc-400 focus:ring-2 focus:ring-orange-500 dark:bg-zinc-900 dark:ring-zinc-800 dark:focus:ring-orange-500/50"
                                                     value={search}
-                                                    onChange={(event) => setSearch(event.target.value)}
+                                                    onChange={(event) =>
+                                                        setSearch(
+                                                            event.target.value,
+                                                        )
+                                                    }
                                                     onBlur={() => {
-                                                        if (search.trim() === '') {
-                                                            setIsSearchInputVisible(false);
+                                                        if (
+                                                            search.trim() === ''
+                                                        ) {
+                                                            setIsSearchInputVisible(
+                                                                false,
+                                                            );
                                                         }
                                                     }}
                                                     onKeyDown={(event) => {
-                                                        if (event.key === 'Escape') {
+                                                        if (
+                                                            event.key ===
+                                                            'Escape'
+                                                        ) {
                                                             hideSearchInput();
                                                         }
                                                     }}
@@ -992,7 +1111,7 @@ export default function CustomerMenuPage({
                                                 />
                                                 <button
                                                     type="button"
-                                                    className="absolute top-1/2 right-3 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-700"
+                                                    className="absolute top-1/2 right-3 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
                                                     onClick={hideSearchInput}
                                                     aria-label="Hide search"
                                                 >
@@ -1002,43 +1121,52 @@ export default function CustomerMenuPage({
                                         ) : (
                                             <button
                                                 type="button"
-                                                className="inline-flex h-12 items-center gap-2 rounded-xl bg-white px-4 text-sm font-semibold text-[#757575] shadow-sm ring-1 ring-zinc-200 transition-all duration-300 hover:bg-[#F5F5F5]"
-                                                onClick={() => setIsSearchInputVisible(true)}
+                                                className="inline-flex h-12 items-center gap-2 rounded-xl bg-white px-4 text-sm font-semibold text-zinc-500 shadow-sm ring-1 ring-zinc-200 transition-all duration-300 hover:bg-zinc-50 dark:bg-zinc-900 dark:text-zinc-400 dark:ring-zinc-800 dark:hover:bg-zinc-800"
+                                                onClick={() =>
+                                                    setIsSearchInputVisible(
+                                                        true,
+                                                    )
+                                                }
                                             >
                                                 <Search className="size-4" />
                                                 Search menu
                                             </button>
                                         )}
-
-
-
                                     </div>
 
                                     {featuredItems.length > 0 && (
                                         <div className="space-y-4">
                                             <div className="flex items-center justify-between gap-3">
-                                                <h2 className="animate-gold-shimmer bg-gradient-to-r from-[#D4AF37] via-[#F9D71C] to-[#D4AF37] bg-[length:200%_auto] bg-clip-text text-sm font-black uppercase tracking-widest text-transparent">
-                                                    <SparkleIcon className="animate-sparkle inline-block size-8 p-1 text-[#D4AF37] drop-shadow-[0_0_8px_rgba(212,175,55,0.5)]" />
-                                                    Top picks
+                                                <h2 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
+                                                    Popular
                                                 </h2>
                                                 <div className="flex items-center gap-2">
-                                                    <span className="text-xs font-semibold text-[#9E9E9E]">
-                                                        Top picks
-                                                    </span>
                                                     <button
                                                         type="button"
-                                                        className="flex h-8 w-8 items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-600 transition-colors hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-40"
-                                                        onClick={() => scrollFeaturedCarousel(-1)}
-                                                        disabled={!canScrollFeaturedPrev}
+                                                        className="flex h-8 w-8 items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-600 transition-colors hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800"
+                                                        onClick={() =>
+                                                            scrollFeaturedCarousel(
+                                                                -1,
+                                                            )
+                                                        }
+                                                        disabled={
+                                                            !canScrollFeaturedPrev
+                                                        }
                                                         aria-label="Previous featured items"
                                                     >
                                                         <ChevronLeft className="size-4" />
                                                     </button>
                                                     <button
                                                         type="button"
-                                                        className="flex h-8 w-8 items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-600 transition-colors hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-40"
-                                                        onClick={() => scrollFeaturedCarousel(1)}
-                                                        disabled={!canScrollFeaturedNext}
+                                                        className="flex h-8 w-8 items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-600 transition-colors hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800"
+                                                        onClick={() =>
+                                                            scrollFeaturedCarousel(
+                                                                1,
+                                                            )
+                                                        }
+                                                        disabled={
+                                                            !canScrollFeaturedNext
+                                                        }
                                                         aria-label="Next featured items"
                                                     >
                                                         <ChevronRight className="size-4" />
@@ -1047,143 +1175,163 @@ export default function CustomerMenuPage({
                                             </div>
                                             <div
                                                 ref={featuredCarouselRef}
-                                                onScroll={updateFeaturedCarouselState}
-                                                className="scrollable overflow-x-auto overscroll-x-contain scroll-smooth snap-x snap-mandatory pb-2"
+                                                onScroll={
+                                                    updateFeaturedCarouselState
+                                                }
+                                                className="scrollable snap-x snap-mandatory overflow-x-auto overscroll-x-contain scroll-smooth pb-4"
                                             >
                                                 <div className="flex min-w-0 gap-4 pr-1">
-                                                    {featuredItems.map((item) => (
-                                                        <article
-                                                            key={`featured-${item.id}`}
-                                                            data-featured-slide="true"
-                                                            className="group w-[240px] shrink-0 snap-start overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-zinc-200"
-                                                        >
-                                                            <div className="relative h-36 overflow-hidden">
-                                                                {item.image_url ? (
-                                                                    <img
-                                                                        src={item.image_url}
-                                                                        alt={item.name}
-                                                                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                                                        loading="lazy"
-                                                                    />
-                                                                ) : (
-                                                                    <div className="flex h-full w-full flex-col items-center justify-center bg-[#F5F5F5]">
-                                                                        <ShoppingCart className="size-5 text-zinc-400 opacity-60" />
-                                                                        <span className="mt-2 text-[10px] font-medium text-zinc-400">
-                                                                            No image
-                                                                        </span>
+                                                    {featuredItems.map(
+                                                        (item) => (
+                                                            <article
+                                                                key={`featured-${item.id}`}
+                                                                data-featured-slide="true"
+                                                                className="group w-[160px] shrink-0 snap-start space-y-3 md:w-[200px]"
+                                                            >
+                                                                <div className="relative aspect-square w-full overflow-hidden rounded-3xl bg-zinc-100 dark:bg-zinc-800">
+                                                                    {item.image_url ? (
+                                                                        <img
+                                                                            src={item.image_url}
+                                                                            alt={item.name}
+                                                                            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                                                            loading="lazy"
+                                                                        />
+                                                                    ) : (
+                                                                        <div className="flex h-full w-full flex-col items-center justify-center text-zinc-300 dark:text-zinc-600">
+                                                                            <ShoppingCart className="size-8 opacity-50" />
+                                                                        </div>
+                                                                    )}
+                                                                    <div className="absolute bottom-2 right-2">
+                                                                        {(cart[item.id] ?? 0) > 0 ? (
+                                                                            <div className="flex h-8 items-center gap-2 rounded-full bg-white px-1 shadow-sm ring-1 ring-zinc-200 dark:bg-zinc-800 dark:ring-zinc-700">
+                                                                                <button
+                                                                                    type="button"
+                                                                                    className="flex h-6 w-6 items-center justify-center rounded-full bg-zinc-100 text-zinc-600 transition-colors hover:bg-zinc-200 dark:bg-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-600"
+                                                                                    onClick={(e) => {
+                                                                                        e.preventDefault();
+                                                                                        updateItemQuantity(item.id, (cart[item.id] ?? 0) - 1);
+                                                                                    }}
+                                                                                >
+                                                                                    <Minus className="size-3" />
+                                                                                </button>
+                                                                                <span className="text-xs font-bold w-3 text-center text-zinc-900 dark:text-zinc-100">
+                                                                                    {cart[item.id]}
+                                                                                </span>
+                                                                                <button
+                                                                                    type="button"
+                                                                                    className="flex h-6 w-6 items-center justify-center rounded-full bg-zinc-100 text-zinc-600 transition-colors hover:bg-zinc-200 dark:bg-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-600"
+                                                                                    onClick={(e) => {
+                                                                                        e.preventDefault();
+                                                                                        updateItemQuantity(item.id, (cart[item.id] ?? 0) + 1);
+                                                                                    }}
+                                                                                >
+                                                                                    <Plus className="size-3" />
+                                                                                </button>
+                                                                            </div>
+                                                                        ) : (
+                                                                            <button
+                                                                                type="button"
+                                                                                className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-zinc-900 shadow-sm transition-transform hover:scale-105 active:scale-95 dark:bg-zinc-800 dark:text-zinc-100"
+                                                                                onClick={(e) => {
+                                                                                    e.preventDefault();
+                                                                                    updateItemQuantity(item.id, 1);
+                                                                                }}
+                                                                            >
+                                                                                <Plus className="size-4" />
+                                                                            </button>
+                                                                        )}
                                                                     </div>
-                                                                )}
-                                                                <span className="absolute top-3 right-3 rounded-full bg-black/50 px-2.5 py-1 text-xs font-black text-white backdrop-blur-sm">
-                                                                    {currency(item.price)}
-                                                                </span>
-                                                            </div>
-                                                            <div className="space-y-3 p-4">
+                                                                </div>
                                                                 <div>
-                                                                    <p className="line-clamp-1 text-sm font-black text-[#212121]">
+                                                                    <h3 className="line-clamp-1 text-sm font-bold text-zinc-900 dark:text-zinc-100">
                                                                         {item.name}
-                                                                    </p>
-                                                                    <p className="mt-1 line-clamp-2 text-xs text-[#757575]">
-                                                                        {item.description ?? 'Freshly prepared and ready for pickup.'}
+                                                                    </h3>
+                                                                    <p className="mt-0.5 text-sm font-semibold text-zinc-500 dark:text-zinc-400">
+                                                                        {currency(item.price)}
                                                                     </p>
                                                                 </div>
-                                                                <Button
-                                                                    type="button"
-                                                                    className={`h-9 w-full rounded-xl text-sm font-bold transition-all duration-300 active:scale-95 ${(cart[item.id] ?? 0) > 0
-                                                                        ? 'bg-[#2E7D32] hover:bg-[#1B5E20]'
-                                                                        : 'bg-[#F57C00] hover:bg-[#E65100]'
-                                                                        }`}
-                                                                    onClick={() => updateItemQuantity(item.id, Math.max(1, (cart[item.id] ?? 0) + 1))}
-                                                                >
-                                                                    {(cart[item.id] ?? 0) > 0
-                                                                        ? `Add more (${cart[item.id] ?? 0})`
-                                                                        : 'Add to order'}
-                                                                </Button>
-                                                            </div>
-                                                        </article>
-                                                    ))}
+                                                            </article>
+                                                        ),
+                                                    )}
                                                 </div>
                                             </div>
                                         </div>
                                     )}
 
-                                    {/* Food Grid (Photo-First) */}
-                                    <div className="grid gap-6 sm:grid-cols-2">
+                                    {/* Food Grid (List View) */}
+                                    <div className="grid gap-6">
                                         {filteredItems.map((item) => (
                                             <div
                                                 key={item.id}
-                                                className="group flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-zinc-200 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+                                                className="group flex gap-4 border-b border-zinc-100 pb-6 transition-all duration-300 last:border-0 dark:border-zinc-800"
                                             >
-                                                <div className="relative aspect-[3/2] overflow-hidden">
+                                                <div className="flex flex-1 flex-col justify-center">
+                                                    <h3 className="text-base font-bold leading-tight text-zinc-900 transition-colors duration-300 dark:text-zinc-100">
+                                                        {item.name}
+                                                    </h3>
+                                                    <p className="mt-1 line-clamp-2 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
+                                                        {item.description ?? 'A delicious selection crafted with high-quality ingredients just for you.'}
+                                                    </p>
+                                                    <div className="mt-3 flex items-center justify-between">
+                                                        <span className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
+                                                            {currency(item.price)}
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                <div className="relative h-28 w-28 shrink-0 overflow-hidden rounded-2xl bg-zinc-100 dark:bg-zinc-800 md:h-32 md:w-32">
                                                     {item.image_url ? (
                                                         <img
                                                             src={item.image_url}
                                                             alt={item.name}
-                                                            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                                            className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
                                                             loading="lazy"
                                                         />
                                                     ) : (
-                                                        <div className="flex h-full w-full flex-col items-center justify-center bg-[#F5F5F5]">
-                                                            <div className="mb-2 h-12 w-12 rounded-full bg-zinc-200/50 flex items-center justify-center">
-                                                                <ShoppingCart className="size-6 text-zinc-400 opacity-50" />
-                                                            </div>
-                                                            <span className="text-xs font-medium text-zinc-400">Preparation in progress</span>
+                                                        <div className="flex h-full w-full items-center justify-center text-zinc-300 dark:text-zinc-600">
+                                                            <ShoppingCart className="size-6 opacity-50" />
                                                         </div>
                                                     )}
-                                                    <div className="absolute top-4 right-4 rounded-full bg-black/40 px-3 py-1.5 text-xs font-black text-white backdrop-blur-md">
-                                                        {currency(item.price)}
-                                                    </div>
-                                                </div>
-
-                                                <div className="flex flex-1 flex-col p-5">
-                                                    <div className="mb-1 flex items-start justify-between">
-                                                        <div>
-                                                            {item.category && (
-                                                                <span className="block text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">
-                                                                    {item.category}
-                                                                </span>
-                                                            )}
-                                                            <h3 className="text-xl font-bold text-[#212121] leading-tight mt-1 group-hover:text-[#F57C00] transition-colors duration-300">
-                                                                {item.name}
-                                                            </h3>
-                                                        </div>
-                                                    </div>
-                                                    <p className="mt-2 text-sm leading-relaxed text-[#757575] line-clamp-2">
-                                                        {item.description ?? 'A delicious selection crafted with high-quality ingredients just for you.'}
-                                                    </p>
-
-                                                    <div className="mt-auto pt-6">
-                                                        <div className="flex items-center justify-between gap-4">
-                                                            <div className="flex items-center gap-1 rounded-full bg-[#FAFAFA] p-1 shadow-inner ring-1 ring-zinc-200">
+                                                    
+                                                    <div className="absolute bottom-2 right-2">
+                                                        {(cart[item.id] ?? 0) > 0 ? (
+                                                            <div className="flex h-8 items-center gap-2 rounded-full bg-white px-1 shadow-sm ring-1 ring-zinc-200 dark:bg-zinc-800 dark:ring-zinc-700">
                                                                 <button
                                                                     type="button"
-                                                                    className="flex h-9 w-9 items-center justify-center rounded-full bg-white font-bold text-[#212121] shadow-sm transition-all hover:bg-[#F57C00] hover:text-white disabled:opacity-20 active:scale-95"
-                                                                    disabled={(cart[item.id] ?? 0) <= 0}
-                                                                    onClick={() => updateItemQuantity(item.id, (cart[item.id] ?? 0) - 1)}
+                                                                    className="flex h-6 w-6 items-center justify-center rounded-full bg-zinc-100 text-zinc-600 transition-colors hover:bg-zinc-200 dark:bg-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-600"
+                                                                    onClick={(e) => {
+                                                                        e.preventDefault();
+                                                                        updateItemQuantity(item.id, (cart[item.id] ?? 0) - 1);
+                                                                    }}
                                                                 >
-                                                                    -
+                                                                    <Minus className="size-3" />
                                                                 </button>
-                                                                <span className="w-10 text-center text-[15px] font-black">
-                                                                    {cart[item.id] ?? 0}
+                                                                <span className="text-xs font-bold w-3 text-center text-zinc-900 dark:text-zinc-100">
+                                                                    {cart[item.id]}
                                                                 </span>
                                                                 <button
                                                                     type="button"
-                                                                    className="flex h-9 w-9 items-center justify-center rounded-full bg-white font-bold text-[#212121] shadow-sm transition-all hover:bg-[#F57C00] hover:text-white active:scale-95"
-                                                                    onClick={() => updateItemQuantity(item.id, (cart[item.id] ?? 0) + 1)}
+                                                                    className="flex h-6 w-6 items-center justify-center rounded-full bg-zinc-100 text-zinc-600 transition-colors hover:bg-zinc-200 dark:bg-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-600"
+                                                                    onClick={(e) => {
+                                                                        e.preventDefault();
+                                                                        updateItemQuantity(item.id, (cart[item.id] ?? 0) + 1);
+                                                                    }}
                                                                 >
-                                                                    +
+                                                                    <Plus className="size-3" />
                                                                 </button>
                                                             </div>
-                                                            <Button
+                                                        ) : (
+                                                            <button
                                                                 type="button"
-                                                                className={`h-11 rounded-full px-6 font-bold transition-all duration-300 active:scale-95 ${(cart[item.id] ?? 0) > 0
-                                                                    ? 'bg-[#2E7D32] hover:bg-[#1B5E20]'
-                                                                    : 'bg-[#F57C00] hover:bg-[#E65100]'
-                                                                    }`}
-                                                                onClick={() => updateItemQuantity(item.id, Math.max(1, (cart[item.id] ?? 0) + 1))}
+                                                                className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-zinc-900 shadow-sm transition-transform hover:scale-105 active:scale-95 dark:bg-zinc-800 dark:text-zinc-100"
+                                                                onClick={(e) => {
+                                                                    e.preventDefault();
+                                                                    updateItemQuantity(item.id, 1);
+                                                                }}
                                                             >
-                                                                {(cart[item.id] ?? 0) > 0 ? 'Add more' : 'Add to order'}
-                                                            </Button>
-                                                        </div>
+                                                                <Plus className="size-4" />
+                                                            </button>
+                                                        )}
                                                     </div>
                                                 </div>
                                             </div>
@@ -1192,35 +1340,53 @@ export default function CustomerMenuPage({
 
                                     {filteredItems.length === 0 && (
                                         <div className="flex flex-col items-center justify-center py-20 text-center">
-                                            <div className="mb-4 h-24 w-24 rounded-full bg-zinc-100 flex items-center justify-center">
+                                            <div className="mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-zinc-100">
                                                 <Search className="size-10 text-zinc-300" />
                                             </div>
-                                            <h3 className="text-xl font-bold text-[#212121]">No items found</h3>
-                                            <p className="mt-2 text-[#757575]">Try adjusting your search or category filters.</p>
+                                            <h3 className="text-xl font-bold text-[#212121]">
+                                                No items found
+                                            </h3>
+                                            <p className="mt-2 text-[#757575]">
+                                                Try adjusting your search or
+                                                category filters.
+                                            </p>
                                         </div>
                                     )}
                                 </div>
                             )}
 
                             {step === 2 && (
-                                <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
-                                    <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-zinc-200">
+                                <div className="animate-in space-y-6 duration-500 fade-in slide-in-from-right-4">
+                                    <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800">
                                         <div className="mb-6">
-                                            <h2 className="text-xl font-bold text-[#212121]">Review Your Cart</h2>
-                                            <p className="text-sm text-[#757575]">Confirm quantities and totals before we proceed to checkout.</p>
+                                            <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
+                                                Review Your Cart
+                                            </h2>
+                                            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                                                Confirm quantities and totals
+                                                before we proceed to checkout.
+                                            </p>
                                         </div>
 
                                         <div className="space-y-4">
                                             {cartItems.length === 0 ? (
                                                 <div className="flex flex-col items-center justify-center py-20 text-center">
-                                                    <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-zinc-50 shadow-inner">
-                                                        <ShoppingCart className="size-10 text-zinc-300" />
+                                                    <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-zinc-50 shadow-inner dark:bg-zinc-800">
+                                                        <ShoppingCart className="size-10 text-zinc-300 dark:text-zinc-600" />
                                                     </div>
-                                                    <h3 className="text-xl font-bold text-[#212121]">Your cart is empty</h3>
-                                                    <p className="mt-2 text-[#757575]">Look like you haven't added anything to your order yet.</p>
+                                                    <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
+                                                        Your cart is empty
+                                                    </h3>
+                                                    <p className="mt-2 text-zinc-500 dark:text-zinc-400">
+                                                        Look like you haven't
+                                                        added anything to your
+                                                        order yet.
+                                                    </p>
                                                     <Button
-                                                        onClick={() => setStep(1)}
-                                                        className="mt-8 h-12 rounded-xl bg-[#F57C00] px-8 font-black text-white shadow-lg shadow-[#F57C00]/20 hover:bg-[#E65100] active:scale-95 transition-all"
+                                                        onClick={() =>
+                                                            setStep(1)
+                                                        }
+                                                        className="mt-8 h-12 rounded-xl bg-orange-600 px-8 font-bold text-white shadow-lg shadow-orange-600/20 transition-all hover:bg-orange-700 active:scale-95 dark:bg-orange-500 dark:shadow-none"
                                                     >
                                                         Browse Our Menu
                                                         <ArrowRight className="ml-2 size-4" />
@@ -1230,154 +1396,276 @@ export default function CustomerMenuPage({
                                                 cartItems.map((item) => (
                                                     <div
                                                         key={item.id}
-                                                        className="flex flex-col gap-4 rounded-xl border border-zinc-100 bg-[#FAFAFA] p-4 transition-all hover:shadow-md md:flex-row md:items-center"
+                                                        className="flex flex-col gap-4 rounded-xl border border-zinc-100 bg-zinc-50 p-4 transition-all hover:shadow-md md:flex-row md:items-center dark:border-zinc-800 dark:bg-zinc-900/50"
                                                     >
                                                         <div className="flex flex-1 items-center gap-4">
-                                                            <div className="h-20 w-20 shrink-0 overflow-hidden rounded-lg border bg-white shadow-sm">
+                                                            <div className="h-20 w-20 shrink-0 overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm dark:border-zinc-700 dark:bg-zinc-800">
                                                                 {item.image_url ? (
                                                                     <img
-                                                                        src={item.image_url}
-                                                                        alt={item.name}
+                                                                        src={
+                                                                            item.image_url
+                                                                        }
+                                                                        alt={
+                                                                            item.name
+                                                                        }
                                                                         className="h-full w-full object-cover"
                                                                         loading="lazy"
                                                                     />
                                                                 ) : (
-                                                                    <div className="flex h-full w-full items-center justify-center bg-zinc-50 text-[10px] font-bold uppercase tracking-tighter text-zinc-400">
+                                                                    <div className="flex h-full w-full items-center justify-center bg-zinc-50 text-[10px] font-bold tracking-tighter text-zinc-400 uppercase dark:bg-zinc-800">
                                                                         No Photo
                                                                     </div>
                                                                 )}
                                                             </div>
                                                             <div className="min-w-0 flex-1">
-                                                                <p className="truncate text-lg font-bold text-[#212121]">{item.name}</p>
-                                                                <p className="text-sm font-black text-[#F57C00]">
-                                                                    {currency(item.price)} <span className="ml-1 text-xs font-medium text-[#9E9E9E]">each</span>
+                                                                <p className="truncate text-lg font-bold text-zinc-900 dark:text-zinc-100">
+                                                                    {item.name}
+                                                                </p>
+                                                                <p className="text-sm font-bold text-orange-600 dark:text-orange-400">
+                                                                    {currency(
+                                                                        item.price,
+                                                                    )}{' '}
+                                                                    <span className="ml-1 text-xs font-medium text-zinc-400 dark:text-zinc-500">
+                                                                        each
+                                                                    </span>
                                                                 </p>
                                                             </div>
                                                         </div>
 
-                                                        <div className="flex items-center justify-between border-t border-zinc-100 pt-4 md:border-0 md:pt-0">
-                                                            <div className="flex items-center gap-1 rounded-full bg-white p-1 shadow-sm ring-1 ring-zinc-100">
+                                                        <div className="flex items-center justify-between border-t border-zinc-200 pt-4 md:border-0 md:pt-0 dark:border-zinc-700">
+                                                            <div className="flex items-center gap-1 rounded-full bg-white p-1 shadow-sm ring-1 ring-zinc-200 dark:bg-zinc-800 dark:ring-zinc-700">
                                                                 <button
                                                                     type="button"
-                                                                    className="flex h-8 w-8 items-center justify-center rounded-full text-[#F57C00] transition-all hover:bg-[#F57C00] hover:text-white active:scale-90"
-                                                                    onClick={() => updateItemQuantity(item.id, item.quantity - 1)}
+                                                                    className="flex h-8 w-8 items-center justify-center rounded-full text-orange-600 transition-all hover:bg-orange-600 hover:text-white active:scale-90 dark:text-orange-400 dark:hover:bg-orange-500"
+                                                                    onClick={() =>
+                                                                        updateItemQuantity(
+                                                                            item.id,
+                                                                            item.quantity -
+                                                                                1,
+                                                                        )
+                                                                    }
                                                                 >
                                                                     -
                                                                 </button>
-                                                                <span className="w-8 text-center text-sm font-black">
-                                                                    {item.quantity}
+                                                                <span className="w-8 text-center text-sm font-bold dark:text-zinc-100">
+                                                                    {
+                                                                        item.quantity
+                                                                    }
                                                                 </span>
                                                                 <button
                                                                     type="button"
-                                                                    className="flex h-8 w-8 items-center justify-center rounded-full text-[#F57C00] transition-all hover:bg-[#F57C00] hover:text-white active:scale-90"
-                                                                    onClick={() => updateItemQuantity(item.id, item.quantity + 1)}
+                                                                    className="flex h-8 w-8 items-center justify-center rounded-full text-orange-600 transition-all hover:bg-orange-600 hover:text-white active:scale-90 dark:text-orange-400 dark:hover:bg-orange-500"
+                                                                    onClick={() =>
+                                                                        updateItemQuantity(
+                                                                            item.id,
+                                                                            item.quantity +
+                                                                                1,
+                                                                        )
+                                                                    }
                                                                 >
                                                                     +
                                                                 </button>
                                                             </div>
-                                                            <p className="text-right text-lg font-black text-[#212121] md:w-28">
-                                                                {currency(item.lineTotal)}
+                                                            <p className="text-right text-lg font-bold text-zinc-900 md:w-28 dark:text-zinc-100">
+                                                                {currency(
+                                                                    item.lineTotal,
+                                                                )}
                                                             </p>
                                                         </div>
                                                     </div>
                                                 ))
                                             )}
                                         </div>
-                                        <div className="mt-6">
-                                            <InputError message={form.errors.items} />
+                                        <div className="mt-8">
+                                            <InputError
+                                                message={form.errors.items}
+                                            />
                                         </div>
                                     </div>
                                 </div>
                             )}
 
                             {step === 3 && (
-                                <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
-                                    <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-zinc-200">
+                                <div className="animate-in space-y-6 duration-500 fade-in slide-in-from-right-4">
+                                    <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800">
                                         <div className="mb-8">
-                                            <h2 className="text-xl font-bold text-[#212121]">Pickup & Contact</h2>
-                                            <p className="text-sm text-[#757575]">Help us coordinate your pickup with accurate details.</p>
+                                            <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
+                                                Pickup & Contact
+                                            </h2>
+                                            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                                                Help us coordinate your pickup
+                                                with accurate details.
+                                            </p>
                                         </div>
 
                                         <div className="grid gap-6">
                                             <div className="grid gap-2">
-                                                <Label htmlFor="name" className="text-xs font-black uppercase tracking-widest text-[#9E9E9E]">Customer Name</Label>
+                                                <Label
+                                                    htmlFor="name"
+                                                    className="text-xs font-bold tracking-widest text-zinc-400 uppercase dark:text-zinc-500"
+                                                >
+                                                    Customer Name
+                                                </Label>
                                                 <Input
                                                     id="name"
-                                                    className="h-12 rounded-xl border-zinc-200 focus:ring-[#F57C00] focus:border-[#F57C00]"
+                                                    className="h-12 rounded-xl border-zinc-200 bg-white transition-all focus:border-orange-600 focus:ring-orange-600 dark:border-zinc-800 dark:bg-zinc-900 dark:focus:border-orange-500 dark:focus:ring-orange-500"
                                                     value={form.data.name}
-                                                    onChange={(event) => form.setData('name', event.target.value)}
+                                                    onChange={(event) =>
+                                                        form.setData(
+                                                            'name',
+                                                            event.target.value,
+                                                        )
+                                                    }
                                                     placeholder="Enter your full name"
                                                 />
-                                                <InputError message={form.errors.name} />
+                                                <InputError
+                                                    message={form.errors.name}
+                                                />
                                             </div>
                                             <div className="grid gap-2">
-                                                <Label htmlFor="phone" className="text-xs font-black uppercase tracking-widest text-[#9E9E9E]">Phone Number <span className="text-[#F57C00]">*</span></Label>
+                                                <Label
+                                                    htmlFor="phone"
+                                                    className="text-xs font-bold tracking-widest text-zinc-400 uppercase dark:text-zinc-500"
+                                                >
+                                                    Phone Number{' '}
+                                                    <span className="text-orange-600 dark:text-orange-500">
+                                                        *
+                                                    </span>
+                                                </Label>
                                                 <Input
                                                     id="phone"
-                                                    className="h-12 rounded-xl border-zinc-200 focus:ring-[#F57C00] focus:border-[#F57C00]"
+                                                    className="h-12 rounded-xl border-zinc-200 bg-white transition-all focus:border-orange-600 focus:ring-orange-600 dark:border-zinc-800 dark:bg-zinc-900 dark:focus:border-orange-500 dark:focus:ring-orange-500"
                                                     value={form.data.phone}
-                                                    onChange={(event) => form.setData('phone', event.target.value)}
+                                                    onChange={(event) =>
+                                                        form.setData(
+                                                            'phone',
+                                                            event.target.value,
+                                                        )
+                                                    }
                                                     placeholder="251 9XX XXX XXX"
                                                 />
-                                                <p className="text-[10px] text-[#9E9E9E]">We'll send a tracking link to this number.</p>
-                                                <InputError message={form.errors.phone} />
+                                                <p className="text-[10px] text-zinc-400 dark:text-zinc-500">
+                                                    We'll send a tracking link
+                                                    to this number.
+                                                </p>
+                                                <InputError
+                                                    message={form.errors.phone}
+                                                />
                                             </div>
                                             <div className="grid gap-6 md:grid-cols-2">
                                                 <div className="grid gap-2">
-                                                    <Label htmlFor="pickup_date" className="text-xs font-black uppercase tracking-widest text-[#9E9E9E]">Pickup Date</Label>
+                                                    <Label
+                                                        htmlFor="pickup_date"
+                                                        className="text-xs font-bold tracking-widest text-zinc-400 uppercase dark:text-zinc-500"
+                                                    >
+                                                        Pickup Date
+                                                    </Label>
                                                     <Input
                                                         id="pickup_date"
                                                         type="date"
                                                         min={todayDate()}
-                                                        className="h-12 rounded-xl border-zinc-200 focus:ring-[#F57C00] focus:border-[#F57C00]"
-                                                        value={form.data.pickup_date}
+                                                        className="h-12 rounded-xl border-zinc-200 bg-white transition-all focus:border-orange-600 focus:ring-orange-600 dark:border-zinc-800 dark:bg-zinc-900 dark:focus:border-orange-500 dark:focus:ring-orange-500"
+                                                        value={
+                                                            form.data
+                                                                .pickup_date
+                                                        }
                                                         onChange={(event) =>
-                                                            form.setData('pickup_date', event.target.value)
+                                                            form.setData(
+                                                                'pickup_date',
+                                                                event.target
+                                                                    .value,
+                                                            )
                                                         }
                                                     />
-                                                    <InputError message={form.errors.pickup_date} />
+                                                    <InputError
+                                                        message={
+                                                            form.errors
+                                                                .pickup_date
+                                                        }
+                                                    />
                                                 </div>
                                                 <div className="grid gap-2">
-                                                    <Label htmlFor="pickup_location" className="text-xs font-black uppercase tracking-widest text-[#9E9E9E]">Branch Location</Label>
+                                                    <Label
+                                                        htmlFor="pickup_location"
+                                                        className="text-xs font-bold tracking-widest text-zinc-400 uppercase dark:text-zinc-500"
+                                                    >
+                                                        Branch Location
+                                                    </Label>
                                                     <select
                                                         id="pickup_location"
-                                                        className="flex h-12 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F57C00] focus-visible:ring-offset-2"
-                                                        value={form.data.pickup_location_id}
+                                                        className="flex h-12 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm ring-offset-white transition-all focus-visible:ring-2 focus-visible:ring-orange-600 focus-visible:ring-offset-2 focus-visible:outline-none dark:border-zinc-800 dark:bg-zinc-900 dark:focus-visible:ring-orange-500"
+                                                        value={
+                                                            form.data
+                                                                .pickup_location_id
+                                                        }
                                                         onChange={(event) =>
                                                             form.setData(
                                                                 'pickup_location_id',
-                                                                Number(event.target.value) || '',
+                                                                Number(
+                                                                    event.target
+                                                                        .value,
+                                                                ) || '',
                                                             )
                                                         }
                                                     >
-                                                        <option value="">Select a branch</option>
-                                                        {pickupLocations.map((location) => (
-                                                            <option key={location.id} value={location.id}>
-                                                                {location.name}
-                                                            </option>
-                                                        ))}
+                                                        <option value="">
+                                                            Select a branch
+                                                        </option>
+                                                        {pickupLocations.map(
+                                                            (location) => (
+                                                                <option
+                                                                    key={
+                                                                        location.id
+                                                                    }
+                                                                    value={
+                                                                        location.id
+                                                                    }
+                                                                    className="dark:bg-zinc-900"
+                                                                >
+                                                                    {
+                                                                        location.name
+                                                                    }
+                                                                </option>
+                                                            ),
+                                                        )}
                                                     </select>
-                                                    <InputError message={form.errors.pickup_location_id} />
+                                                    <InputError
+                                                        message={
+                                                            form.errors
+                                                                .pickup_location_id
+                                                        }
+                                                    />
                                                 </div>
                                             </div>
 
                                             {selectedPickupLocation && (
-                                                <div className="rounded-2xl border border-[#FFF3E0] bg-[#FFF8F1] p-5 transition-all animate-in slide-in-from-top-2">
+                                                <div className="animate-in rounded-2xl border border-orange-100 bg-orange-50/30 p-5 transition-all slide-in-from-top-2 dark:border-orange-900/40 dark:bg-orange-950/20">
                                                     <div className="flex items-start gap-4">
-                                                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#F57C00] text-white">
+                                                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-orange-600 text-white dark:bg-orange-500">
                                                             <MapPin className="size-5" />
                                                         </div>
                                                         <div>
-                                                            <p className="font-bold text-[#212121]">{selectedPickupLocation.name}</p>
-                                                            <p className="mt-1 text-sm text-[#757575] leading-relaxed">{selectedPickupLocation.address}</p>
+                                                            <p className="font-bold text-zinc-900 dark:text-zinc-100">
+                                                                {
+                                                                    selectedPickupLocation.name
+                                                                }
+                                                            </p>
+                                                            <p className="mt-1 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
+                                                                {
+                                                                    selectedPickupLocation.address
+                                                                }
+                                                            </p>
                                                             {selectedPickupLocation.google_maps_url && (
                                                                 <a
-                                                                    className="mt-3 inline-flex items-center gap-1.5 text-sm font-bold text-[#F57C00] hover:underline"
-                                                                    href={selectedPickupLocation.google_maps_url}
+                                                                    className="mt-4 inline-flex items-center gap-1.5 text-sm font-bold text-orange-600 transition-colors hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
+                                                                    href={
+                                                                        selectedPickupLocation.google_maps_url
+                                                                    }
                                                                     target="_blank"
                                                                     rel="noopener noreferrer"
                                                                 >
-                                                                    Open in Google Maps
+                                                                    Open in
+                                                                    Google Maps
                                                                     <ExternalLink className="size-3" />
                                                                 </a>
                                                             )}
@@ -1386,18 +1674,30 @@ export default function CustomerMenuPage({
                                                 </div>
                                             )}
 
-                                            <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-zinc-100 bg-[#FAFAFA] p-4 transition-all hover:bg-white hover:shadow-sm">
+                                            <label className="flex cursor-pointer items-start gap-4 rounded-xl border border-zinc-100 bg-zinc-50 p-4 transition-all hover:bg-white hover:shadow-sm dark:border-zinc-800 dark:bg-zinc-900/50 dark:hover:bg-zinc-800">
                                                 <input
                                                     type="checkbox"
-                                                    className="mt-1 h-5 w-5 rounded border-zinc-300 text-[#F57C00] focus:ring-[#F57C00]"
-                                                    checked={form.data.notify_when_ready}
+                                                    className="mt-1 h-5 w-5 rounded border-zinc-300 text-orange-600 focus:ring-orange-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-orange-500 dark:focus:ring-orange-500"
+                                                    checked={
+                                                        form.data
+                                                            .notify_when_ready
+                                                    }
                                                     onChange={(event) =>
-                                                        form.setData('notify_when_ready', event.target.checked)
+                                                        form.setData(
+                                                            'notify_when_ready',
+                                                            event.target
+                                                                .checked,
+                                                        )
                                                     }
                                                 />
-                                                <span className="text-sm font-medium text-[#212121] leading-tight">
+                                                <span className="text-sm leading-tight font-bold text-zinc-900 dark:text-zinc-100">
                                                     SMS Ready Notification
-                                                    <span className="block mt-1 text-xs font-normal text-[#757575]">We'll text you as soon as your order is packaged and ready to go.</span>
+                                                    <span className="mt-2 block text-xs font-medium text-zinc-500 dark:text-zinc-400">
+                                                        We'll text you as soon
+                                                        as your order is
+                                                        packaged and ready to
+                                                        go.
+                                                    </span>
                                                 </span>
                                             </label>
                                         </div>
@@ -1406,21 +1706,31 @@ export default function CustomerMenuPage({
                             )}
 
                             {step === 4 && (
-                                <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
-                                    <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-zinc-200">
+                                <div className="animate-in space-y-6 duration-500 fade-in slide-in-from-right-4">
+                                    <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800">
                                         <div className="mb-8">
-                                            <h2 className="text-xl font-bold text-[#212121]">Payment Upload</h2>
-                                            <p className="text-sm text-[#757575]">Upload your bank transfer receipt to verify your order.</p>
+                                            <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
+                                                Payment Upload
+                                            </h2>
+                                            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                                                Upload your bank transfer
+                                                receipt to verify your order.
+                                            </p>
                                         </div>
 
                                         <div className="space-y-6">
-                                            <div className="group relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-zinc-200 bg-[#FAFAFA] p-10 transition-all hover:border-[#F57C00] hover:bg-white">
-                                                <div className="mb-4 rounded-full bg-white p-4 shadow-sm ring-1 ring-zinc-100 group-hover:scale-110 group-hover:text-[#F57C00] transition-all duration-300">
+                                            <div className="group relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-zinc-200 bg-zinc-50 p-10 transition-all hover:border-orange-600 hover:bg-white dark:border-zinc-800 dark:bg-zinc-900/50 dark:hover:border-orange-500 dark:hover:bg-zinc-800">
+                                                <div className="mb-4 rounded-full bg-white p-4 shadow-sm ring-1 ring-zinc-100 transition-all duration-300 group-hover:scale-110 group-hover:text-orange-600 dark:bg-zinc-800 dark:ring-zinc-700 dark:group-hover:text-orange-500">
                                                     <Upload className="size-8" />
                                                 </div>
                                                 <div className="text-center">
-                                                    <p className="text-base font-bold text-[#212121]">Click to upload receipt</p>
-                                                    <p className="mt-1 text-xs text-[#9E9E9E]">PNG, JPG or WEBP (Max 5MB)</p>
+                                                    <p className="text-base font-bold text-zinc-900 dark:text-zinc-100">
+                                                        Click to upload receipt
+                                                    </p>
+                                                    <p className="mt-1 text-xs text-zinc-400 dark:text-zinc-500">
+                                                        PNG, JPG or WEBP (Max
+                                                        5MB)
+                                                    </p>
                                                 </div>
                                                 <input
                                                     id="receipt"
@@ -1428,54 +1738,87 @@ export default function CustomerMenuPage({
                                                     className="absolute inset-0 cursor-pointer opacity-0"
                                                     accept="image/png,image/jpeg,image/jpg,image/webp"
                                                     onChange={(event) =>
-                                                        form.setData('receipt', event.target.files?.[0] ?? null)
+                                                        form.setData(
+                                                            'receipt',
+                                                            event.target
+                                                                .files?.[0] ??
+                                                                null,
+                                                        )
                                                     }
                                                 />
                                             </div>
 
                                             {form.data.receipt && (
-                                                <div className="flex items-center gap-4 rounded-xl bg-[#E8F5E9] p-4 text-[#2E7D32] animate-in slide-in-from-bottom-2">
-                                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#2E7D32] text-white">
+                                                <div className="flex animate-in items-center gap-4 rounded-xl bg-emerald-50 p-4 text-emerald-700 slide-in-from-bottom-2 dark:bg-emerald-950/20 dark:text-emerald-400">
+                                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white dark:bg-emerald-500">
                                                         <CheckCircle2 className="size-5" />
                                                     </div>
                                                     <div className="min-w-0 flex-1">
-                                                        <p className="truncate text-sm font-bold">File selected: {form.data.receipt.name}</p>
-                                                        <p className="text-[10px] opacity-80 uppercase font-black">Ready for submission</p>
+                                                        <p className="truncate text-sm font-bold">
+                                                            File selected:{' '}
+                                                            {
+                                                                form.data
+                                                                    .receipt
+                                                                    .name
+                                                            }
+                                                        </p>
+                                                        <p className="text-[10px] font-bold uppercase opacity-80">
+                                                            Ready for submission
+                                                        </p>
                                                     </div>
                                                     <button
                                                         type="button"
-                                                        className="text-xs font-black uppercase tracking-widest hover:underline"
-                                                        onClick={() => form.setData('receipt', null)}
+                                                        className="text-xs font-bold tracking-widest uppercase hover:underline"
+                                                        onClick={() =>
+                                                            form.setData(
+                                                                'receipt',
+                                                                null,
+                                                            )
+                                                        }
                                                     >
                                                         Remove
                                                     </button>
                                                 </div>
                                             )}
 
-                                            <div className="rounded-xl bg-[#FFF3E0] p-4 text-[#E65100]">
-                                                <p className="text-xs font-medium leading-relaxed">
-                                                    <span className="font-black uppercase tracking-widest mr-2 underline">Note:</span>
-                                                    You can also skip this for now and upload later using the tracking link we'll send via SMS.
+                                            <div className="rounded-xl border border-orange-100/50 bg-orange-50 p-4 text-orange-700 dark:border-orange-900/30 dark:bg-orange-950/20 dark:text-orange-400">
+                                                <p className="text-xs leading-relaxed font-medium">
+                                                    <span className="mr-2 font-bold tracking-widest uppercase underline">
+                                                        Note:
+                                                    </span>
+                                                    You can also skip this for
+                                                    now and upload later using
+                                                    the tracking link we'll send
+                                                    via SMS.
                                                 </p>
                                             </div>
 
-                                            <InputError message={form.errors.receipt} />
+                                            <InputError
+                                                message={form.errors.receipt}
+                                            />
                                         </div>
                                     </div>
                                 </div>
                             )}
 
                             {/* Navigation Bar (Floating on Mobile, Inline on Desktop) */}
-                            <div className={`fixed bottom-0 left-0 right-0 z-50 bg-white/90 p-4 shadow-[0_-8px_30px_rgb(0,0,0,0.12)] backdrop-blur-xl ring-1 ring-zinc-200/50 transition-all duration-300 md:relative md:bottom-auto md:left-auto md:right-auto md:z-0 md:w-full md:max-w-none md:translate-x-0 md:translate-y-0 md:opacity-100 md:pointer-events-auto md:bg-transparent md:p-0 md:pt-12 md:shadow-none md:ring-0 md:backdrop-blur-none ${hideBottomActions ? 'translate-y-[120%] opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}`}>
+                            <div
+                                className={`fixed right-0 bottom-0 left-0 z-50 bg-white/80 p-4 shadow-[0_-8px_30px_rgb(0,0,0,0.05)] ring-1 ring-zinc-200/50 backdrop-blur-xl transition-all duration-300 md:pointer-events-auto md:relative md:right-auto md:bottom-auto md:left-auto md:z-0 md:w-full md:max-w-none md:translate-x-0 md:translate-y-0 md:bg-transparent md:p-0 md:pt-12 md:opacity-100 md:shadow-none md:ring-0 md:backdrop-blur-none dark:bg-zinc-900/80 dark:ring-zinc-800/50 ${hideBottomActions ? 'pointer-events-none translate-y-[120%] opacity-0' : 'translate-y-0 opacity-100'}`}
+                            >
                                 <div className="flex w-full items-center justify-between gap-4">
                                     <Button
                                         type="button"
                                         variant="ghost"
-                                        className={`h-14 rounded-2xl px-8 font-bold text-[#757575] transition-all hover:bg-zinc-100 ${step === 1 ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+                                        className={`h-14 rounded-2xl px-8 font-bold text-zinc-500 transition-all hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800 ${step === 1 ? 'pointer-events-none opacity-0' : 'opacity-100'}`}
                                         disabled={step === 1}
                                         onClick={() => {
-                                            setStep((value) => Math.max(1, value - 1));
-                                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                                            setStep((value) =>
+                                                Math.max(1, value - 1),
+                                            );
+                                            window.scrollTo({
+                                                top: 0,
+                                                behavior: 'smooth',
+                                            });
                                         }}
                                     >
                                         Back
@@ -1484,15 +1827,25 @@ export default function CustomerMenuPage({
                                         {step < 4 ? (
                                             <Button
                                                 type="button"
-                                                className="h-14 rounded-2xl px-12 font-black shadow-lg shadow-[#F57C00]/20 bg-[#F57C00] hover:bg-[#E65100] active:scale-95 transition-all text-white"
+                                                className="h-14 rounded-2xl bg-orange-600 px-12 font-bold text-white shadow-lg shadow-orange-600/20 transition-all hover:bg-orange-700 active:scale-95 dark:bg-orange-500 dark:shadow-none"
                                                 disabled={
-                                                    (step === 1 && cartItems.length === 0) ||
-                                                    (step === 2 && cartItems.length === 0) ||
-                                                    (step === 3 && !canContinueDetails)
+                                                    (step === 1 &&
+                                                        cartItems.length ===
+                                                            0) ||
+                                                    (step === 2 &&
+                                                        cartItems.length ===
+                                                            0) ||
+                                                    (step === 3 &&
+                                                        !canContinueDetails)
                                                 }
                                                 onClick={() => {
-                                                    setStep((value) => Math.min(4, value + 1));
-                                                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                                                    setStep((value) =>
+                                                        Math.min(4, value + 1),
+                                                    );
+                                                    window.scrollTo({
+                                                        top: 0,
+                                                        behavior: 'smooth',
+                                                    });
                                                 }}
                                             >
                                                 Continue
@@ -1500,11 +1853,16 @@ export default function CustomerMenuPage({
                                         ) : (
                                             <Button
                                                 type="button"
-                                                className="h-14 rounded-2xl px-12 font-black shadow-lg shadow-[#2E7D32]/20 bg-[#2E7D32] hover:bg-[#1B5E20] active:scale-95 transition-all text-white"
-                                                disabled={form.processing || cartItems.length === 0}
+                                                className="h-14 rounded-2xl bg-emerald-600 px-12 font-bold text-white shadow-lg shadow-emerald-600/20 transition-all hover:bg-emerald-700 active:scale-95 dark:bg-emerald-500 dark:shadow-none"
+                                                disabled={
+                                                    form.processing ||
+                                                    cartItems.length === 0
+                                                }
                                                 onClick={submitOrder}
                                             >
-                                                {form.processing ? 'Submitting...' : 'Confirm Order'}
+                                                {form.processing
+                                                    ? 'Submitting...'
+                                                    : 'Confirm Order'}
                                             </Button>
                                         )}
                                     </div>
@@ -1515,14 +1873,16 @@ export default function CustomerMenuPage({
                         <aside className="hidden lg:block">
                             <div className="sticky top-24 space-y-6">
                                 {/* Cart Summary Card */}
-                                <div className="overflow-hidden rounded-2xl bg-white shadow-xl ring-1 ring-zinc-200">
-                                    <div className="bg-[#212121] px-6 py-5 text-white">
+                                <div className="overflow-hidden rounded-2xl bg-white shadow-xl ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800">
+                                    <div className="bg-zinc-900 px-6 py-5 text-zinc-100 dark:bg-zinc-800">
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-2">
-                                                <ShoppingCart className="size-5 text-[#F57C00]" />
-                                                <h3 className="font-black uppercase tracking-widest text-sm">Review Order</h3>
+                                                <ShoppingCart className="size-5 text-orange-600 dark:text-orange-500" />
+                                                <h3 className="text-sm font-bold tracking-widest uppercase">
+                                                    Review Order
+                                                </h3>
                                             </div>
-                                            <span className="rounded-full bg-white/10 px-3 py-1 text-[10px] font-black uppercase">
+                                            <span className="rounded-full bg-white/10 px-3 py-1 text-[10px] font-bold uppercase ring-1 ring-white/20">
                                                 {cartCount} items
                                             </span>
                                         </div>
@@ -1530,58 +1890,98 @@ export default function CustomerMenuPage({
 
                                     <div className="p-6">
                                         {cartItems.length === 0 ? (
-                                            <div className="flex flex-col items-center justify-center py-6 text-center" id="empty-cart-summary">
-                                                <div className="mb-4 h-16 w-16 rounded-full bg-zinc-50 flex items-center justify-center">
-                                                    <ShoppingCart className="size-6 text-zinc-300" />
+                                            <div
+                                                className="flex flex-col items-center justify-center py-8 text-center"
+                                                id="empty-cart-summary"
+                                            >
+                                                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-zinc-50 dark:bg-zinc-800">
+                                                    <ShoppingCart className="size-8 text-zinc-300 dark:text-zinc-700" />
                                                 </div>
-                                                <p className="text-sm font-medium text-[#9E9E9E]">Your bag is empty.</p>
+                                                <p className="text-sm font-bold text-zinc-500 dark:text-zinc-400">
+                                                    Your bag is empty.
+                                                </p>
                                             </div>
                                         ) : (
                                             <div className="space-y-4">
-                                                {cartItems.slice(0, 5).map((item) => (
-                                                    <div key={item.id} className="flex items-center justify-between gap-4">
-                                                        <div className="flex min-w-0 items-center gap-3">
-                                                            <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg border border-zinc-100 bg-zinc-50 shadow-sm">
-                                                                {item.image_url ? (
-                                                                    <img
-                                                                        src={item.image_url}
-                                                                        alt={item.name}
-                                                                        className="h-full w-full object-cover"
-                                                                        loading="lazy"
-                                                                    />
-                                                                ) : (
-                                                                    <div className="flex h-full w-full items-center justify-center bg-zinc-100 text-[8px] font-black uppercase tracking-tighter text-zinc-400">
-                                                                        Prep
-                                                                    </div>
+                                                {cartItems
+                                                    .slice(0, 5)
+                                                    .map((item) => (
+                                                        <div
+                                                            key={item.id}
+                                                            className="flex items-center justify-between gap-4"
+                                                        >
+                                                            <div className="flex min-w-0 items-center gap-3">
+                                                                <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm dark:border-zinc-700 dark:bg-zinc-800">
+                                                                    {item.image_url ? (
+                                                                        <img
+                                                                            src={
+                                                                                item.image_url
+                                                                            }
+                                                                            alt={
+                                                                                item.name
+                                                                            }
+                                                                            className="h-full w-full object-cover"
+                                                                            loading="lazy"
+                                                                        />
+                                                                    ) : (
+                                                                        <div className="flex h-full w-full items-center justify-center bg-zinc-50 text-[8px] font-bold tracking-tighter text-zinc-400 uppercase dark:bg-zinc-800">
+                                                                            Prep
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                                <div className="min-w-0 flex-1">
+                                                                    <p className="truncate text-sm font-bold text-zinc-900 dark:text-zinc-100">
+                                                                        {
+                                                                            item.name
+                                                                        }
+                                                                    </p>
+                                                                    <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
+                                                                        Qty:{' '}
+                                                                        {
+                                                                            item.quantity
+                                                                        }
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                            <span className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
+                                                                {currency(
+                                                                    item.lineTotal,
                                                                 )}
-                                                            </div>
-                                                            <div className="min-w-0 flex-1">
-                                                                <p className="truncate text-sm font-bold text-[#212121]">{item.name}</p>
-                                                                <p className="text-xs font-medium text-[#757575]">Qty: {item.quantity}</p>
-                                                            </div>
+                                                            </span>
                                                         </div>
-                                                        <span className="text-sm font-black text-[#212121]">{currency(item.lineTotal)}</span>
-                                                    </div>
-                                                ))}
+                                                    ))}
                                                 {cartItems.length > 5 && (
-                                                    <p className="text-center text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">
-                                                        + {cartItems.length - 5} additional items
+                                                    <p className="text-center text-[10px] font-bold tracking-widest text-zinc-400 uppercase dark:text-zinc-500">
+                                                        + {cartItems.length - 5}{' '}
+                                                        additional items
                                                     </p>
                                                 )}
 
-                                                <div className="mt-6 space-y-3 rounded-xl bg-[#FAFAFA] p-4 text-sm">
-                                                    <div className="flex justify-between text-[#757575]">
+                                                <div className="mt-8 space-y-4 rounded-xl bg-zinc-50 p-4 text-sm ring-1 ring-zinc-200/50 dark:bg-zinc-800/50 dark:ring-zinc-700/50">
+                                                    <div className="flex justify-between text-zinc-500 dark:text-zinc-400">
                                                         <span>Subtotal</span>
-                                                        <span className="font-bold">{currency(cartTotal)}</span>
+                                                        <span className="font-bold text-zinc-900 dark:text-zinc-100">
+                                                            {currency(
+                                                                cartTotal,
+                                                            )}
+                                                        </span>
                                                     </div>
-                                                    <div className="flex justify-between text-[#757575]">
-                                                        <span>Processing Fee</span>
-                                                        <span className="font-bold text-[#2E7D32]">FREE</span>
+                                                    <div className="flex justify-between text-zinc-500 dark:text-zinc-400">
+                                                        <span>
+                                                            Processing Fee
+                                                        </span>
+                                                        <span className="font-bold text-emerald-600 dark:text-emerald-500">
+                                                            FREE
+                                                        </span>
                                                     </div>
-                                                    <div className="border-t border-zinc-200 pt-3">
-                                                        <div className="flex justify-between text-lg font-black text-[#212121]">
+                                                    <div className="border-t border-zinc-200 pt-4 dark:border-zinc-700">
+                                                        <div className="flex justify-between text-lg font-bold text-zinc-900 dark:text-zinc-100">
                                                             <span>Total</span>
-                                                            <span className="text-[#F57C00]">{currency(cartTotal)}</span>
+                                                            <span className="text-orange-600 dark:text-orange-400">
+                                                                {currency(
+                                                                    cartTotal,
+                                                                )}
+                                                            </span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1591,22 +1991,39 @@ export default function CustomerMenuPage({
                                 </div>
 
                                 {/* Help Card */}
-                                <div className="rounded-2xl bg-[#FFF3E0] p-6 text-[#E65100]">
-                                    <div className="flex items-center gap-3 mb-4">
-                                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-sm">
+                                <div className="animate-in rounded-2xl border border-orange-100 bg-orange-50/30 p-6 text-orange-700 duration-500 slide-in-from-bottom-4 dark:border-orange-900/40 dark:bg-orange-950/20 dark:text-orange-400">
+                                    <div className="mb-4 flex items-center gap-3">
+                                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-orange-100 dark:bg-zinc-800 dark:ring-orange-900/50">
                                             <Clock3 className="size-4" />
                                         </div>
-                                        <h4 className="text-sm font-black uppercase tracking-widest">Help & Info</h4>
+                                        <h4 className="text-xs font-bold tracking-widest uppercase">
+                                            Help & Info
+                                        </h4>
                                     </div>
-                                    <div className="space-y-3">
+                                    <div className="space-y-4">
                                         <div className="flex items-start gap-3">
-                                            <div className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#F57C00]"></div>
-                                            <p className="text-xs leading-relaxed font-medium">Pickup times are estimated and may vary based on demand.</p>
+                                            <div className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-orange-600 dark:bg-orange-500"></div>
+                                            <p className="text-xs leading-relaxed font-medium">
+                                                Pickup times are estimated and
+                                                may vary based on demand.
+                                            </p>
                                         </div>
                                         <div className="flex items-start gap-3">
-                                            <div className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#F57C00]"></div>
-                                            <p className="text-xs leading-relaxed font-medium">Please ensure your phone number is correct for tracking updates.</p>
+                                            <div className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-orange-600 dark:bg-orange-500"></div>
+                                            <p className="text-xs leading-relaxed font-medium">
+                                                Please ensure your phone number
+                                                is correct for tracking updates.
+                                            </p>
                                         </div>
+                                    </div>
+                                    <div className="mt-6">
+                                        <FeedbackModal
+                                            customerId={
+                                                customerToken
+                                                    ? Number(customerToken)
+                                                    : undefined
+                                            }
+                                        />
                                     </div>
                                 </div>
                             </div>

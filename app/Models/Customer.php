@@ -33,6 +33,22 @@ class Customer extends Model
     }
 
     /**
+     * Get all cake preorders for the customer.
+     */
+    public function cakePreorders(): HasMany
+    {
+        return $this->hasMany(CakePreorder::class);
+    }
+
+    /**
+     * Get all catering service requests for the customer.
+     */
+    public function cateringServiceRequests(): HasMany
+    {
+        return $this->hasMany(CateringServiceRequest::class);
+    }
+
+    /**
      * Device/browser tokens associated with this customer.
      */
     public function tokens(): HasMany

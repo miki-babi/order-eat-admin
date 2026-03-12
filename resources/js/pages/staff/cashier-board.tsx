@@ -1,5 +1,6 @@
 import { Head, router } from '@inertiajs/react';
 import { CheckCircle2, ReceiptText, Wallet } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -92,6 +93,16 @@ export default function CashierBoard({
             },
         );
     };
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            router.reload({
+                only: ['confirmedOrders', 'servedOrders', 'summary'],
+            });
+        }, 10000);
+
+        return () => clearInterval(interval);
+    }, []);
 
     const renderOrder = (order: CashierOrderRow, served: boolean) => (
         <Card key={order.id} className="border-none shadow-sm ring-1 ring-zinc-200">

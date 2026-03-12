@@ -31,17 +31,17 @@ export function NavUser() {
                     <DropdownMenuTrigger asChild>
                         <SidebarMenuButton
                             size="lg"
-                            className="h-14 w-full rounded-2xl bg-[#212121] text-white shadow-xl ring-1 ring-white/10 transition-all hover:bg-[#212121] hover:scale-[0.98] data-[state=open]:bg-[#212121]"
+                            className="h-14 w-full rounded-2xl bg-[#212121] text-white shadow-xl ring-1 ring-white/10 transition-all hover:bg-[#212121] hover:scale-[0.98] data-[state=open]:bg-[#212121] group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:rounded-xl group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:justify-center"
                             data-test="sidebar-menu-button"
                         >
-                            <div className="flex w-full items-center gap-3">
-                                <Avatar className="size-9 border-2 border-[#F57C00] shadow-sm">
+                            <div className="flex w-full items-center gap-3 group-data-[collapsible=icon]:justify-center">
+                                <Avatar className="size-9 border-2 border-[#F57C00] shadow-sm group-data-[collapsible=icon]:size-8 group-data-[collapsible=icon]:border">
                                     <AvatarImage src={user.avatar} alt={user.name} />
                                     <AvatarFallback className="bg-zinc-800 text-[10px] font-black uppercase text-white">
                                         {getInitials(user.name)}
                                     </AvatarFallback>
                                 </Avatar>
-                                <div className="flex flex-1 flex-col text-left">
+                                <div className="flex flex-1 flex-col text-left group-data-[collapsible=icon]:hidden">
                                     <span className="truncate text-[11px] font-black uppercase tracking-wider text-white">
                                         {user.name}
                                     </span>
@@ -52,7 +52,7 @@ export function NavUser() {
                                         </span>
                                     </div>
                                 </div>
-                                <ChevronsUpDown className="ml-auto size-3.5 text-zinc-500" />
+                                <ChevronsUpDown className="ml-auto size-3.5 text-zinc-500 group-data-[collapsible=icon]:hidden" />
                             </div>
                         </SidebarMenuButton>
                     </DropdownMenuTrigger>

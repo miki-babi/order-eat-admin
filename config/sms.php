@@ -27,6 +27,14 @@ return [
             'label' => 'Order Ready',
             'body' => 'Hi {name}, your order #{orderid} is ready for pickup at {branch}.',
         ],
+        'cake_preorder_created' => [
+            'label' => 'Cake Preorder Created',
+            'body' => 'Hi {name}, your cake preorder #{requestid} for {eventdate} is received. Estimated total: {total} ETB.',
+        ],
+        'catering_request_created' => [
+            'label' => 'Catering Request Created',
+            'body' => 'Hi {name}, your catering request #{requestid} for {eventdate} ({guestcount} guests) is received.',
+        ],
         'promo_default' => [
             'label' => 'Promo Message',
             'body' => 'Hi {name}, we have a special offer for you at {branch}.',
@@ -90,5 +98,8 @@ return [
         'freq_item' => 'Most frequently purchased item',
         'freq_branch' => 'Most frequently used pickup branch',
         'disapprovalreason' => 'Receipt disapproval reason',
+        'requestid' => 'Cake preorder or catering request ID',
+        'eventdate' => 'Requested event date',
+        'guestcount' => 'Total guests for catering request',
     ],
 ];
