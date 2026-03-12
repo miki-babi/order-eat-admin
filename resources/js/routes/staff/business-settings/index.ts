@@ -82,7 +82,7 @@ index.form = indexForm
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\BusinessSettingsController::update
-* @see Modules/Ordering/app/Http/Controllers/Staff/BusinessSettingsController.php:42
+* @see Modules/Ordering/app/Http/Controllers/Staff/BusinessSettingsController.php:43
 * @route '/staff/business-settings'
 */
 export const update = (options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
@@ -97,7 +97,7 @@ update.definition = {
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\BusinessSettingsController::update
-* @see Modules/Ordering/app/Http/Controllers/Staff/BusinessSettingsController.php:42
+* @see Modules/Ordering/app/Http/Controllers/Staff/BusinessSettingsController.php:43
 * @route '/staff/business-settings'
 */
 update.url = (options?: RouteQueryOptions) => {
@@ -106,7 +106,7 @@ update.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\BusinessSettingsController::update
-* @see Modules/Ordering/app/Http/Controllers/Staff/BusinessSettingsController.php:42
+* @see Modules/Ordering/app/Http/Controllers/Staff/BusinessSettingsController.php:43
 * @route '/staff/business-settings'
 */
 update.patch = (options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
@@ -116,7 +116,7 @@ update.patch = (options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\BusinessSettingsController::update
-* @see Modules/Ordering/app/Http/Controllers/Staff/BusinessSettingsController.php:42
+* @see Modules/Ordering/app/Http/Controllers/Staff/BusinessSettingsController.php:43
 * @route '/staff/business-settings'
 */
 const updateForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -131,7 +131,7 @@ const updateForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> =>
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\BusinessSettingsController::update
-* @see Modules/Ordering/app/Http/Controllers/Staff/BusinessSettingsController.php:42
+* @see Modules/Ordering/app/Http/Controllers/Staff/BusinessSettingsController.php:43
 * @route '/staff/business-settings'
 */
 updateForm.patch = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({

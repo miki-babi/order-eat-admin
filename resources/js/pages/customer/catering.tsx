@@ -81,7 +81,7 @@ export default function Catering({
         customer_token: customerToken,
         name: customerPrefill.name ?? '',
         phone: customerPrefill.phone ?? '',
-        package_ids: packages[0] ? [packages[0].id] : [],
+        package_ids: [],
         event_date: todayDate(),
         guest_count: 1,
         venue: '',

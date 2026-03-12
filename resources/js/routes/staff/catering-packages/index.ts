@@ -1,7 +1,88 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../wayfinder'
 /**
+* @see \Modules\Ordering\Http\Controllers\Staff\CateringRequestController::index
+* @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:105
+* @route '/staff/catering-packages'
+*/
+export const index = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: index.url(options),
+    method: 'get',
+})
+
+index.definition = {
+    methods: ["get","head"],
+    url: '/staff/catering-packages',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \Modules\Ordering\Http\Controllers\Staff\CateringRequestController::index
+* @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:105
+* @route '/staff/catering-packages'
+*/
+index.url = (options?: RouteQueryOptions) => {
+    return index.definition.url + queryParams(options)
+}
+
+/**
+* @see \Modules\Ordering\Http\Controllers\Staff\CateringRequestController::index
+* @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:105
+* @route '/staff/catering-packages'
+*/
+index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: index.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Modules\Ordering\Http\Controllers\Staff\CateringRequestController::index
+* @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:105
+* @route '/staff/catering-packages'
+*/
+index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: index.url(options),
+    method: 'head',
+})
+
+/**
+* @see \Modules\Ordering\Http\Controllers\Staff\CateringRequestController::index
+* @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:105
+* @route '/staff/catering-packages'
+*/
+const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: index.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Modules\Ordering\Http\Controllers\Staff\CateringRequestController::index
+* @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:105
+* @route '/staff/catering-packages'
+*/
+indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: index.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Modules\Ordering\Http\Controllers\Staff\CateringRequestController::index
+* @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:105
+* @route '/staff/catering-packages'
+*/
+indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: index.url({
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'HEAD',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'get',
+})
+
+index.form = indexForm
+
+/**
 * @see \Modules\Ordering\Http\Controllers\Staff\CateringRequestController::store
-* @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:119
+* @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:141
 * @route '/staff/catering-packages'
 */
 export const store = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -16,7 +97,7 @@ store.definition = {
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\CateringRequestController::store
-* @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:119
+* @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:141
 * @route '/staff/catering-packages'
 */
 store.url = (options?: RouteQueryOptions) => {
@@ -25,7 +106,7 @@ store.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\CateringRequestController::store
-* @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:119
+* @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:141
 * @route '/staff/catering-packages'
 */
 store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -35,7 +116,7 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\CateringRequestController::store
-* @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:119
+* @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:141
 * @route '/staff/catering-packages'
 */
 const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -45,7 +126,7 @@ const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => 
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\CateringRequestController::store
-* @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:119
+* @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:141
 * @route '/staff/catering-packages'
 */
 storeForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -57,7 +138,7 @@ store.form = storeForm
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\CateringRequestController::update
-* @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:139
+* @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:161
 * @route '/staff/catering-packages/{cateringPackage}'
 */
 export const update = (args: { cateringPackage: number | { id: number } } | [cateringPackage: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -72,7 +153,7 @@ update.definition = {
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\CateringRequestController::update
-* @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:139
+* @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:161
 * @route '/staff/catering-packages/{cateringPackage}'
 */
 update.url = (args: { cateringPackage: number | { id: number } } | [cateringPackage: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -105,7 +186,7 @@ update.url = (args: { cateringPackage: number | { id: number } } | [cateringPack
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\CateringRequestController::update
-* @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:139
+* @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:161
 * @route '/staff/catering-packages/{cateringPackage}'
 */
 update.put = (args: { cateringPackage: number | { id: number } } | [cateringPackage: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -115,7 +196,7 @@ update.put = (args: { cateringPackage: number | { id: number } } | [cateringPack
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\CateringRequestController::update
-* @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:139
+* @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:161
 * @route '/staff/catering-packages/{cateringPackage}'
 */
 const updateForm = (args: { cateringPackage: number | { id: number } } | [cateringPackage: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -130,7 +211,7 @@ const updateForm = (args: { cateringPackage: number | { id: number } } | [cateri
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\CateringRequestController::update
-* @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:139
+* @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:161
 * @route '/staff/catering-packages/{cateringPackage}'
 */
 updateForm.put = (args: { cateringPackage: number | { id: number } } | [cateringPackage: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -147,7 +228,7 @@ update.form = updateForm
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\CateringRequestController::destroy
-* @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:167
+* @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:189
 * @route '/staff/catering-packages/{cateringPackage}'
 */
 export const destroy = (args: { cateringPackage: number | { id: number } } | [cateringPackage: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -162,7 +243,7 @@ destroy.definition = {
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\CateringRequestController::destroy
-* @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:167
+* @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:189
 * @route '/staff/catering-packages/{cateringPackage}'
 */
 destroy.url = (args: { cateringPackage: number | { id: number } } | [cateringPackage: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -195,7 +276,7 @@ destroy.url = (args: { cateringPackage: number | { id: number } } | [cateringPac
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\CateringRequestController::destroy
-* @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:167
+* @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:189
 * @route '/staff/catering-packages/{cateringPackage}'
 */
 destroy.delete = (args: { cateringPackage: number | { id: number } } | [cateringPackage: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -205,7 +286,7 @@ destroy.delete = (args: { cateringPackage: number | { id: number } } | [catering
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\CateringRequestController::destroy
-* @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:167
+* @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:189
 * @route '/staff/catering-packages/{cateringPackage}'
 */
 const destroyForm = (args: { cateringPackage: number | { id: number } } | [cateringPackage: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -220,7 +301,7 @@ const destroyForm = (args: { cateringPackage: number | { id: number } } | [cater
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\CateringRequestController::destroy
-* @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:167
+* @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:189
 * @route '/staff/catering-packages/{cateringPackage}'
 */
 destroyForm.delete = (args: { cateringPackage: number | { id: number } } | [cateringPackage: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -236,6 +317,7 @@ destroyForm.delete = (args: { cateringPackage: number | { id: number } } | [cate
 destroy.form = destroyForm
 
 const cateringPackages = {
+    index: Object.assign(index, index),
     store: Object.assign(store, store),
     update: Object.assign(update, update),
     destroy: Object.assign(destroy, destroy),

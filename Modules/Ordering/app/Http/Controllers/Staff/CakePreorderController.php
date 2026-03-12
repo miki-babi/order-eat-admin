@@ -17,7 +17,7 @@ use Modules\Ordering\Http\Requests\Staff\UpdateCakePreorderStatusRequest;
 class CakePreorderController extends Controller
 {
     /**
-     * Show staff cake package management and preorder list.
+     * Show staff cake preorder list.
      */
     public function index(Request $request): Response
     {
@@ -25,39 +25,6 @@ class CakePreorderController extends Controller
         $user = $request->user();
         $search = trim((string) $request->input('search', ''));
         $status = is_string($request->input('status')) ? $request->input('status') : null;
-
-        $packages = CakePackage::query()
-            ->with('parent:id,name')
-            ->withCount(['preorderItems', 'subPackages'])
-            ->orderByRaw('CASE WHEN parent_id IS NULL THEN 0 ELSE 1 END')
-            ->orderBy('parent_id')
-            ->orderByDesc('is_active')
-            ->orderBy('name')
-            ->get()
-            ->map(fn(CakePackage $package) => [
-                'id' => $package->id,
-                'parent_id' => $package->parent_id,
-                'parent_name' => $package->parent?->name,
-                'name' => $package->name,
-                'description' => $package->description,
-                'image_url' => $this->toPublicAssetUrl($package->image_url),
-                'price' => $package->price !== null ? (float) $package->price : null,
-                'is_active' => (bool) $package->is_active,
-                'preorder_items_count' => (int) $package->preorder_items_count,
-                'sub_packages_count' => (int) $package->sub_packages_count,
-                'updated_at' => $package->updated_at?->toDateTimeString(),
-            ])
-            ->values();
-
-        $parentPackageOptions = CakePackage::query()
-            ->topLevel()
-            ->orderBy('name')
-            ->get()
-            ->map(fn(CakePackage $package) => [
-                'id' => $package->id,
-                'name' => $package->name,
-            ])
-            ->values();
 
         $preorders = CakePreorder::query()
             ->with(['customer', 'items.package'])
@@ -103,7 +70,6 @@ class CakePreorderController extends Controller
             ]);
 
         return Inertia::render('staff/cake-preorders', [
-            'packages' => $packages,
             'preorders' => $preorders,
             'filters' => [
                 'search' => $search,
@@ -112,12 +78,63 @@ class CakePreorderController extends Controller
             'statusOptions' => CakePreorder::statuses(),
             'canManagePackages' => $user->hasPermission('menu_items.manage'),
             'canUpdateRequests' => $user->hasPermission('orders.update'),
-            'parentPackageOptions' => $parentPackageOptions,
             'summary' => [
                 'total_packages' => CakePackage::query()->count(),
                 'active_packages' => CakePackage::query()->where('is_active', true)->count(),
                 'total_preorders' => CakePreorder::query()->count(),
                 'pending_preorders' => CakePreorder::query()->where('status', 'pending')->count(),
+            ],
+        ]);
+    }
+
+    /**
+     * Show cake package management page.
+     */
+    public function packages(Request $request): Response
+    {
+        /** @var \App\Models\User $user */
+        $user = $request->user();
+
+        $packages = CakePackage::query()
+            ->with('parent:id,name')
+            ->withCount(['preorderItems', 'subPackages'])
+            ->orderByRaw('CASE WHEN parent_id IS NULL THEN 0 ELSE 1 END')
+            ->orderBy('parent_id')
+            ->orderByDesc('is_active')
+            ->orderBy('name')
+            ->get()
+            ->map(fn(CakePackage $package) => [
+                'id' => $package->id,
+                'parent_id' => $package->parent_id,
+                'parent_name' => $package->parent?->name,
+                'name' => $package->name,
+                'description' => $package->description,
+                'image_url' => $this->toPublicAssetUrl($package->image_url),
+                'price' => $package->price !== null ? (float) $package->price : null,
+                'is_active' => (bool) $package->is_active,
+                'preorder_items_count' => (int) $package->preorder_items_count,
+                'sub_packages_count' => (int) $package->sub_packages_count,
+                'updated_at' => $package->updated_at?->toDateTimeString(),
+            ])
+            ->values();
+
+        $parentPackageOptions = CakePackage::query()
+            ->topLevel()
+            ->orderBy('name')
+            ->get()
+            ->map(fn(CakePackage $package) => [
+                'id' => $package->id,
+                'name' => $package->name,
+            ])
+            ->values();
+
+        return Inertia::render('staff/cake-packages', [
+            'packages' => $packages,
+            'parentPackageOptions' => $parentPackageOptions,
+            'canManagePackages' => $user->hasPermission('menu_items.manage'),
+            'summary' => [
+                'total_packages' => CakePackage::query()->count(),
+                'active_packages' => CakePackage::query()->where('is_active', true)->count(),
             ],
         ]);
     }

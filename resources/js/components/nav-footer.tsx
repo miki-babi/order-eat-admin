@@ -27,18 +27,18 @@ export function NavFooter({
                         <SidebarMenuItem key={item.title}>
                             <SidebarMenuButton
                                 asChild
-                                className="h-9 px-3 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-[#F57C00] group/footer-item"
+                                className="h-9 px-3 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-[#F57C00] group/footer-item group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:justify-center"
                             >
                                 <a
-                                    href={toUrl(item.href)}
+                                    href={item.href ? toUrl(item.href) : '#'}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex items-center gap-3"
+                                    className="flex items-center gap-3 group-data-[collapsible=icon]:justify-center"
                                 >
                                     {item.icon && (
-                                        <item.icon className="size-4 opacity-70 transition-opacity group-hover/footer-item:opacity-100" />
+                                        <item.icon className="size-4 opacity-70 transition-opacity group-hover/footer-item:opacity-100 shrink-0" />
                                     )}
-                                    <span className="text-[10px] font-black uppercase tracking-widest leading-none">
+                                    <span className="text-[10px] font-black uppercase tracking-widest leading-none group-data-[collapsible=icon]:hidden">
                                         {item.title}
                                     </span>
                                 </a>

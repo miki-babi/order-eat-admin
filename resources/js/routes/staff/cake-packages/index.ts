@@ -1,7 +1,88 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../wayfinder'
 /**
+* @see \Modules\Ordering\Http\Controllers\Staff\CakePreorderController::index
+* @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:93
+* @route '/staff/cake-packages'
+*/
+export const index = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: index.url(options),
+    method: 'get',
+})
+
+index.definition = {
+    methods: ["get","head"],
+    url: '/staff/cake-packages',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \Modules\Ordering\Http\Controllers\Staff\CakePreorderController::index
+* @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:93
+* @route '/staff/cake-packages'
+*/
+index.url = (options?: RouteQueryOptions) => {
+    return index.definition.url + queryParams(options)
+}
+
+/**
+* @see \Modules\Ordering\Http\Controllers\Staff\CakePreorderController::index
+* @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:93
+* @route '/staff/cake-packages'
+*/
+index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: index.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Modules\Ordering\Http\Controllers\Staff\CakePreorderController::index
+* @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:93
+* @route '/staff/cake-packages'
+*/
+index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: index.url(options),
+    method: 'head',
+})
+
+/**
+* @see \Modules\Ordering\Http\Controllers\Staff\CakePreorderController::index
+* @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:93
+* @route '/staff/cake-packages'
+*/
+const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: index.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Modules\Ordering\Http\Controllers\Staff\CakePreorderController::index
+* @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:93
+* @route '/staff/cake-packages'
+*/
+indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: index.url(options),
+    method: 'get',
+})
+
+/**
+* @see \Modules\Ordering\Http\Controllers\Staff\CakePreorderController::index
+* @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:93
+* @route '/staff/cake-packages'
+*/
+indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: index.url({
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'HEAD',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'get',
+})
+
+index.form = indexForm
+
+/**
 * @see \Modules\Ordering\Http\Controllers\Staff\CakePreorderController::store
-* @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:128
+* @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:145
 * @route '/staff/cake-packages'
 */
 export const store = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -16,7 +97,7 @@ store.definition = {
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\CakePreorderController::store
-* @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:128
+* @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:145
 * @route '/staff/cake-packages'
 */
 store.url = (options?: RouteQueryOptions) => {
@@ -25,7 +106,7 @@ store.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\CakePreorderController::store
-* @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:128
+* @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:145
 * @route '/staff/cake-packages'
 */
 store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -35,7 +116,7 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\CakePreorderController::store
-* @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:128
+* @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:145
 * @route '/staff/cake-packages'
 */
 const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -45,7 +126,7 @@ const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => 
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\CakePreorderController::store
-* @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:128
+* @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:145
 * @route '/staff/cake-packages'
 */
 storeForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -57,7 +138,7 @@ store.form = storeForm
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\CakePreorderController::update
-* @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:148
+* @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:165
 * @route '/staff/cake-packages/{cakePackage}'
 */
 export const update = (args: { cakePackage: number | { id: number } } | [cakePackage: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -72,7 +153,7 @@ update.definition = {
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\CakePreorderController::update
-* @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:148
+* @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:165
 * @route '/staff/cake-packages/{cakePackage}'
 */
 update.url = (args: { cakePackage: number | { id: number } } | [cakePackage: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -105,7 +186,7 @@ update.url = (args: { cakePackage: number | { id: number } } | [cakePackage: num
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\CakePreorderController::update
-* @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:148
+* @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:165
 * @route '/staff/cake-packages/{cakePackage}'
 */
 update.put = (args: { cakePackage: number | { id: number } } | [cakePackage: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -115,7 +196,7 @@ update.put = (args: { cakePackage: number | { id: number } } | [cakePackage: num
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\CakePreorderController::update
-* @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:148
+* @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:165
 * @route '/staff/cake-packages/{cakePackage}'
 */
 const updateForm = (args: { cakePackage: number | { id: number } } | [cakePackage: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -130,7 +211,7 @@ const updateForm = (args: { cakePackage: number | { id: number } } | [cakePackag
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\CakePreorderController::update
-* @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:148
+* @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:165
 * @route '/staff/cake-packages/{cakePackage}'
 */
 updateForm.put = (args: { cakePackage: number | { id: number } } | [cakePackage: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -147,7 +228,7 @@ update.form = updateForm
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\CakePreorderController::destroy
-* @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:185
+* @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:202
 * @route '/staff/cake-packages/{cakePackage}'
 */
 export const destroy = (args: { cakePackage: number | { id: number } } | [cakePackage: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -162,7 +243,7 @@ destroy.definition = {
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\CakePreorderController::destroy
-* @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:185
+* @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:202
 * @route '/staff/cake-packages/{cakePackage}'
 */
 destroy.url = (args: { cakePackage: number | { id: number } } | [cakePackage: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -195,7 +276,7 @@ destroy.url = (args: { cakePackage: number | { id: number } } | [cakePackage: nu
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\CakePreorderController::destroy
-* @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:185
+* @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:202
 * @route '/staff/cake-packages/{cakePackage}'
 */
 destroy.delete = (args: { cakePackage: number | { id: number } } | [cakePackage: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -205,7 +286,7 @@ destroy.delete = (args: { cakePackage: number | { id: number } } | [cakePackage:
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\CakePreorderController::destroy
-* @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:185
+* @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:202
 * @route '/staff/cake-packages/{cakePackage}'
 */
 const destroyForm = (args: { cakePackage: number | { id: number } } | [cakePackage: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -220,7 +301,7 @@ const destroyForm = (args: { cakePackage: number | { id: number } } | [cakePacka
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\CakePreorderController::destroy
-* @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:185
+* @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:202
 * @route '/staff/cake-packages/{cakePackage}'
 */
 destroyForm.delete = (args: { cakePackage: number | { id: number } } | [cakePackage: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -236,6 +317,7 @@ destroyForm.delete = (args: { cakePackage: number | { id: number } } | [cakePack
 destroy.form = destroyForm
 
 const cakePackages = {
+    index: Object.assign(index, index),
     store: Object.assign(store, store),
     update: Object.assign(update, update),
     destroy: Object.assign(destroy, destroy),

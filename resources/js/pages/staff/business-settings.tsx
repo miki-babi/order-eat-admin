@@ -28,6 +28,7 @@ type BusinessSettingsPayload = {
     social_tiktok: string;
     social_telegram: string;
     social_x: string;
+    google_review_url: string;
 };
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -52,6 +53,7 @@ export default function BusinessSettings({
         social_tiktok: string | null;
         social_telegram: string | null;
         social_x: string | null;
+        google_review_url: string | null;
     };
     canManageSettings: boolean;
 }) {
@@ -70,6 +72,7 @@ export default function BusinessSettings({
         social_tiktok: settings.social_tiktok ?? '',
         social_telegram: settings.social_telegram ?? '',
         social_x: settings.social_x ?? '',
+        google_review_url: settings.google_review_url ?? '',
     });
 
     useEffect(() => {
@@ -267,6 +270,18 @@ export default function BusinessSettings({
                                         placeholder="x.com/your-handle or @your-handle"
                                     />
                                     <InputError message={form.errors.social_x} />
+                                </div>
+
+                                <div className="grid gap-2 md:col-span-2">
+                                    <Label htmlFor="google_review_url">Google Review URL</Label>
+                                    <Input
+                                        id="google_review_url"
+                                        value={form.data.google_review_url}
+                                        onChange={(event) => form.setData('google_review_url', event.target.value)}
+                                        placeholder="https://g.page/r/your-id/review"
+                                    />
+                                    <p className="text-xs text-zinc-500">Satisfied customers will be redirected to this link to leave a public review.</p>
+                                    <InputError message={form.errors.google_review_url} />
                                 </div>
                             </CardContent>
                         </Card>

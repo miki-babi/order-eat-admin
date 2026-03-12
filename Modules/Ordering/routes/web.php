@@ -92,6 +92,9 @@ Route::middleware(['auth', 'verified', 'staff'])
         Route::get('cake-preorders', [StaffCakePreorderController::class, 'index'])
             ->middleware(['permission:orders.view', 'feature:staff_cake_preorders'])
             ->name('cake-preorders.index');
+        Route::get('cake-packages', [StaffCakePreorderController::class, 'packages'])
+            ->middleware(['permission:orders.view', 'feature:staff_cake_preorders'])
+            ->name('cake-packages.index');
         Route::post('cake-packages', [StaffCakePreorderController::class, 'storePackage'])
             ->middleware(['permission:menu_items.manage', 'feature:staff_cake_preorders'])
             ->name('cake-packages.store');
@@ -108,6 +111,9 @@ Route::middleware(['auth', 'verified', 'staff'])
         Route::get('catering-requests', [StaffCateringRequestController::class, 'index'])
             ->middleware(['permission:orders.view', 'feature:staff_catering_requests'])
             ->name('catering-requests.index');
+        Route::get('catering-packages', [StaffCateringRequestController::class, 'packages'])
+            ->middleware(['permission:orders.view', 'feature:staff_catering_requests'])
+            ->name('catering-packages.index');
         Route::post('catering-packages', [StaffCateringRequestController::class, 'storePackage'])
             ->middleware(['permission:menu_items.manage', 'feature:staff_catering_requests'])
             ->name('catering-packages.store');

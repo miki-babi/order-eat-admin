@@ -24,6 +24,7 @@ class UpdateBusinessSettingsRequest extends FormRequest
             'social_tiktok' => ['nullable', 'string', 'max:255'],
             'social_telegram' => ['nullable', 'string', 'max:255'],
             'social_x' => ['nullable', 'string', 'max:255'],
+            'google_review_url' => ['nullable', 'string', 'max:1000'],
         ];
     }
 }

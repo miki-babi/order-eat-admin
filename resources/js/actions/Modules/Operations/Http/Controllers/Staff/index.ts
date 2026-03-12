@@ -1,8 +1,10 @@
+import FeedbackController from './FeedbackController'
 import PickupLocationController from './PickupLocationController'
 import TableQrController from './TableQrController'
 import BranchScreenController from './BranchScreenController'
 
 const Staff = {
+    FeedbackController: Object.assign(FeedbackController, FeedbackController),
     PickupLocationController: Object.assign(PickupLocationController, PickupLocationController),
     TableQrController: Object.assign(TableQrController, TableQrController),
     BranchScreenController: Object.assign(BranchScreenController, BranchScreenController),

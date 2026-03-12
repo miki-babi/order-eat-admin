@@ -82,7 +82,7 @@ index.form = indexForm
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\CateringRequestController::status
-* @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:187
+* @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:209
 * @route '/staff/catering-requests/{cateringServiceRequest}/status'
 */
 export const status = (args: { cateringServiceRequest: number | { id: number } } | [cateringServiceRequest: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
@@ -97,7 +97,7 @@ status.definition = {
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\CateringRequestController::status
-* @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:187
+* @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:209
 * @route '/staff/catering-requests/{cateringServiceRequest}/status'
 */
 status.url = (args: { cateringServiceRequest: number | { id: number } } | [cateringServiceRequest: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -130,7 +130,7 @@ status.url = (args: { cateringServiceRequest: number | { id: number } } | [cater
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\CateringRequestController::status
-* @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:187
+* @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:209
 * @route '/staff/catering-requests/{cateringServiceRequest}/status'
 */
 status.patch = (args: { cateringServiceRequest: number | { id: number } } | [cateringServiceRequest: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
@@ -140,7 +140,7 @@ status.patch = (args: { cateringServiceRequest: number | { id: number } } | [cat
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\CateringRequestController::status
-* @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:187
+* @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:209
 * @route '/staff/catering-requests/{cateringServiceRequest}/status'
 */
 const statusForm = (args: { cateringServiceRequest: number | { id: number } } | [cateringServiceRequest: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -155,7 +155,7 @@ const statusForm = (args: { cateringServiceRequest: number | { id: number } } | 
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\CateringRequestController::status
-* @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:187
+* @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:209
 * @route '/staff/catering-requests/{cateringServiceRequest}/status'
 */
 statusForm.patch = (args: { cateringServiceRequest: number | { id: number } } | [cateringServiceRequest: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({

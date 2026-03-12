@@ -1,6 +1,6 @@
 import { Head, router } from '@inertiajs/react';
 import { CheckCheck, ConciergeBell, Flame, HandPlatter, Timer, UtensilsCrossed } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -112,6 +112,15 @@ export default function WaiterBoard({
     summary: Summary;
 }) {
     const [processingOrderId, setProcessingOrderId] = useState<number | null>(null);
+    useEffect(() => {
+        const interval = setInterval(() => {
+            router.reload({
+                only: ['pendingConfirmationOrders', 'awaitingKitchenOrders', 'readyToServeOrders', 'servedOrders', 'summary'],
+            });
+        }, 10000);
+
+        return () => clearInterval(interval);
+    }, []);
 
     const selectScreen = (screenId: number) => {
         router.get(

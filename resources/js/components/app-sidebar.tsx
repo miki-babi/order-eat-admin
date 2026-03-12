@@ -1,17 +1,18 @@
 import { Link, usePage } from '@inertiajs/react';
-import { BarChart3, ClipboardList, Coffee, ConciergeBell, KeyRound, MapPin, MessageSquareText, MonitorSmartphone, QrCode, Shield, Store, Users, UtensilsCrossed, Wallet } from 'lucide-react';
+import { BarChart3, ClipboardList, Coffee, ConciergeBell, KeyRound, MapPin, MessageSquareText, MonitorSmartphone, Package, QrCode, Search, Shield, Store, Users, UtensilsCrossed, Wallet } from 'lucide-react';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
-import { toUrl } from '@/lib/utils';
 import {
     Sidebar,
     SidebarContent,
     SidebarFooter,
     SidebarHeader,
     SidebarMenu,
-    SidebarMenuItem,
+    SidebarMenuItem
+    
 } from '@/components/ui/sidebar';
+import { toUrl } from '@/lib/utils';
 import type { NavGroup, NavItem } from '@/types';
 import AppLogo from './app-logo';
 
@@ -57,10 +58,24 @@ export function AppSidebar() {
                     }]
                     : []),
                 ...(can('orders.view')
-                    ? [{ title: 'Cake Preorders', href: '/staff/cake-preorders', icon: Coffee }]
+                    ? [{
+                        title: 'Cake Preorders',
+                        icon: Coffee,
+                        items: [
+                            { title: 'Preorder List', href: '/staff/cake-preorders', icon: ClipboardList },
+                            { title: 'Cake Packages', href: '/staff/cake-packages', icon: Package },
+                        ]
+                    }]
                     : []),
                 ...(can('orders.view')
-                    ? [{ title: 'Catering Requests', href: '/staff/catering-requests', icon: UtensilsCrossed }]
+                    ? [{
+                        title: 'Catering',
+                        icon: UtensilsCrossed,
+                        items: [
+                            { title: 'Requests', href: '/staff/catering-requests', icon: ClipboardList },
+                            { title: 'Catering Packages', href: '/staff/catering-packages', icon: Package },
+                        ]
+                    }]
                     : []),
             ],
         },
@@ -73,6 +88,9 @@ export function AppSidebar() {
                 ...(can('customers.view')
                     ? [{ title: 'Customers', href: '/staff/customers', icon: Users }]
                     : []),
+                // ...(can('orders.view')
+                //     ? [{ title: 'Feedback', href: '/staff/feedbacks', icon: MessageSquareText }]
+                //     : []),
                 ...(can('sms_templates.manage')
                     ? [{ title: 'Outreach', href: '/staff/sms-templates', icon: MessageSquareText }]
                     : []),
@@ -128,23 +146,42 @@ export function AppSidebar() {
         : findFirstHref(mainNavItems);
 
     return (
-        <Sidebar collapsible="icon" variant="inset" className="bg-white/50 backdrop-blur-xl border-r border-zinc-100">
-            <SidebarHeader className="py-8">
-                <SidebarMenu>
-                    <SidebarMenuItem>
-                        <Link href={homeHref} prefetch className="block transition-all hover:opacity-80">
-                            <AppLogo />
-                        </Link>
-                    </SidebarMenuItem>
-                </SidebarMenu>
+        <Sidebar collapsible="icon" variant="inset" className="border-r-0 bg-zinc-50/50 selection:bg-[#F57C00]/10">
+            <SidebarHeader className="bg-white/40 backdrop-blur-md">
+                <div className="flex flex-col gap-6 py-4">
+                    <SidebarMenu>
+                        <SidebarMenuItem>
+                            <Link href={homeHref} prefetch className="block transition-all hover:opacity-80 active:scale-95">
+                                <AppLogo />
+                            </Link>
+                        </SidebarMenuItem>
+                    </SidebarMenu>
+
+                    {/* Quick Search */}
+                    <div className=" hidden px-4 group-data-[collapsible=icon]:hidden">
+                        <div className="group relative flex items-center">
+                            <Search className="absolute left-3 size-3.5 text-zinc-400 group-focus-within:text-[#F57C00] transition-colors" />
+                            <input
+                                type="text"
+                                placeholder="Search Intel..."
+                                className="h-9 w-full rounded-xl border border-zinc-100 bg-white/50 pl-9 pr-3 text-[11px] font-bold tracking-tight placeholder:text-zinc-400 focus:border-[#F57C00]/30 focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#F57C00]/5 transition-all"
+                            />
+                            <div className="absolute right-2 flex items-center gap-0.5 rounded-md border border-zinc-200 bg-zinc-50 px-1 py-0.5 text-[9px] font-black text-zinc-400">
+                                <span>⌘</span>
+                                <span>K</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </SidebarHeader>
 
-            <SidebarContent className="flex-1">
+            <SidebarContent className="scrollbar-none bg-transparent">
                 <NavMain groups={mainNavGroups} />
             </SidebarContent>
 
-            <SidebarFooter className="p-4 space-y-4 border-t border-zinc-100/50">
+            <SidebarFooter className="border-t border-zinc-100/80 bg-white/40 p-4 backdrop-blur-md">
                 <NavFooter items={footerNavItems} />
+                <div className="h-px w-full bg-gradient-to-r from-transparent via-zinc-100 to-transparent my-1 group-data-[collapsible=icon]:hidden" />
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

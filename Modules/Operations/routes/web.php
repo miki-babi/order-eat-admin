@@ -5,10 +5,19 @@ use Modules\Operations\Http\Controllers\Staff\BranchScreenController;
 use Modules\Operations\Http\Controllers\Staff\PickupLocationController;
 use Modules\Operations\Http\Controllers\Staff\TableQrController;
 
+use Modules\Operations\Http\Controllers\PublicFeedbackController;
+use Modules\Operations\Http\Controllers\Staff\FeedbackController;
+
+Route::post('/feedbacks', [PublicFeedbackController::class, 'store'])->name('feedbacks.store');
+
 Route::middleware(['auth', 'verified', 'staff'])
     ->prefix('staff')
     ->name('staff.')
     ->group(function (): void {
+        Route::get('feedbacks', [FeedbackController::class, 'index'])
+            ->middleware(['permission:orders.view']) // Using orders.view for now, common for staff
+            ->name('feedbacks.index');
+
         Route::get('pickup-locations', [PickupLocationController::class, 'index'])
             ->middleware(['permission:pickup_locations.manage', 'feature:staff_pickup_locations'])
             ->name('pickup-locations.index');

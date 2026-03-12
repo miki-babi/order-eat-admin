@@ -12,7 +12,8 @@ import {
     Receipt,
     Search,
     MapPin,
-    RotateCcw
+    RotateCcw,
+    ThumbsDown
 } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
 import { Badge } from '@/components/ui/badge';
@@ -113,6 +114,7 @@ type Summary = {
     pending_orders: number;
     pending_receipts: number;
     ready_orders: number;
+    complaints: number;
 };
 
 type SourceSummary = {
@@ -328,7 +330,7 @@ export default function StaffOrders({
             <Head title="Staff Orders" />
             <div className="space-y-8 bg-zinc-50/50 p-6 min-h-screen">
                 {/* 📌 Section 1 — Header Summary */}
-                <div className="hidden grid gap-4 md:grid-cols-4">
+                <div className="grid gap-4 md:grid-cols-4">
                     <Card className="border-none shadow-sm ring-1 ring-zinc-200">
                         <CardContent className="pt-6">
                             <div className="flex items-center justify-between">
@@ -535,7 +537,9 @@ export default function StaffOrders({
                                 const isExpanded = expandedCards.includes(order.id);
 
                                 return (
-                                    <Card key={order.id} className="overflow-hidden border-none shadow-sm ring-1 ring-zinc-200 transition-all hover:ring-[#F57C00]/30 bg-white rounded-2xl">
+                                    <Card key={order.id} className="overflow-hidden border-none shadow-sm ring-1 ring-zinc-200 transition-all hover:ring-[#F57C00]/30 bg-white rounded-2xl"
+                                     onClick={() => toggleCard(order.id)}
+                                    >
                                         <div className="p-4 flex items-center justify-between gap-4">
                                             <div className="flex items-center gap-4 flex-1 min-w-0">
                                                 <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#F57C00]/10 text-[#F57C00] shrink-0">

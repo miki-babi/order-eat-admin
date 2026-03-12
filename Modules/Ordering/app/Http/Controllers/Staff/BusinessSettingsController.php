@@ -31,6 +31,7 @@ class BusinessSettingsController extends Controller
                 'social_tiktok' => $settings->social_tiktok,
                 'social_telegram' => $settings->social_telegram,
                 'social_x' => $settings->social_x,
+                'google_review_url' => $settings->google_review_url,
             ],
             'canManageSettings' => $request->user()?->hasPermission('menu_items.manage') ?? false,
         ]);
@@ -55,6 +56,7 @@ class BusinessSettingsController extends Controller
             'social_tiktok' => $validated['social_tiktok'] ?? null,
             'social_telegram' => $validated['social_telegram'] ?? null,
             'social_x' => $validated['social_x'] ?? null,
+            'google_review_url' => $validated['google_review_url'] ?? null,
         ]);
 
         return back()->with('success', 'Business settings updated.');

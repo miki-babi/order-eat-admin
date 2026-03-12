@@ -5,14 +5,14 @@ import {
     Edit3,
     PackageCheck,
     Search,
-    Trash2,
     ChevronDown,
     ChevronUp,
     Filter,
     MoreHorizontal,
     Calendar,
     Phone,
-    Package
+    Package,
+    ArrowRight
 } from 'lucide-react';
 import { useMemo, useState, type FormEvent } from 'react';
 import InputError from '@/components/input-error';
@@ -23,14 +23,6 @@ import {
     Collapsible,
     CollapsibleContent,
 } from '@/components/ui/collapsible';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -156,8 +148,6 @@ export default function CakePreorders({
 }) {
     const [expandedCards, setExpandedCards] = useState<number[]>([]);
     const [isFiltersOpen, setIsFiltersOpen] = useState(false);
-    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-    const [editingPackage, setEditingPackage] = useState<CakePackageRow | null>(null);
 
     const toggleCard = (preorderId: number) => {
         setExpandedCards(prev =>
@@ -170,29 +160,6 @@ export default function CakePreorders({
         status: filters.status ?? '',
     });
 
-    const createPackageForm = useForm({
-        parent_id: '',
-        name: '',
-        description: '',
-        image: null as File | null,
-        price: '',
-        is_active: true,
-    });
-
-    const editPackageForm = useForm({
-        _method: 'put',
-        parent_id: '',
-        name: '',
-        description: '',
-        image: null as File | null,
-        price: '',
-        is_active: true,
-    });
-
-    const editParentOptions = useMemo(
-        () => parentPackageOptions.filter((option) => option.id !== editingPackage?.id),
-        [parentPackageOptions, editingPackage?.id],
-    );
 
     const applyFilters = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -213,58 +180,6 @@ export default function CakePreorders({
         });
     };
 
-    const createPackage = (event: FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        createPackageForm.post('/staff/cake-packages', {
-            forceFormData: true,
-            preserveScroll: true,
-            onSuccess: () => {
-                createPackageForm.reset();
-                createPackageForm.setData('parent_id', '');
-                createPackageForm.setData('is_active', true);
-                setIsCreateModalOpen(false);
-            },
-        });
-    };
-
-    const startEditPackage = (pkg: CakePackageRow) => {
-        setEditingPackage(pkg);
-        editPackageForm.setData({
-            _method: 'put',
-            parent_id: pkg.parent_id ? String(pkg.parent_id) : '',
-            name: pkg.name,
-            description: pkg.description ?? '',
-            image: null,
-            price: pkg.price !== null ? String(pkg.price) : '',
-            is_active: pkg.is_active,
-        });
-    };
-
-    const updatePackage = (event: FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-
-        if (!editingPackage) {
-            return;
-        }
-
-        editPackageForm.post(`/staff/cake-packages/${editingPackage.id}`, {
-            forceFormData: true,
-            preserveScroll: true,
-            onSuccess: () => {
-                setEditingPackage(null);
-            },
-        });
-    };
-
-    const deletePackage = (pkg: CakePackageRow) => {
-        if (!window.confirm(`Delete or deactivate "${pkg.name}"?`)) {
-            return;
-        }
-
-        router.delete(`/staff/cake-packages/${pkg.id}`, {
-            preserveScroll: true,
-        });
-    };
 
     const updatePreorderStatus = (preorderId: number, status: string) => {
         router.patch(`/staff/cake-preorders/${preorderId}/status`, {
@@ -434,105 +349,6 @@ export default function CakePreorders({
                     </Collapsible>
                 </div>
 
-                <Dialog open={!!editingPackage} onOpenChange={(open) => !open && setEditingPackage(null)}>
-                    <DialogContent className="sm:max-w-[600px] rounded-3xl border-none p-0 overflow-hidden bg-white shadow-2xl">
-                        <DialogHeader className="p-6 bg-zinc-50 border-b border-zinc-100">
-                            <DialogTitle className="flex items-center gap-2 text-sm font-black uppercase tracking-widest text-[#212121]">
-                                <Edit3 className="size-4 text-[#F57C00]" />
-                                Edit Package: {editingPackage?.name}
-                            </DialogTitle>
-                            <DialogDescription className="text-xs font-bold text-zinc-500 uppercase tracking-wide">
-                                Modify the details of the cake package.
-                            </DialogDescription>
-                        </DialogHeader>
-                        <form className="p-6 space-y-6" onSubmit={updatePackage}>
-                            <div className="grid gap-6 md:grid-cols-2">
-                                <div className="space-y-2 md:col-span-2">
-                                    <Label htmlFor="edit-parent" className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">Parent Package</Label>
-                                    <select
-                                        id="edit-parent"
-                                        value={editPackageForm.data.parent_id}
-                                        onChange={(event) => editPackageForm.setData('parent_id', event.target.value)}
-                                        className="h-12 w-full rounded-xl border border-zinc-100 bg-zinc-50/50 px-4 text-sm font-bold focus:bg-white transition-all outline-none ring-offset-white focus-visible:ring-2 focus-visible:ring-zinc-950"
-                                    >
-                                        <option value="">No parent (top-level package)</option>
-                                        {editParentOptions.map((option) => (
-                                            <option key={option.id} value={String(option.id)}>
-                                                {option.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    <InputError message={editPackageForm.errors.parent_id} />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="edit-name" className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">Name</Label>
-                                    <Input
-                                        id="edit-name"
-                                        value={editPackageForm.data.name}
-                                        onChange={(event) => editPackageForm.setData('name', event.target.value)}
-                                        className="h-12 rounded-xl border border-zinc-100 bg-zinc-50/50 px-4 text-sm font-bold focus:bg-white transition-all outline-none ring-offset-white focus-visible:ring-2 focus-visible:ring-zinc-950"
-                                    />
-                                    <InputError message={editPackageForm.errors.name} />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="edit-price" className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">Price (ETB)</Label>
-                                    <Input
-                                        id="edit-price"
-                                        type="number"
-                                        min="0"
-                                        step="0.01"
-                                        value={editPackageForm.data.price}
-                                        onChange={(event) => editPackageForm.setData('price', event.target.value)}
-                                        className="h-12 rounded-xl border border-zinc-100 bg-zinc-50/50 px-4 text-sm font-bold focus:bg-white transition-all outline-none ring-offset-white focus-visible:ring-2 focus-visible:ring-zinc-950"
-                                    />
-                                    <InputError message={editPackageForm.errors.price} />
-                                </div>
-                                <div className="space-y-2 md:col-span-2">
-                                    <Label htmlFor="edit-description" className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">Description</Label>
-                                    <Input
-                                        id="edit-description"
-                                        value={editPackageForm.data.description}
-                                        onChange={(event) => editPackageForm.setData('description', event.target.value)}
-                                        className="h-12 rounded-xl border border-zinc-100 bg-zinc-50/50 px-4 text-sm font-bold focus:bg-white transition-all outline-none ring-offset-white focus-visible:ring-2 focus-visible:ring-zinc-950"
-                                    />
-                                    <InputError message={editPackageForm.errors.description} />
-                                </div>
-                                <div className="space-y-2 md:col-span-2">
-                                    <Label htmlFor="edit-image" className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">Replacement Image</Label>
-                                    <Input
-                                        id="edit-image"
-                                        type="file"
-                                        accept="image/png,image/jpeg,image/jpg,image/webp"
-                                        className="h-12 rounded-xl border border-zinc-100 bg-zinc-50/50 px-4 text-sm font-bold focus:bg-white transition-all outline-none ring-offset-white focus-visible:ring-2 focus-visible:ring-zinc-950 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-black file:bg-[#F57C00]/10 file:text-[#F57C00] hover:file:bg-[#F57C00]/20"
-                                        onChange={(event) => editPackageForm.setData('image', event.target.files?.[0] ?? null)}
-                                    />
-                                    <InputError message={editPackageForm.errors.image} />
-                                </div>
-                            </div>
-                            <div className="flex items-center justify-between rounded-2xl border border-zinc-100 bg-zinc-50/50 px-5 py-4">
-                                <label className="flex items-center gap-3 cursor-pointer group">
-                                    <div className="relative flex items-center">
-                                        <input
-                                            type="checkbox"
-                                            className="peer size-5 rounded-lg border-zinc-200 text-[#F57C00] focus:ring-[#F57C00]/20 transition-all cursor-pointer"
-                                            checked={editPackageForm.data.is_active}
-                                            onChange={(event) => editPackageForm.setData('is_active', event.target.checked)}
-                                        />
-                                    </div>
-                                    <span className="text-sm font-black text-[#212121] group-hover:text-black transition-colors">Active package</span>
-                                </label>
-                                <div className="flex gap-3">
-                                    <Button type="button" variant="ghost" className="rounded-xl font-bold text-zinc-500 hover:bg-zinc-100" onClick={() => setEditingPackage(null)}>
-                                        Cancel
-                                    </Button>
-                                    <Button type="submit" className="rounded-xl bg-[#212121] text-white hover:bg-black font-bold px-6 shadow-lg shadow-black/20" disabled={editPackageForm.processing}>
-                                        Save Changes
-                                    </Button>
-                                </div>
-                            </div>
-                        </form>
-                    </DialogContent>
-                </Dialog>
 
                 <div className="space-y-4">
                     <div className="flex items-center justify-between px-2">
@@ -547,7 +363,10 @@ export default function CakePreorders({
                         {preorders.data.map((preorder) => {
                             const isExpanded = expandedCards.includes(preorder.id);
                             return (
-                                <Card key={preorder.id} className="group overflow-hidden border-none shadow-sm ring-1 ring-zinc-200 transition-all hover:ring-zinc-300 bg-white rounded-3xl">
+                                <Card key={preorder.id} className="group overflow-hidden border-none shadow-sm ring-1 ring-zinc-200 transition-all hover:ring-zinc-300 bg-white rounded-3xl"
+                                    onClick={() => toggleCard(preorder.id)}
+
+                                >
                                     <div className="p-4 sm:p-5">
                                         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                                             <div className="flex items-start gap-4">
@@ -693,180 +512,22 @@ export default function CakePreorders({
                     </div>
                 </div>
 
-                <div className="space-y-4">
-                    <div className="flex items-center justify-between px-2">
-                        <h3 className="text-sm font-black uppercase tracking-widest text-zinc-500 flex items-center gap-2">
-                            <PackageCheck className="size-4 text-[#F57C00]" />
-                            Cake Packages
-                        </h3>
-                        {canManagePackages && (
-                            <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-                                <DialogTrigger asChild>
-                                    <Button variant="outline" size="sm" className="h-8 rounded-lg font-bold border-zinc-200">
-                                        Add New
-                                    </Button>
-                                </DialogTrigger>
-                                <DialogContent className="sm:max-w-[600px] rounded-3xl border-none p-0 overflow-hidden bg-white shadow-2xl">
-                                    <DialogHeader className="p-6 bg-zinc-50 border-b border-zinc-100">
-                                        <DialogTitle className="flex items-center gap-2 text-sm font-black uppercase tracking-widest text-[#212121]">
-                                            <CakeSlice className="size-4 text-[#F57C00]" />
-                                            Create Cake Package
-                                        </DialogTitle>
-                                        <DialogDescription className="text-xs font-bold text-zinc-500 uppercase tracking-wide">
-                                            Fill in the details to create a new cake package.
-                                        </DialogDescription>
-                                    </DialogHeader>
-                                    <form className="p-6 space-y-6" onSubmit={createPackage}>
-                                        <div className="grid gap-6 md:grid-cols-2">
-                                            <div className="space-y-2 md:col-span-2">
-                                                <Label htmlFor="new-parent" className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">Parent Package</Label>
-                                                <select
-                                                    id="new-parent"
-                                                    value={createPackageForm.data.parent_id}
-                                                    onChange={(event) => createPackageForm.setData('parent_id', event.target.value)}
-                                                    className="h-12 w-full rounded-xl border border-zinc-100 bg-zinc-50/50 px-4 text-sm font-bold focus:bg-white transition-all outline-none ring-offset-white focus-visible:ring-2 focus-visible:ring-zinc-950"
-                                                >
-                                                    <option value="">No parent (top-level package)</option>
-                                                    {parentPackageOptions.map((option) => (
-                                                        <option key={option.id} value={String(option.id)}>
-                                                            {option.name}
-                                                        </option>
-                                                    ))}
-                                                </select>
-                                                <InputError message={createPackageForm.errors.parent_id} />
-                                            </div>
-                                            <div className="space-y-2">
-                                                <Label htmlFor="new-name" className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">Name</Label>
-                                                <Input
-                                                    id="new-name"
-                                                    value={createPackageForm.data.name}
-                                                    onChange={(event) => createPackageForm.setData('name', event.target.value)}
-                                                    className="h-12 rounded-xl border border-zinc-100 bg-zinc-50/50 px-4 text-sm font-bold focus:bg-white transition-all outline-none ring-offset-white focus-visible:ring-2 focus-visible:ring-zinc-950"
-                                                />
-                                                <InputError message={createPackageForm.errors.name} />
-                                            </div>
-                                            <div className="space-y-2">
-                                                <Label htmlFor="new-price" className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">Price (ETB)</Label>
-                                                <Input
-                                                    id="new-price"
-                                                    type="number"
-                                                    min="0"
-                                                    step="0.01"
-                                                    value={createPackageForm.data.price}
-                                                    onChange={(event) => createPackageForm.setData('price', event.target.value)}
-                                                    className="h-12 rounded-xl border border-zinc-100 bg-zinc-50/50 px-4 text-sm font-bold focus:bg-white transition-all outline-none ring-offset-white focus-visible:ring-2 focus-visible:ring-zinc-950"
-                                                />
-                                                <InputError message={createPackageForm.errors.price} />
-                                            </div>
-                                            <div className="space-y-2 md:col-span-2">
-                                                <Label htmlFor="new-description" className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">Description</Label>
-                                                <Input
-                                                    id="new-description"
-                                                    value={createPackageForm.data.description}
-                                                    onChange={(event) => createPackageForm.setData('description', event.target.value)}
-                                                    className="h-12 rounded-xl border border-zinc-100 bg-zinc-50/50 px-4 text-sm font-bold focus:bg-white transition-all outline-none ring-offset-white focus-visible:ring-2 focus-visible:ring-zinc-950"
-                                                />
-                                                <InputError message={createPackageForm.errors.description} />
-                                            </div>
-                                            <div className="space-y-2 md:col-span-2">
-                                                <Label htmlFor="new-image" className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">Image</Label>
-                                                <Input
-                                                    id="new-image"
-                                                    type="file"
-                                                    accept="image/png,image/jpeg,image/jpg,image/webp"
-                                                    className="h-12 rounded-xl border border-zinc-100 bg-zinc-50/50 px-4 text-sm font-bold focus:bg-white transition-all outline-none ring-offset-white focus-visible:ring-2 focus-visible:ring-zinc-950 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-black file:bg-[#F57C00]/10 file:text-[#F57C00] hover:file:bg-[#F57C00]/20"
-                                                    onChange={(event) => createPackageForm.setData('image', event.target.files?.[0] ?? null)}
-                                                />
-                                                <InputError message={createPackageForm.errors.image} />
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center justify-between rounded-2xl border border-zinc-100 bg-zinc-50/50 px-5 py-4">
-                                            <label className="flex items-center gap-3 cursor-pointer group">
-                                                <div className="relative flex items-center">
-                                                    <input
-                                                        type="checkbox"
-                                                        className="peer size-5 rounded-lg border-zinc-200 text-[#F57C00] focus:ring-[#F57C00]/20 transition-all cursor-pointer"
-                                                        checked={createPackageForm.data.is_active}
-                                                        onChange={(event) => createPackageForm.setData('is_active', event.target.checked)}
-                                                    />
-                                                </div>
-                                                <span className="text-sm font-black text-[#212121] group-hover:text-black transition-colors">Active package</span>
-                                            </label>
-                                            <div className="flex gap-3">
-                                                <Button type="button" variant="ghost" className="rounded-xl font-bold text-zinc-500 hover:bg-zinc-100" onClick={() => setIsCreateModalOpen(false)}>
-                                                    Cancel
-                                                </Button>
-                                                <Button type="submit" className="rounded-xl bg-[#F57C00] text-white hover:bg-[#E65100] font-bold px-6 shadow-lg shadow-[#F57C00]/20" disabled={createPackageForm.processing}>
-                                                    Add Package
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    </form>
-                                </DialogContent>
-                            </Dialog>
-                        )}
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between rounded-3xl border border-zinc-100 bg-white p-6 shadow-sm">
+                    <div className="flex items-center gap-4">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#F57C00]/10 text-[#F57C00]">
+                            <PackageCheck className="size-6" />
+                        </div>
+                        <div>
+                            <h3 className="text-base font-black text-zinc-900">Cake Package Management</h3>
+                            <p className="text-xs font-medium text-zinc-500">Configure your cake packages, sizes, and pricing catalog.</p>
+                        </div>
                     </div>
-
-                    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                        {packages.map((pkg) => (
-                            <article key={pkg.id} className="group relative flex flex-col overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-zinc-200 transition-all hover:shadow-md">
-                                <div className="aspect-[16/10] overflow-hidden bg-zinc-100 relative">
-                                    {pkg.image_url ? (
-                                        <img src={pkg.image_url} alt={pkg.name} className="h-full w-full object-cover transition-transform group-hover:scale-105" loading="lazy" />
-                                    ) : (
-                                        <div className="flex h-full w-full items-center justify-center text-zinc-300">
-                                            <Package className="size-12 opacity-20" />
-                                        </div>
-                                    )}
-                                    <div className="absolute top-3 right-3 flex gap-2">
-                                        <Badge className={`rounded-full px-2 py-0.5 text-[8px] font-black uppercase tracking-tight shadow-none border-none ${pkg.is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-zinc-100 text-zinc-600'}`}>
-                                            {pkg.is_active ? 'Active' : 'Inactive'}
-                                        </Badge>
-                                    </div>
-                                </div>
-                                <div className="flex flex-1 flex-col p-5">
-                                    <div className="flex items-start justify-between gap-3">
-                                        <div className="min-w-0 flex-1">
-                                            <h4 className="truncate text-base font-black text-[#212121]">{pkg.name}</h4>
-                                            <p className="mt-1 line-clamp-2 text-xs font-medium text-zinc-500">{pkg.description || 'No description provided'}</p>
-                                            {pkg.parent_name && (
-                                                <p className="mt-2 text-[10px] font-black uppercase tracking-widest text-[#F57C00]">
-                                                    Sub-package of {pkg.parent_name}
-                                                </p>
-                                            )}
-                                            {!pkg.parent_name && pkg.sub_packages_count > 0 && (
-                                                <p className="mt-2 text-[10px] font-black uppercase tracking-widest text-zinc-400">
-                                                    {pkg.sub_packages_count} sub-package{pkg.sub_packages_count === 1 ? '' : 's'}
-                                                </p>
-                                            )}
-                                        </div>
-                                        <div className="text-right">
-                                            <p className="text-sm font-black text-[#F57C00]">{currency(pkg.price)}</p>
-                                        </div>
-                                    </div>
-
-                                    <div className="mt-4 flex items-center gap-4 border-t border-zinc-50 pt-4">
-                                        <div className="flex items-center gap-1.5 min-w-0">
-                                            <Clock3 className="size-3.5 text-zinc-400 shrink-0" />
-                                            <span className="truncate text-[10px] font-bold text-zinc-600">{pkg.preorder_items_count} Preorders</span>
-                                        </div>
-                                    </div>
-
-                                    {canManagePackages && (
-                                        <div className="mt-4 flex gap-2 transition-opacity">
-                                            <Button type="button" variant="outline" className="h-9 flex-1 rounded-xl text-xs font-bold border-zinc-200" onClick={() => startEditPackage(pkg)}>
-                                                <Edit3 className="mr-2 size-3.5" />
-                                                Edit
-                                            </Button>
-                                            <Button type="button" variant="outline" className="h-9 w-9 p-0 rounded-xl border-rose-100 text-rose-600 hover:bg-rose-50" onClick={() => deletePackage(pkg)}>
-                                                <Trash2 className="size-3.5" />
-                                            </Button>
-                                        </div>
-                                    )}
-                                </div>
-                            </article>
-                        ))}
-                    </div>
+                    <Button asChild className="h-11 rounded-xl bg-[#212121] text-white hover:bg-black font-bold px-6 shadow-lg shadow-zinc-200 gap-2">
+                        <Link href="/staff/cake-packages">
+                            Manage Packages
+                            <ArrowRight className="size-4" />
+                        </Link>
+                    </Button>
                 </div>
 
                 <div className="flex justify-end">

@@ -6,6 +6,7 @@ import smsNotificationSettings from './sms-notification-settings'
 import smsPhoneLists from './sms-phone-lists'
 import smsContacts from './sms-contacts'
 import smsCampaigns from './sms-campaigns'
+import feedbacks from './feedbacks'
 import pickupLocations from './pickup-locations'
 import tableQr from './table-qr'
 import tableSessions from './table-sessions'
@@ -30,6 +31,7 @@ const staff = {
     smsPhoneLists: Object.assign(smsPhoneLists, smsPhoneLists),
     smsContacts: Object.assign(smsContacts, smsContacts),
     smsCampaigns: Object.assign(smsCampaigns, smsCampaigns),
+    feedbacks: Object.assign(feedbacks, feedbacks),
     pickupLocations: Object.assign(pickupLocations, pickupLocations),
     tableQr: Object.assign(tableQr, tableQr),
     tableSessions: Object.assign(tableSessions, tableSessions),

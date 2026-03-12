@@ -26,5 +26,6 @@ class BusinessSetting extends Model
         'social_tiktok',
         'social_telegram',
         'social_x',
+        'google_review_url',
     ];
 }

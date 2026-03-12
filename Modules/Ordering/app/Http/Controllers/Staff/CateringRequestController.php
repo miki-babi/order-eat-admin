@@ -17,7 +17,7 @@ use Modules\Ordering\Http\Requests\Staff\UpdateCateringServiceRequestStatusReque
 class CateringRequestController extends Controller
 {
     /**
-     * Show staff catering package management and service request list.
+     * Show staff catering service request list.
      */
     public function index(Request $request): Response
     {
@@ -25,24 +25,6 @@ class CateringRequestController extends Controller
         $user = $request->user();
         $search = trim((string) $request->input('search', ''));
         $status = is_string($request->input('status')) ? $request->input('status') : null;
-
-        $packages = CateringPackage::query()
-            ->withCount(['serviceRequestItems as service_requests_count'])
-            ->orderByDesc('is_active')
-            ->orderBy('name')
-            ->get()
-            ->map(fn (CateringPackage $package) => [
-                'id' => $package->id,
-                'name' => $package->name,
-                'description' => $package->description,
-                'image_url' => $this->toPublicAssetUrl($package->image_url),
-                'price_per_person' => (float) $package->price_per_person,
-                'min_guests' => (int) $package->min_guests,
-                'is_active' => (bool) $package->is_active,
-                'service_requests_count' => (int) $package->service_requests_count,
-                'updated_at' => $package->updated_at?->toDateTimeString(),
-            ])
-            ->values();
 
         $requests = CateringServiceRequest::query()
             ->with(['customer', 'package', 'items.package'])
@@ -95,7 +77,6 @@ class CateringRequestController extends Controller
             });
 
         return Inertia::render('staff/catering-requests', [
-            'packages' => $packages,
             'requests' => $requests,
             'filters' => [
                 'search' => $search,
@@ -109,6 +90,47 @@ class CateringRequestController extends Controller
                 'active_packages' => CateringPackage::query()->where('is_active', true)->count(),
                 'total_requests' => CateringServiceRequest::query()->count(),
                 'pending_requests' => CateringServiceRequest::query()->where('status', 'pending')->count(),
+                'status_counts' => CateringServiceRequest::query()
+                    ->selectRaw('status, count(*) as count')
+                    ->groupBy('status')
+                    ->pluck('count', 'status')
+                    ->all(),
+            ],
+        ]);
+    }
+
+    /**
+     * Show catering package management page.
+     */
+    public function packages(Request $request): Response
+    {
+        /** @var \App\Models\User $user */
+        $user = $request->user();
+
+        $packages = CateringPackage::query()
+            ->withCount(['serviceRequestItems as service_requests_count'])
+            ->orderByDesc('is_active')
+            ->orderBy('name')
+            ->get()
+            ->map(fn (CateringPackage $package) => [
+                'id' => $package->id,
+                'name' => $package->name,
+                'description' => $package->description,
+                'image_url' => $this->toPublicAssetUrl($package->image_url),
+                'price_per_person' => (float) $package->price_per_person,
+                'min_guests' => (int) $package->min_guests,
+                'is_active' => (bool) $package->is_active,
+                'service_requests_count' => (int) $package->service_requests_count,
+                'updated_at' => $package->updated_at?->toDateTimeString(),
+            ])
+            ->values();
+
+        return Inertia::render('staff/catering-packages', [
+            'packages' => $packages,
+            'canManagePackages' => $user->hasPermission('menu_items.manage'),
+            'summary' => [
+                'total_packages' => CateringPackage::query()->count(),
+                'active_packages' => CateringPackage::query()->where('is_active', true)->count(),
             ],
         ]);
     }
