@@ -207,7 +207,7 @@ class QrMenuController extends Controller
             'verified_at' => $tableSession->verified_at,
         ]);
 
-        if ($tableSession->dining_table_id !== $diningTable->id) {
+        if ((int) $tableSession->dining_table_id !== (int) $diningTable->id) {
             Log::warning('QR menu store: table session token does not belong to this table', [
                 'expected_table_id' => $diningTable->id,
                 'session_table_id' => $tableSession->dining_table_id,
