@@ -5,7 +5,7 @@ import orders from './orders'
 * @see Modules/Ordering/app/Http/Controllers/QrMenuController.php:26
 * @route '/qr-menu/{diningTable}'
 */
-export const show = (args: { diningTable: string | { qr_code: string } } | [diningTable: string | { qr_code: string } ] | string | { qr_code: string }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+export const show = (args: { diningTable: string | number | { qr_code: string | number } } | [diningTable: string | number | { qr_code: string | number } ] | string | number | { qr_code: string | number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
     url: show.url(args, options),
     method: 'get',
 })
@@ -20,7 +20,7 @@ show.definition = {
 * @see Modules/Ordering/app/Http/Controllers/QrMenuController.php:26
 * @route '/qr-menu/{diningTable}'
 */
-show.url = (args: { diningTable: string | { qr_code: string } } | [diningTable: string | { qr_code: string } ] | string | { qr_code: string }, options?: RouteQueryOptions) => {
+show.url = (args: { diningTable: string | number | { qr_code: string | number } } | [diningTable: string | number | { qr_code: string | number } ] | string | number | { qr_code: string | number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { diningTable: args }
     }
@@ -53,7 +53,7 @@ show.url = (args: { diningTable: string | { qr_code: string } } | [diningTable: 
 * @see Modules/Ordering/app/Http/Controllers/QrMenuController.php:26
 * @route '/qr-menu/{diningTable}'
 */
-show.get = (args: { diningTable: string | { qr_code: string } } | [diningTable: string | { qr_code: string } ] | string | { qr_code: string }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+show.get = (args: { diningTable: string | number | { qr_code: string | number } } | [diningTable: string | number | { qr_code: string | number } ] | string | number | { qr_code: string | number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
     url: show.url(args, options),
     method: 'get',
 })
@@ -63,7 +63,7 @@ show.get = (args: { diningTable: string | { qr_code: string } } | [diningTable: 
 * @see Modules/Ordering/app/Http/Controllers/QrMenuController.php:26
 * @route '/qr-menu/{diningTable}'
 */
-show.head = (args: { diningTable: string | { qr_code: string } } | [diningTable: string | { qr_code: string } ] | string | { qr_code: string }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+show.head = (args: { diningTable: string | number | { qr_code: string | number } } | [diningTable: string | number | { qr_code: string | number } ] | string | number | { qr_code: string | number }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     url: show.url(args, options),
     method: 'head',
 })
@@ -73,7 +73,7 @@ show.head = (args: { diningTable: string | { qr_code: string } } | [diningTable:
 * @see Modules/Ordering/app/Http/Controllers/QrMenuController.php:26
 * @route '/qr-menu/{diningTable}'
 */
-const showForm = (args: { diningTable: string | { qr_code: string } } | [diningTable: string | { qr_code: string } ] | string | { qr_code: string }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+const showForm = (args: { diningTable: string | number | { qr_code: string | number } } | [diningTable: string | number | { qr_code: string | number } ] | string | number | { qr_code: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
     action: show.url(args, options),
     method: 'get',
 })
@@ -83,7 +83,7 @@ const showForm = (args: { diningTable: string | { qr_code: string } } | [diningT
 * @see Modules/Ordering/app/Http/Controllers/QrMenuController.php:26
 * @route '/qr-menu/{diningTable}'
 */
-showForm.get = (args: { diningTable: string | { qr_code: string } } | [diningTable: string | { qr_code: string } ] | string | { qr_code: string }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+showForm.get = (args: { diningTable: string | number | { qr_code: string | number } } | [diningTable: string | number | { qr_code: string | number } ] | string | number | { qr_code: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
     action: show.url(args, options),
     method: 'get',
 })
@@ -93,7 +93,7 @@ showForm.get = (args: { diningTable: string | { qr_code: string } } | [diningTab
 * @see Modules/Ordering/app/Http/Controllers/QrMenuController.php:26
 * @route '/qr-menu/{diningTable}'
 */
-showForm.head = (args: { diningTable: string | { qr_code: string } } | [diningTable: string | { qr_code: string } ] | string | { qr_code: string }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+showForm.head = (args: { diningTable: string | number | { qr_code: string | number } } | [diningTable: string | number | { qr_code: string | number } ] | string | number | { qr_code: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
     action: show.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'HEAD',
