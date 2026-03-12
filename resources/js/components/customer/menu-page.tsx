@@ -478,41 +478,7 @@ export default function CustomerMenuPage({
     //     });
     // }, []);
 
-    const autoAdvanceFeaturedCarousel = useCallback(() => {
-        const carousel = featuredCarouselRef.current;
-
-        if (!carousel) {
-            return;
-        }
-
-        const maxScrollLeft = carousel.scrollWidth - carousel.clientWidth;
-
-        if (maxScrollLeft <= 1) {
-            return;
-        }
-
-        const firstSlide = carousel.querySelector<HTMLElement>(
-            '[data-featured-slide="true"]',
-        );
-        const slideWidth = firstSlide?.offsetWidth ?? 0;
-        const gap = 16;
-        const fallbackStep = carousel.clientWidth * 0.85;
-        const stepSize = slideWidth > 0 ? slideWidth + gap : fallbackStep;
-        const isAtEnd = carousel.scrollLeft >= maxScrollLeft - 4;
-
-        if (isAtEnd) {
-            carousel.scrollTo({
-                left: 0,
-                behavior: 'smooth',
-            });
-            return;
-        }
-
-        carousel.scrollBy({
-            left: Math.min(stepSize, maxScrollLeft - carousel.scrollLeft),
-            behavior: 'smooth',
-        });
-    }, []);
+    // Note: automatic featured carousel advancement has been disabled.
 
     const hideSearchInput = useCallback(() => {
         setSearch('');
@@ -592,24 +558,6 @@ export default function CustomerMenuPage({
         const caretPosition = input.value.length;
         input.setSelectionRange(caretPosition, caretPosition);
     }, [isSearchInputVisible, step]);
-
-    useEffect(() => {
-        if (step !== 1 || featuredItems.length <= 1) {
-            return;
-        }
-
-        if (typeof window === 'undefined') {
-            return;
-        }
-
-        const intervalId = window.setInterval(() => {
-            autoAdvanceFeaturedCarousel();
-        }, 3000);
-
-        return () => {
-            window.clearInterval(intervalId);
-        };
-    }, [autoAdvanceFeaturedCarousel, featuredItems.length, step]);
 
     useEffect(() => {
         persistStep(stepStorageKey, step);
