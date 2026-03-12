@@ -12,6 +12,7 @@ use App\Services\CustomerIdentityService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -39,6 +40,14 @@ class QrMenuController extends Controller
         $queryToken = $request->query('session');
         $sessionToken = is_string($queryToken) ? trim($queryToken) : '';
 
+        Log::info('QR menu show: resolving table session', [
+            'table_id' => $diningTable->id,
+            'table_qr_code' => $diningTable->qr_code,
+            'session_token_query' => $sessionToken,
+            'ip' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+        ]);
+
         $tableSession = $sessionToken !== ''
             ? TableSession::query()
                 ->where('dining_table_id', $diningTable->id)
@@ -47,6 +56,12 @@ class QrMenuController extends Controller
             : null;
 
         if (! $tableSession) {
+            Log::warning('QR menu show: no existing table session found, creating new one', [
+                'table_id' => $diningTable->id,
+                'table_qr_code' => $diningTable->qr_code,
+                'session_token_query' => $sessionToken,
+            ]);
+
             $tableSession = TableSession::query()->create([
                 'dining_table_id' => $diningTable->id,
                 'session_token' => Str::random(64),
@@ -56,12 +71,28 @@ class QrMenuController extends Controller
                 'initial_user_agent' => substr((string) $request->userAgent(), 0, 65535),
             ]);
         } else {
+            Log::info('QR menu show: existing table session found', [
+                'table_id' => $diningTable->id,
+                'table_qr_code' => $diningTable->qr_code,
+                'session_token_query' => $sessionToken,
+                'session_id' => $tableSession->id,
+                'session_token' => $tableSession->session_token,
+                'verified_at' => $tableSession->verified_at,
+            ]);
+
             $tableSession->update([
                 'last_seen_at' => now(),
             ]);
         }
 
         if ($sessionToken !== $tableSession->session_token) {
+            Log::info('QR menu show: redirecting to normalize session token', [
+                'table_id' => $diningTable->id,
+                'table_qr_code' => $diningTable->qr_code,
+                'session_token_query' => $sessionToken,
+                'normalized_session_token' => $tableSession->session_token,
+            ]);
+
             return to_route('qr-menu.show', [
                 'diningTable' => $diningTable->qr_code,
                 'session' => $tableSession->session_token,
@@ -153,11 +184,37 @@ class QrMenuController extends Controller
 
         $validated = $request->validated();
 
+        Log::info('QR menu store: incoming order payload', [
+            'table_id' => $diningTable->id,
+            'table_qr_code' => $diningTable->qr_code,
+            'table_session_token' => $validated['table_session_token'] ?? null,
+            'customer_token_present' => array_key_exists('customer_token', $validated),
+            'items_count' => isset($validated['items']) ? count((array) $validated['items']) : null,
+            'ip' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+        ]);
+
         $tableSession = TableSession::query()
             ->where('session_token', $validated['table_session_token'])
             ->firstOrFail();
 
+        Log::info('QR menu store: resolved table session for order', [
+            'table_id' => $diningTable->id,
+            'table_qr_code' => $diningTable->qr_code,
+            'session_id' => $tableSession->id,
+            'session_token' => $tableSession->session_token,
+            'session_table_id' => $tableSession->dining_table_id,
+            'verified_at' => $tableSession->verified_at,
+        ]);
+
         if ($tableSession->dining_table_id !== $diningTable->id) {
+            Log::warning('QR menu store: table session token does not belong to this table', [
+                'expected_table_id' => $diningTable->id,
+                'session_table_id' => $tableSession->dining_table_id,
+                'session_id' => $tableSession->id,
+                'session_token' => $tableSession->session_token,
+            ]);
+
             throw ValidationException::withMessages([
                 'table_session_token' => 'Session token is invalid for this table.',
             ]);

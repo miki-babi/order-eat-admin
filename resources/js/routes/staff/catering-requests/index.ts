@@ -85,7 +85,7 @@ index.form = indexForm
 * @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:209
 * @route '/staff/catering-requests/{cateringServiceRequest}/status'
 */
-export const status = (args: { cateringServiceRequest: string | number | { id: string | number } } | [cateringServiceRequest: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
+export const status = (args: { cateringServiceRequest: number | { id: number } } | [cateringServiceRequest: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
     url: status.url(args, options),
     method: 'patch',
 })
@@ -100,7 +100,7 @@ status.definition = {
 * @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:209
 * @route '/staff/catering-requests/{cateringServiceRequest}/status'
 */
-status.url = (args: { cateringServiceRequest: string | number | { id: string | number } } | [cateringServiceRequest: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions) => {
+status.url = (args: { cateringServiceRequest: number | { id: number } } | [cateringServiceRequest: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { cateringServiceRequest: args }
     }
@@ -133,7 +133,7 @@ status.url = (args: { cateringServiceRequest: string | number | { id: string | n
 * @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:209
 * @route '/staff/catering-requests/{cateringServiceRequest}/status'
 */
-status.patch = (args: { cateringServiceRequest: string | number | { id: string | number } } | [cateringServiceRequest: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
+status.patch = (args: { cateringServiceRequest: number | { id: number } } | [cateringServiceRequest: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
     url: status.url(args, options),
     method: 'patch',
 })
@@ -143,7 +143,7 @@ status.patch = (args: { cateringServiceRequest: string | number | { id: string |
 * @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:209
 * @route '/staff/catering-requests/{cateringServiceRequest}/status'
 */
-const statusForm = (args: { cateringServiceRequest: string | number | { id: string | number } } | [cateringServiceRequest: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+const statusForm = (args: { cateringServiceRequest: number | { id: number } } | [cateringServiceRequest: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: status.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PATCH',
@@ -158,7 +158,7 @@ const statusForm = (args: { cateringServiceRequest: string | number | { id: stri
 * @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:209
 * @route '/staff/catering-requests/{cateringServiceRequest}/status'
 */
-statusForm.patch = (args: { cateringServiceRequest: string | number | { id: string | number } } | [cateringServiceRequest: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+statusForm.patch = (args: { cateringServiceRequest: number | { id: number } } | [cateringServiceRequest: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: status.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PATCH',

@@ -141,7 +141,7 @@ store.form = storeForm
 * @see Modules/Operations/app/Http/Controllers/Staff/BranchScreenController.php:182
 * @route '/staff/screens/{branchScreen}'
 */
-export const update = (args: { branchScreen: string | number | { id: string | number } } | [branchScreen: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
+export const update = (args: { branchScreen: number | { id: number } } | [branchScreen: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
     url: update.url(args, options),
     method: 'put',
 })
@@ -156,7 +156,7 @@ update.definition = {
 * @see Modules/Operations/app/Http/Controllers/Staff/BranchScreenController.php:182
 * @route '/staff/screens/{branchScreen}'
 */
-update.url = (args: { branchScreen: string | number | { id: string | number } } | [branchScreen: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions) => {
+update.url = (args: { branchScreen: number | { id: number } } | [branchScreen: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { branchScreen: args }
     }
@@ -189,7 +189,7 @@ update.url = (args: { branchScreen: string | number | { id: string | number } } 
 * @see Modules/Operations/app/Http/Controllers/Staff/BranchScreenController.php:182
 * @route '/staff/screens/{branchScreen}'
 */
-update.put = (args: { branchScreen: string | number | { id: string | number } } | [branchScreen: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
+update.put = (args: { branchScreen: number | { id: number } } | [branchScreen: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
     url: update.url(args, options),
     method: 'put',
 })
@@ -199,7 +199,7 @@ update.put = (args: { branchScreen: string | number | { id: string | number } } 
 * @see Modules/Operations/app/Http/Controllers/Staff/BranchScreenController.php:182
 * @route '/staff/screens/{branchScreen}'
 */
-const updateForm = (args: { branchScreen: string | number | { id: string | number } } | [branchScreen: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+const updateForm = (args: { branchScreen: number | { id: number } } | [branchScreen: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: update.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PUT',
@@ -214,7 +214,7 @@ const updateForm = (args: { branchScreen: string | number | { id: string | numbe
 * @see Modules/Operations/app/Http/Controllers/Staff/BranchScreenController.php:182
 * @route '/staff/screens/{branchScreen}'
 */
-updateForm.put = (args: { branchScreen: string | number | { id: string | number } } | [branchScreen: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+updateForm.put = (args: { branchScreen: number | { id: number } } | [branchScreen: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: update.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PUT',
@@ -231,7 +231,7 @@ update.form = updateForm
 * @see Modules/Operations/app/Http/Controllers/Staff/BranchScreenController.php:217
 * @route '/staff/screens/{branchScreen}/assignments'
 */
-export const syncAssignments = (args: { branchScreen: string | number | { id: string | number } } | [branchScreen: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
+export const syncAssignments = (args: { branchScreen: number | { id: number } } | [branchScreen: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
     url: syncAssignments.url(args, options),
     method: 'patch',
 })
@@ -246,7 +246,7 @@ syncAssignments.definition = {
 * @see Modules/Operations/app/Http/Controllers/Staff/BranchScreenController.php:217
 * @route '/staff/screens/{branchScreen}/assignments'
 */
-syncAssignments.url = (args: { branchScreen: string | number | { id: string | number } } | [branchScreen: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions) => {
+syncAssignments.url = (args: { branchScreen: number | { id: number } } | [branchScreen: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { branchScreen: args }
     }
@@ -279,7 +279,7 @@ syncAssignments.url = (args: { branchScreen: string | number | { id: string | nu
 * @see Modules/Operations/app/Http/Controllers/Staff/BranchScreenController.php:217
 * @route '/staff/screens/{branchScreen}/assignments'
 */
-syncAssignments.patch = (args: { branchScreen: string | number | { id: string | number } } | [branchScreen: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
+syncAssignments.patch = (args: { branchScreen: number | { id: number } } | [branchScreen: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
     url: syncAssignments.url(args, options),
     method: 'patch',
 })
@@ -289,7 +289,7 @@ syncAssignments.patch = (args: { branchScreen: string | number | { id: string | 
 * @see Modules/Operations/app/Http/Controllers/Staff/BranchScreenController.php:217
 * @route '/staff/screens/{branchScreen}/assignments'
 */
-const syncAssignmentsForm = (args: { branchScreen: string | number | { id: string | number } } | [branchScreen: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+const syncAssignmentsForm = (args: { branchScreen: number | { id: number } } | [branchScreen: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: syncAssignments.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PATCH',
@@ -304,7 +304,7 @@ const syncAssignmentsForm = (args: { branchScreen: string | number | { id: strin
 * @see Modules/Operations/app/Http/Controllers/Staff/BranchScreenController.php:217
 * @route '/staff/screens/{branchScreen}/assignments'
 */
-syncAssignmentsForm.patch = (args: { branchScreen: string | number | { id: string | number } } | [branchScreen: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+syncAssignmentsForm.patch = (args: { branchScreen: number | { id: number } } | [branchScreen: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: syncAssignments.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PATCH',

@@ -141,7 +141,7 @@ store.form = storeForm
 * @see Modules/Operations/app/Http/Controllers/Staff/TableQrController.php:126
 * @route '/staff/table-qr/{diningTable}'
 */
-export const update = (args: { diningTable: string | number | { id: string | number } } | [diningTable: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
+export const update = (args: { diningTable: number | { id: number } } | [diningTable: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
     url: update.url(args, options),
     method: 'put',
 })
@@ -156,7 +156,7 @@ update.definition = {
 * @see Modules/Operations/app/Http/Controllers/Staff/TableQrController.php:126
 * @route '/staff/table-qr/{diningTable}'
 */
-update.url = (args: { diningTable: string | number | { id: string | number } } | [diningTable: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions) => {
+update.url = (args: { diningTable: number | { id: number } } | [diningTable: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { diningTable: args }
     }
@@ -189,7 +189,7 @@ update.url = (args: { diningTable: string | number | { id: string | number } } |
 * @see Modules/Operations/app/Http/Controllers/Staff/TableQrController.php:126
 * @route '/staff/table-qr/{diningTable}'
 */
-update.put = (args: { diningTable: string | number | { id: string | number } } | [diningTable: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
+update.put = (args: { diningTable: number | { id: number } } | [diningTable: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
     url: update.url(args, options),
     method: 'put',
 })
@@ -199,7 +199,7 @@ update.put = (args: { diningTable: string | number | { id: string | number } } |
 * @see Modules/Operations/app/Http/Controllers/Staff/TableQrController.php:126
 * @route '/staff/table-qr/{diningTable}'
 */
-const updateForm = (args: { diningTable: string | number | { id: string | number } } | [diningTable: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+const updateForm = (args: { diningTable: number | { id: number } } | [diningTable: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: update.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PUT',
@@ -214,7 +214,7 @@ const updateForm = (args: { diningTable: string | number | { id: string | number
 * @see Modules/Operations/app/Http/Controllers/Staff/TableQrController.php:126
 * @route '/staff/table-qr/{diningTable}'
 */
-updateForm.put = (args: { diningTable: string | number | { id: string | number } } | [diningTable: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+updateForm.put = (args: { diningTable: number | { id: number } } | [diningTable: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: update.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PUT',
