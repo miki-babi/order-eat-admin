@@ -554,22 +554,28 @@ export default function CustomerMenuPage({
     }, [cart, cartStorageKey, allowedMenuItemIds]);
 
     useEffect(() => {
-        updateFeaturedCarouselState();
+        if (typeof window === 'undefined') {
+            return;
+        }
 
+        window.requestAnimationFrame(updateFeaturedCarouselState);
+    }, [featuredItems.length, step, updateFeaturedCarouselState]);
+
+    useEffect(() => {
         if (typeof window === 'undefined') {
             return;
         }
 
         const onResize = () => {
-            updateFeaturedCarouselState();
+            window.requestAnimationFrame(updateFeaturedCarouselState);
         };
 
-        window.addEventListener('resize', onResize);
+        window.addEventListener('resize', onResize, { passive: true });
 
         return () => {
             window.removeEventListener('resize', onResize);
         };
-    }, [featuredItems.length, step, updateFeaturedCarouselState]);
+    }, [updateFeaturedCarouselState]);
 
     useEffect(() => {
         if (!isSearchInputVisible || step !== 1) {
