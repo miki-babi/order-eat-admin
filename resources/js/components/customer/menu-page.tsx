@@ -1187,7 +1187,7 @@ export default function CustomerMenuPage({
                                                                             src={item.image_url}
                                                                             alt={item.name}
                                                                             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                                                            // loading="lazy"
+                                                                            loading="lazy"
                                                                         />
                                                                     ) : (
                                                                         <div className="flex h-full w-full flex-col items-center justify-center text-zinc-300 dark:text-zinc-600">
