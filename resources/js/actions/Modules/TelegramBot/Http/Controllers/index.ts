@@ -1,6 +1,6 @@
+import WebhookController from './WebhookController'
 import MiniAppIdentityController from './MiniAppIdentityController'
 import MiniAppOrdersController from './MiniAppOrdersController'
-import WebhookController from './WebhookController'
 
 const Controllers = {
     WebhookController: Object.assign(WebhookController, WebhookController),
