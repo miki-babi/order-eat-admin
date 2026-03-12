@@ -9,8 +9,9 @@ import {
     X,
     Plus,
     Minus,
+    CheckCircle2,
 } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FeedbackModal } from '@/components/customer/feedback-modal';
 import InputError from '@/components/input-error';
 import { Badge } from '@/components/ui/badge';
@@ -188,6 +189,7 @@ export default function QrMenu({
     );
     const [hideTopChrome, setHideTopChrome] = useState(false);
     const [hideBottomActions, setHideBottomActions] = useState(false);
+    const [orderJustPlaced, setOrderJustPlaced] = useState(false);
     const lastScrollY = useRef(0);
     const searchInputRef = useRef<HTMLInputElement | null>(null);
     const featuredCarouselRef = useRef<HTMLDivElement | null>(null);
@@ -234,7 +236,7 @@ export default function QrMenu({
         [filteredItems],
     );
 
-    const updateFeaturedCarouselState = () => {
+    const updateFeaturedCarouselState = useCallback(() => {
         const carousel = featuredCarouselRef.current;
 
         if (!carousel) {
@@ -253,7 +255,7 @@ export default function QrMenu({
 
         setCanScrollFeaturedPrev(carousel.scrollLeft > 4);
         setCanScrollFeaturedNext(carousel.scrollLeft < maxScrollLeft - 4);
-    };
+    }, []);
 
     const scrollFeaturedCarousel = (direction: -1 | 1) => {
         const carousel = featuredCarouselRef.current;
@@ -268,7 +270,7 @@ export default function QrMenu({
         });
     };
 
-    const autoAdvanceFeaturedCarousel = () => {
+    const autoAdvanceFeaturedCarousel = useCallback(() => {
         const carousel = featuredCarouselRef.current;
 
         if (!carousel) {
@@ -302,7 +304,7 @@ export default function QrMenu({
             left: Math.min(stepSize, maxScrollLeft - carousel.scrollLeft),
             behavior: 'smooth',
         });
-    };
+    }, []);
 
     const hideSearchInput = () => {
         setSearch('');
@@ -344,8 +346,6 @@ export default function QrMenu({
     }, [cart, cartStorageKey, allowedMenuItemIds]);
 
     useEffect(() => {
-        updateFeaturedCarouselState();
-
         if (typeof window === 'undefined') {
             return;
         }
@@ -354,9 +354,12 @@ export default function QrMenu({
             updateFeaturedCarouselState();
         };
 
+        const timeoutId = window.setTimeout(onResize, 0);
+
         window.addEventListener('resize', onResize);
 
         return () => {
+            window.clearTimeout(timeoutId);
             window.removeEventListener('resize', onResize);
         };
     }, [featuredItems.length, updateFeaturedCarouselState]);
@@ -449,6 +452,10 @@ export default function QrMenu({
     }, []);
 
     const updateItemQuantity = (itemId: number, nextQuantity: number) => {
+        if (orderJustPlaced) {
+            setOrderJustPlaced(false);
+        }
+
         setCart((previous) => {
             const next = { ...previous };
 
@@ -480,6 +487,7 @@ export default function QrMenu({
                 onSuccess: () => {
                     clearPersistedCart(cartStorageKey);
                     setCart({});
+                    setOrderJustPlaced(true);
                 },
                 onError: (errors) => {
                     if (errors.table_session_token) {
@@ -918,6 +926,22 @@ export default function QrMenu({
                                                 No payment required upfront.
                                             </p>
                                         </div>
+
+                                        {orderJustPlaced && (
+                                            <div className="rounded-xl border border-emerald-500/30 bg-emerald-50 px-4 py-3 text-sm text-emerald-900 shadow-sm dark:border-emerald-500/30 dark:bg-emerald-950/40 dark:text-emerald-200">
+                                                <div className="flex items-start gap-2">
+                                                    <CheckCircle2 className="mt-0.5 size-4 text-emerald-600 dark:text-emerald-400" />
+                                                    <div>
+                                                        <p className="font-semibold">
+                                                            Order placed successfully
+                                                        </p>
+                                                        <p className="mt-0.5 text-xs opacity-80">
+                                                            Your table order has been sent to the kitchen. A staff member will attend to you shortly.
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
 
                                         <InputError
                                             message={form.errors.items}
