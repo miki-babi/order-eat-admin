@@ -1,7 +1,8 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../wayfinder'
+import customerTags from './customer-tags'
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\WaiterBoardController::index
-* @see Modules/Ordering/app/Http/Controllers/Staff/WaiterBoardController.php:23
+* @see Modules/Ordering/app/Http/Controllers/Staff/WaiterBoardController.php:25
 * @route '/staff/waiter-board'
 */
 export const index = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +17,7 @@ index.definition = {
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\WaiterBoardController::index
-* @see Modules/Ordering/app/Http/Controllers/Staff/WaiterBoardController.php:23
+* @see Modules/Ordering/app/Http/Controllers/Staff/WaiterBoardController.php:25
 * @route '/staff/waiter-board'
 */
 index.url = (options?: RouteQueryOptions) => {
@@ -25,7 +26,7 @@ index.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\WaiterBoardController::index
-* @see Modules/Ordering/app/Http/Controllers/Staff/WaiterBoardController.php:23
+* @see Modules/Ordering/app/Http/Controllers/Staff/WaiterBoardController.php:25
 * @route '/staff/waiter-board'
 */
 index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -35,7 +36,7 @@ index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\WaiterBoardController::index
-* @see Modules/Ordering/app/Http/Controllers/Staff/WaiterBoardController.php:23
+* @see Modules/Ordering/app/Http/Controllers/Staff/WaiterBoardController.php:25
 * @route '/staff/waiter-board'
 */
 index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -45,7 +46,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\WaiterBoardController::index
-* @see Modules/Ordering/app/Http/Controllers/Staff/WaiterBoardController.php:23
+* @see Modules/Ordering/app/Http/Controllers/Staff/WaiterBoardController.php:25
 * @route '/staff/waiter-board'
 */
 const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -55,7 +56,7 @@ const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => (
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\WaiterBoardController::index
-* @see Modules/Ordering/app/Http/Controllers/Staff/WaiterBoardController.php:23
+* @see Modules/Ordering/app/Http/Controllers/Staff/WaiterBoardController.php:25
 * @route '/staff/waiter-board'
 */
 indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -65,7 +66,7 @@ indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\WaiterBoardController::index
-* @see Modules/Ordering/app/Http/Controllers/Staff/WaiterBoardController.php:23
+* @see Modules/Ordering/app/Http/Controllers/Staff/WaiterBoardController.php:25
 * @route '/staff/waiter-board'
 */
 indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -82,7 +83,7 @@ index.form = indexForm
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\WaiterBoardController::confirm
-* @see Modules/Ordering/app/Http/Controllers/Staff/WaiterBoardController.php:121
+* @see Modules/Ordering/app/Http/Controllers/Staff/WaiterBoardController.php:140
 * @route '/staff/waiter-board/orders/{order}/confirm'
 */
 export const confirm = (args: { order: number | { id: number } } | [order: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
@@ -97,7 +98,7 @@ confirm.definition = {
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\WaiterBoardController::confirm
-* @see Modules/Ordering/app/Http/Controllers/Staff/WaiterBoardController.php:121
+* @see Modules/Ordering/app/Http/Controllers/Staff/WaiterBoardController.php:140
 * @route '/staff/waiter-board/orders/{order}/confirm'
 */
 confirm.url = (args: { order: number | { id: number } } | [order: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -130,7 +131,7 @@ confirm.url = (args: { order: number | { id: number } } | [order: number | { id:
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\WaiterBoardController::confirm
-* @see Modules/Ordering/app/Http/Controllers/Staff/WaiterBoardController.php:121
+* @see Modules/Ordering/app/Http/Controllers/Staff/WaiterBoardController.php:140
 * @route '/staff/waiter-board/orders/{order}/confirm'
 */
 confirm.patch = (args: { order: number | { id: number } } | [order: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
@@ -140,7 +141,7 @@ confirm.patch = (args: { order: number | { id: number } } | [order: number | { i
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\WaiterBoardController::confirm
-* @see Modules/Ordering/app/Http/Controllers/Staff/WaiterBoardController.php:121
+* @see Modules/Ordering/app/Http/Controllers/Staff/WaiterBoardController.php:140
 * @route '/staff/waiter-board/orders/{order}/confirm'
 */
 const confirmForm = (args: { order: number | { id: number } } | [order: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -155,7 +156,7 @@ const confirmForm = (args: { order: number | { id: number } } | [order: number |
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\WaiterBoardController::confirm
-* @see Modules/Ordering/app/Http/Controllers/Staff/WaiterBoardController.php:121
+* @see Modules/Ordering/app/Http/Controllers/Staff/WaiterBoardController.php:140
 * @route '/staff/waiter-board/orders/{order}/confirm'
 */
 confirmForm.patch = (args: { order: number | { id: number } } | [order: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -172,7 +173,7 @@ confirm.form = confirmForm
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\WaiterBoardController::serve
-* @see Modules/Ordering/app/Http/Controllers/Staff/WaiterBoardController.php:222
+* @see Modules/Ordering/app/Http/Controllers/Staff/WaiterBoardController.php:241
 * @route '/staff/waiter-board/orders/{order}/serve'
 */
 export const serve = (args: { order: number | { id: number } } | [order: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
@@ -187,7 +188,7 @@ serve.definition = {
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\WaiterBoardController::serve
-* @see Modules/Ordering/app/Http/Controllers/Staff/WaiterBoardController.php:222
+* @see Modules/Ordering/app/Http/Controllers/Staff/WaiterBoardController.php:241
 * @route '/staff/waiter-board/orders/{order}/serve'
 */
 serve.url = (args: { order: number | { id: number } } | [order: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -220,7 +221,7 @@ serve.url = (args: { order: number | { id: number } } | [order: number | { id: n
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\WaiterBoardController::serve
-* @see Modules/Ordering/app/Http/Controllers/Staff/WaiterBoardController.php:222
+* @see Modules/Ordering/app/Http/Controllers/Staff/WaiterBoardController.php:241
 * @route '/staff/waiter-board/orders/{order}/serve'
 */
 serve.patch = (args: { order: number | { id: number } } | [order: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
@@ -230,7 +231,7 @@ serve.patch = (args: { order: number | { id: number } } | [order: number | { id:
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\WaiterBoardController::serve
-* @see Modules/Ordering/app/Http/Controllers/Staff/WaiterBoardController.php:222
+* @see Modules/Ordering/app/Http/Controllers/Staff/WaiterBoardController.php:241
 * @route '/staff/waiter-board/orders/{order}/serve'
 */
 const serveForm = (args: { order: number | { id: number } } | [order: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -245,7 +246,7 @@ const serveForm = (args: { order: number | { id: number } } | [order: number | {
 
 /**
 * @see \Modules\Ordering\Http\Controllers\Staff\WaiterBoardController::serve
-* @see Modules/Ordering/app/Http/Controllers/Staff/WaiterBoardController.php:222
+* @see Modules/Ordering/app/Http/Controllers/Staff/WaiterBoardController.php:241
 * @route '/staff/waiter-board/orders/{order}/serve'
 */
 serveForm.patch = (args: { order: number | { id: number } } | [order: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -264,6 +265,7 @@ const waiter = {
     index: Object.assign(index, index),
     confirm: Object.assign(confirm, confirm),
     serve: Object.assign(serve, serve),
+    customerTags: Object.assign(customerTags, customerTags),
 }
 
 export default waiter

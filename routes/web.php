@@ -53,4 +53,35 @@ Route::get('/welcome', function () {
     ]);
 })->name('welcome');
 
+Route::get('/rooms', function () {
+    return Inertia::render('rooms/index', [
+        'rooms' => [
+            [
+                'id' => 'room-101',
+                'name' => 'Room 101',
+                'capacity' => 4,
+                'status' => 'Available',
+            ],
+            [
+                'id' => 'room-102',
+                'name' => 'Room 102',
+                'capacity' => 2,
+                'status' => 'Occupied',
+            ],
+            [
+                'id' => 'room-201',
+                'name' => 'Room 201',
+                'capacity' => 6,
+                'status' => 'Cleaning',
+            ],
+        ],
+    ]);
+})->name('rooms.index');
+
+Route::get('/room/{roomId}', function (string $roomId) {
+    return Inertia::render('rooms/show', [
+        'roomId' => $roomId,
+    ]);
+})->where('roomId', '[A-Za-z0-9_-]+')->name('rooms.show');
+
 require __DIR__.'/settings.php';

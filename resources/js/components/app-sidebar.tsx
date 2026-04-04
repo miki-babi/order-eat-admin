@@ -57,33 +57,33 @@ export function AppSidebar() {
                         ]
                     }]
                     : []),
-                ...(can('orders.view')
-                    ? [{
-                        title: 'Cake Preorders',
-                        icon: Coffee,
-                        items: [
-                            { title: 'Preorder List', href: '/staff/cake-preorders', icon: ClipboardList },
-                            { title: 'Cake Packages', href: '/staff/cake-packages', icon: Package },
-                        ]
-                    }]
-                    : []),
-                ...(can('orders.view')
-                    ? [{
-                        title: 'Catering',
-                        icon: UtensilsCrossed,
-                        items: [
-                            { title: 'Requests', href: '/staff/catering-requests', icon: ClipboardList },
-                            { title: 'Catering Packages', href: '/staff/catering-packages', icon: Package },
-                        ]
-                    }]
-                    : []),
+                // ...(can('orders.view')
+                //     ? [{
+                //         title: 'Cake Preorders',
+                //         icon: Coffee,
+                //         items: [
+                //             { title: 'Preorder List', href: '/staff/cake-preorders', icon: ClipboardList },
+                //             { title: 'Cake Packages', href: '/staff/cake-packages', icon: Package },
+                //         ]
+                //     }]
+                //     : []),
+                // ...(can('orders.view')
+                //     ? [{
+                //         title: 'Catering',
+                //         icon: UtensilsCrossed,
+                //         items: [
+                //             { title: 'Requests', href: '/staff/catering-requests', icon: ClipboardList },
+                //             { title: 'Catering Packages', href: '/staff/catering-packages', icon: Package },
+                //         ]
+                //     }]
+                //     : []),
             ],
         },
         {
             label: 'Management',
             items: [
                 ...(can('menu_items.manage')
-                    ? [{ title: 'Catalog', href: '/staff/menu-items', icon: Coffee }]
+                    ? [{ title: 'Menu', href: '/staff/menu-items', icon: Coffee }]
                     : []),
                 ...(can('customers.view')
                     ? [{ title: 'Customers', href: '/staff/customers', icon: Users }]
@@ -92,7 +92,7 @@ export function AppSidebar() {
                 //     ? [{ title: 'Feedback', href: '/staff/feedbacks', icon: MessageSquareText }]
                 //     : []),
                 ...(can('sms_templates.manage')
-                    ? [{ title: 'Outreach', href: '/staff/sms-templates', icon: MessageSquareText }]
+                    ? [{ title: 'Marketing', href: '/staff/sms-templates', icon: MessageSquareText }]
                     : []),
             ],
         },
