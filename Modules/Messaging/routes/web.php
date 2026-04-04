@@ -28,6 +28,9 @@ Route::middleware(['auth', 'verified', 'staff'])
         Route::get('sms-campaigns/preview-audience', [SmsTemplateController::class, 'previewAudience'])
             ->middleware(['permission:sms_templates.manage', 'feature:staff_sms_campaign_preview'])
             ->name('sms-campaigns.preview-audience');
+        Route::post('sms-campaigns/recommended-text', [SmsTemplateController::class, 'recommendedText'])
+            ->middleware(['permission:sms_templates.manage', 'feature:staff_sms_campaign_preview'])
+            ->name('sms-campaigns.recommended-text');
         Route::post('sms-campaigns/send', [SmsTemplateController::class, 'sendCampaign'])
             ->middleware(['permission:sms_templates.manage', 'feature:staff_sms_templates'])
             ->name('sms-campaigns.send');

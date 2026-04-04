@@ -77,6 +77,9 @@ Route::middleware(['auth', 'verified', 'staff'])
         Route::patch('waiter-board/orders/{order}/serve', [WaiterBoardController::class, 'serve'])
             ->middleware(['permission:orders.update', 'feature:staff_waiter_board'])
             ->name('waiter.serve');
+        Route::patch('waiter-board/orders/{order}/customer-tags', [WaiterBoardController::class, 'updateCustomerTags'])
+            ->middleware(['permission:orders.update', 'feature:staff_waiter_board'])
+            ->name('waiter.customer-tags.update');
 
         Route::get('kitchen-board', [KitchenBoardController::class, 'index'])
             ->middleware(['permission:orders.view', 'feature:staff_kitchen_board'])

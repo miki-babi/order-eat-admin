@@ -22,7 +22,20 @@ class Customer extends Model
         'phone',
         'telegram_id',
         'telegram_username',
+        'tags',
     ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'tags' => 'array',
+        ];
+    }
 
     /**
      * Get all orders for the customer.

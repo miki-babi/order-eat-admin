@@ -4,7 +4,9 @@ namespace Modules\Ordering\Http\Controllers\Staff;
 
 use App\Http\Controllers\Controller;
 use App\Models\BranchScreen;
+use App\Models\Customer;
 use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\OrderScreenStatus;
 use App\Models\User;
 use App\Support\BranchAccess;
@@ -51,6 +53,8 @@ class WaiterBoardController extends Controller
                 'awaitingKitchenOrders' => [],
                 'readyToServeOrders' => [],
                 'servedOrders' => [],
+                'customerInsights' => [],
+                'behaviorTagCatalog' => $this->behaviorTagCatalog(),
                 'summary' => [
                     'pending_confirmation' => 0,
                     'awaiting_kitchen' => 0,
@@ -71,26 +75,39 @@ class WaiterBoardController extends Controller
             ->where('pickup_location_id', $selectedScreen->pickup_location_id)
             ->orderBy('created_at');
 
-        $pendingConfirmationOrders = (clone $ordersBase)
+        $pendingConfirmationOrderRows = (clone $ordersBase)
             ->where('waiter_status', Order::WAITER_STATUS_PENDING_CONFIRMATION)
-            ->get()
+            ->get();
+
+        $confirmedOrderRows = (clone $ordersBase)
+            ->where('waiter_status', Order::WAITER_STATUS_CONFIRMED)
+            ->get();
+
+        $servedOrderRows = (clone $ordersBase)
+            ->where('waiter_status', Order::WAITER_STATUS_SERVED)
+            ->latest('served_at')
+            ->limit(50)
+            ->get();
+
+        $customerInsights = $this->buildCustomerInsights(
+            $pendingConfirmationOrderRows
+                ->concat($confirmedOrderRows)
+                ->concat($servedOrderRows),
+            $selectedScreen->pickup_location_id,
+        );
+
+        $pendingConfirmationOrders = $pendingConfirmationOrderRows
             ->map(fn (Order $order) => $this->transformOrder($order, false))
             ->values();
 
-        $confirmedOrders = (clone $ordersBase)
-            ->where('waiter_status', Order::WAITER_STATUS_CONFIRMED)
-            ->get()
+        $confirmedOrders = $confirmedOrderRows
             ->map(fn (Order $order) => $this->transformOrder($order, true))
             ->values();
 
         [$readyToServeOrders, $awaitingKitchenOrders] = $confirmedOrders
             ->partition(fn (array $order) => (bool) $order['is_ready_to_serve']);
 
-        $servedOrders = (clone $ordersBase)
-            ->where('waiter_status', Order::WAITER_STATUS_SERVED)
-            ->latest('served_at')
-            ->limit(50)
-            ->get()
+        $servedOrders = $servedOrderRows
             ->map(fn (Order $order) => $this->transformOrder($order, false))
             ->values();
 
@@ -106,6 +123,8 @@ class WaiterBoardController extends Controller
             'awaitingKitchenOrders' => $awaitingKitchenOrders->values(),
             'readyToServeOrders' => $readyToServeOrders->values(),
             'servedOrders' => $servedOrders,
+            'customerInsights' => $customerInsights,
+            'behaviorTagCatalog' => $this->behaviorTagCatalog(),
             'summary' => [
                 'pending_confirmation' => $pendingConfirmationOrders->count(),
                 'awaiting_kitchen' => $awaitingKitchenOrders->count(),
@@ -250,6 +269,41 @@ class WaiterBoardController extends Controller
     }
 
     /**
+     * Update customer behavior tags from waiter board modal.
+     */
+    public function updateCustomerTags(Request $request, Order $order): RedirectResponse
+    {
+        /** @var User $user */
+        $user = $request->user();
+
+        $this->ensureUserCanOperateWaiterFlow($user, $order->pickup_location_id);
+
+        if (! $order->customer_id) {
+            return back()->with('error', 'This order does not have a customer profile to tag.');
+        }
+
+        $validated = $request->validate([
+            'tags' => ['required', 'array'],
+            'tags.*' => ['array'],
+            'tags.*.*' => ['string', 'max:120'],
+        ]);
+
+        $sanitizedTags = $this->sanitizeBehaviorTags($validated['tags'] ?? []);
+
+        $order->loadMissing('customer:id,tags');
+
+        if (! $order->customer) {
+            return back()->with('error', 'Unable to find customer profile for this order.');
+        }
+
+        $order->customer->update([
+            'tags' => $sanitizedTags === [] ? null : $sanitizedTags,
+        ]);
+
+        return back()->with('success', 'Customer behavior tags updated.');
+    }
+
+    /**
      * @param  Collection<int, BranchScreen>  $screens
      */
     protected function resolveSelectedScreen(Request $request, Collection $screens): ?BranchScreen
@@ -284,6 +338,7 @@ class WaiterBoardController extends Controller
 
         return [
             'id' => $order->id,
+            'customer_id' => $order->customer_id ? (int) $order->customer_id : null,
             'source_channel' => in_array($order->source_channel, Order::sourceChannels(), true)
                 ? $order->source_channel
                 : Order::SOURCE_WEB,
@@ -314,6 +369,278 @@ class WaiterBoardController extends Controller
                 ])->values()
                 : [],
             'is_ready_to_serve' => $kitchenTotal === 0 || $kitchenPrepared === $kitchenTotal,
+        ];
+    }
+
+    /**
+     * Build customer-level insights used in the waiter board order detail modal.
+     *
+     * @param  Collection<int, Order>  $orders
+     * @return array<int, array{
+     *     behavior_tags: array<string, mixed>|list<mixed>|null,
+     *     recent_orders: array<int, array{
+     *         id: int,
+     *         source_channel: string,
+     *         waiter_status: string,
+     *         order_status: string,
+     *         table_name: string|null,
+     *         total_amount: float,
+     *         created_at: string|null,
+     *         items: array<int, array{name: string, quantity: int}>
+     *     }>,
+     *     frequent_items: array<int, array{name: string, quantity: int, orders_count: int}>
+     * }>
+     */
+    protected function buildCustomerInsights(Collection $orders, int $pickupLocationId): array
+    {
+        $customerIds = $orders
+            ->pluck('customer_id')
+            ->filter(fn ($id) => is_numeric($id))
+            ->map(fn ($id) => (int) $id)
+            ->unique()
+            ->values();
+
+        if ($customerIds->isEmpty()) {
+            return [];
+        }
+
+        $behaviorTagsByCustomer = Customer::query()
+            ->whereIn('id', $customerIds)
+            ->get(['id', 'tags'])
+            ->mapWithKeys(fn (Customer $customer) => [
+                (int) $customer->id => $customer->tags,
+            ]);
+
+        $recentOrdersByCustomer = Order::query()
+            ->with([
+                'diningTable:id,name',
+                'items.menuItem:id,name',
+            ])
+            ->whereIn('customer_id', $customerIds)
+            ->where('pickup_location_id', $pickupLocationId)
+            ->latest('created_at')
+            ->get()
+            ->groupBy(fn (Order $order) => (int) $order->customer_id)
+            ->map(function (Collection $customerOrders): array {
+                return $customerOrders
+                    ->take(20)
+                    ->map(fn (Order $order) => [
+                        'id' => $order->id,
+                        'source_channel' => in_array($order->source_channel, Order::sourceChannels(), true)
+                            ? $order->source_channel
+                            : Order::SOURCE_WEB,
+                        'waiter_status' => $order->waiter_status,
+                        'order_status' => $order->order_status,
+                        'table_name' => $order->diningTable?->name,
+                        'total_amount' => (float) $order->total_amount,
+                        'created_at' => $order->created_at?->toDateTimeString(),
+                        'items' => $order->items
+                            ->map(fn ($item) => [
+                                'name' => $item->menuItem?->name ?? 'Item',
+                                'quantity' => (int) $item->quantity,
+                            ])
+                            ->values()
+                            ->all(),
+                    ])
+                    ->values()
+                    ->all();
+            });
+
+        $frequentItemsByCustomer = OrderItem::query()
+            ->join('orders', 'orders.id', '=', 'order_items.order_id')
+            ->leftJoin('menu_items', 'menu_items.id', '=', 'order_items.menu_item_id')
+            ->whereIn('orders.customer_id', $customerIds)
+            ->where('orders.pickup_location_id', $pickupLocationId)
+            ->select('orders.customer_id')
+            ->selectRaw('menu_items.name as item_name')
+            ->selectRaw('SUM(order_items.quantity) as total_quantity')
+            ->selectRaw('COUNT(DISTINCT orders.id) as orders_count')
+            ->groupBy('orders.customer_id', 'menu_items.name')
+            ->orderByDesc('total_quantity')
+            ->get()
+            ->groupBy(fn ($row) => (int) $row->customer_id)
+            ->map(function (Collection $rows): array {
+                return $rows
+                    ->take(8)
+                    ->map(fn ($row) => [
+                        'name' => is_string($row->item_name) && trim($row->item_name) !== ''
+                            ? trim($row->item_name)
+                            : 'Item',
+                        'quantity' => (int) $row->total_quantity,
+                        'orders_count' => (int) $row->orders_count,
+                    ])
+                    ->values()
+                    ->all();
+            });
+
+        $insights = [];
+
+        foreach ($customerIds as $customerId) {
+            $customerIdInt = (int) $customerId;
+
+            $insights[$customerIdInt] = [
+                'behavior_tags' => $behaviorTagsByCustomer[$customerIdInt] ?? null,
+                'recent_orders' => $recentOrdersByCustomer[$customerIdInt] ?? [],
+                'frequent_items' => $frequentItemsByCustomer[$customerIdInt] ?? [],
+            ];
+        }
+
+        return $insights;
+    }
+
+    /**
+     * @param  mixed  $rawTags
+     * @return array<string, list<string>>
+     */
+    protected function sanitizeBehaviorTags($rawTags): array
+    {
+        if (! is_array($rawTags)) {
+            return [];
+        }
+
+        /** @var array<string, list<string>> $allowedTagsByGroup */
+        $allowedTagsByGroup = collect($this->behaviorTagCatalog())
+            ->mapWithKeys(fn (array $group): array => [
+                (string) $group['key'] => collect($group['tags'])
+                    ->filter(fn ($tag): bool => is_string($tag) && trim($tag) !== '')
+                    ->map(fn ($tag): string => trim((string) $tag))
+                    ->values()
+                    ->all(),
+            ])
+            ->all();
+
+        $sanitized = [];
+
+        foreach ($allowedTagsByGroup as $groupKey => $allowedTags) {
+            $candidateTags = $rawTags[$groupKey] ?? null;
+
+            if (! is_array($candidateTags)) {
+                continue;
+            }
+
+            $normalizedCandidates = collect($candidateTags)
+                ->filter(fn ($tag): bool => is_string($tag) && trim($tag) !== '')
+                ->map(fn ($tag): string => trim((string) $tag))
+                ->unique()
+                ->values()
+                ->all();
+
+            $validTags = array_values(array_intersect($allowedTags, $normalizedCandidates));
+
+            if ($validTags === []) {
+                continue;
+            }
+
+            $sanitized[$groupKey] = $validTags;
+        }
+
+        return $sanitized;
+    }
+
+    /**
+     * @return list<array{
+     *     key: string,
+     *     title: string,
+     *     note: string|null,
+     *     description: list<string>,
+     *     tags: list<string>
+     * }>
+     */
+    protected function behaviorTagCatalog(): array
+    {
+        return [
+            [
+                'key' => 'visit_behavior',
+                'title' => 'Visit Behavior',
+                'note' => 'VERY important',
+                'description' => [
+                    'Visit frequency (daily, weekly, rare)',
+                    'Time of visit (morning / afternoon / night)',
+                    'Day pattern (weekend vs weekday)',
+                    'Stay duration (quick vs long stay)',
+                ],
+                'tags' => [
+                    'Morning regular',
+                    'Weekend visitor',
+                    'Quick buyer',
+                ],
+            ],
+            [
+                'key' => 'ordering_behavior',
+                'title' => 'Ordering Behavior',
+                'note' => null,
+                'description' => [
+                    'Average spending',
+                    'Favorite items / categories',
+                    'Order size (1 item vs many)',
+                    'Reorder rate (same thing again?)',
+                ],
+                'tags' => [
+                    'High spender',
+                    'Coffee lover',
+                    'Bulk orderer',
+                    'Repeater',
+                ],
+            ],
+            [
+                'key' => 'decision_style',
+                'title' => 'Decision Style',
+                'note' => null,
+                'description' => [
+                    'Time to order (fast vs slow)',
+                    'Changes order often?',
+                    'Needs waiter help?',
+                ],
+                'tags' => [
+                    'Decisive',
+                    'Indecisive',
+                    'Needs assistance',
+                ],
+            ],
+            [
+                'key' => 'social_behavior',
+                'title' => 'Social Behavior',
+                'note' => null,
+                'description' => [
+                    'Comes alone or in group',
+                    'Group size',
+                    'Role in group (leader vs follower)',
+                ],
+                'tags' => [
+                    'Group leader',
+                    'Solo customer',
+                    'Family type',
+                ],
+            ],
+            [
+                'key' => 'engagement_level',
+                'title' => 'Engagement Level',
+                'note' => null,
+                'description' => [
+                    'Calls waiter often?',
+                    'Uses digital menu actively?',
+                    'Responds to recommendations?',
+                ],
+                'tags' => [
+                    'Highly engaged',
+                    'Low interaction',
+                ],
+            ],
+            [
+                'key' => 'sensitivity_preferences',
+                'title' => 'Sensitivity / Preferences',
+                'note' => null,
+                'description' => [
+                    'Price sensitivity (cheap vs premium)',
+                    'Likes discounts?',
+                    'Tries new items or sticks to same?',
+                ],
+                'tags' => [
+                    'Price sensitive',
+                    'Explorer',
+                    'Loyal to same item',
+                ],
+            ],
         ];
     }
 

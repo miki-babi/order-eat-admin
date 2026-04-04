@@ -209,6 +209,8 @@ export default function SmsTemplates({
     const [audiencePreview, setAudiencePreview] = useState<PromoAudiencePreview | null>(null);
     const [audiencePreviewLoading, setAudiencePreviewLoading] = useState(false);
     const [audiencePreviewError, setAudiencePreviewError] = useState<string | null>(null);
+    const [recommendedTextLoading, setRecommendedTextLoading] = useState(false);
+    const [recommendedTextError, setRecommendedTextError] = useState<string | null>(null);
     const [promoShowcaseIndex, setPromoShowcaseIndex] = useState(0);
     const [isPromoShowcaseHovered, setIsPromoShowcaseHovered] = useState(false);
     const [selectedPlaceholder, setSelectedPlaceholder] = useState<SmsPlaceholder | null>(null);
@@ -436,12 +438,17 @@ export default function SmsTemplates({
         setAudiencePreviewError(null);
     };
 
+    const clearRecommendedTextState = () => {
+        setRecommendedTextError(null);
+    };
+
     const updatePromoTargetingField = <K extends keyof PromoWizardData>(
         key: K,
         value: PromoWizardData[K],
     ) => {
         promoForm.setData(key, value);
         clearAudiencePreview();
+        clearRecommendedTextState();
     };
 
     const openPromoWizard = () => {
@@ -453,6 +460,7 @@ export default function SmsTemplates({
         setPromoConfirmMode(null);
         setAudiencePreview(null);
         setAudiencePreviewError(null);
+        clearRecommendedTextState();
     };
 
     const closePromoWizard = () => {
@@ -461,6 +469,8 @@ export default function SmsTemplates({
         setPromoConfirmOpen(false);
         setPromoConfirmMode(null);
         setPromoSubmitMode(null);
+        setRecommendedTextLoading(false);
+        clearRecommendedTextState();
     };
 
     const goToPreviousPromoStep = () => {
@@ -478,6 +488,7 @@ export default function SmsTemplates({
     const updatePromoPlatform = (platform: PromoPlatform) => {
         promoForm.setData('platform', platform);
         clearAudiencePreview();
+        clearRecommendedTextState();
 
         if (platform === 'sms' && promoForm.data.message.length > 480) {
             promoForm.setData('message', promoForm.data.message.slice(0, 480));
@@ -486,6 +497,77 @@ export default function SmsTemplates({
         if (platform === 'sms') {
             promoForm.setData('telegram_button_text', '');
             promoForm.setData('telegram_button_url', '');
+        }
+    };
+
+    const generateRecommendedPromoText = async () => {
+        if (!promoForm.data.platform) {
+            return;
+        }
+
+        setRecommendedTextLoading(true);
+        setRecommendedTextError(null);
+
+        try {
+            const response = await fetch('/staff/sms-campaigns/recommended-text', {
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement | null)?.content ?? '',
+                },
+                body: JSON.stringify({
+                    platform: promoForm.data.platform,
+                    search: promoForm.data.search,
+                    orders_min: promoForm.data.orders_min,
+                    orders_max: promoForm.data.orders_max,
+                    recency_min_days: promoForm.data.recency_min_days,
+                    recency_max_days: promoForm.data.recency_max_days,
+                    total_spent_min: promoForm.data.total_spent_min,
+                    total_spent_max: promoForm.data.total_spent_max,
+                    avg_order_value_min: promoForm.data.avg_order_value_min,
+                    avg_order_value_max: promoForm.data.avg_order_value_max,
+                    branch_ids: promoForm.data.branch_ids,
+                    include_menu_item_ids: promoForm.data.include_menu_item_ids,
+                    exclude_menu_item_ids: promoForm.data.exclude_menu_item_ids,
+                }),
+            });
+
+            const payload: unknown = await response.json();
+
+            if (!response.ok) {
+                const message =
+                    typeof payload === 'object' &&
+                    payload !== null &&
+                    'message' in payload &&
+                    typeof payload.message === 'string'
+                        ? payload.message
+                        : 'Unable to generate recommended promo text right now.';
+
+                setRecommendedTextError(message);
+                return;
+            }
+
+            const adText =
+                typeof payload === 'object' &&
+                payload !== null &&
+                'ad_text' in payload &&
+                typeof payload.ad_text === 'string'
+                    ? payload.ad_text.trim()
+                    : '';
+
+            if (adText === '') {
+                setRecommendedTextError('Recommendation service returned an empty promo text.');
+                return;
+            }
+
+            promoForm.setData('message', adText.slice(0, promoMessageLimit));
+            setRecommendedTextError(null);
+        } catch {
+            setRecommendedTextError('Unable to generate recommended promo text right now.');
+        } finally {
+            setRecommendedTextLoading(false);
         }
     };
 
@@ -1379,6 +1461,23 @@ export default function SmsTemplates({
                                                 ? 'SMS mode: short and direct copy works best.'
                                                 : 'Telegram mode: you can use longer copy and richer tone.'}
                                         </p>
+                                        <div className="mt-3 flex flex-wrap items-center gap-2">
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                className="h-9 rounded-lg border-zinc-300 text-[10px] font-black uppercase tracking-widest text-zinc-700 hover:border-[#F57C00] hover:text-[#F57C00]"
+                                                disabled={recommendedTextLoading || !promoForm.data.platform}
+                                                onClick={generateRecommendedPromoText}
+                                            >
+                                                {recommendedTextLoading ? 'Generating...' : 'Recommend Text'}
+                                            </Button>
+                                            <p className="text-[10px] font-bold text-zinc-400">
+                                                Uses current targeting filters to request AI promo copy.
+                                            </p>
+                                        </div>
+                                        {recommendedTextError ? (
+                                            <p className="mt-2 text-xs font-black text-rose-600">{recommendedTextError}</p>
+                                        ) : null}
                                     </div>
 
                                     <textarea

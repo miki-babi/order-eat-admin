@@ -25,6 +25,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -251,6 +253,105 @@ class SmsTemplateController extends Controller
     }
 
     /**
+     * Generate AI-recommended promo text from current wizard filters.
+     */
+    public function recommendedText(PreviewPromoAudienceRequest $request): JsonResponse
+    {
+        $validated = $request->validated();
+        $rangeError = $this->promoRangeValidationMessage($validated);
+
+        if ($rangeError !== null) {
+            return response()->json([
+                'message' => $rangeError,
+            ], 422);
+        }
+
+        $payload = [
+            'order_frequency' => $this->normalizedRange(
+                $validated['orders_min'] ?? null,
+                $validated['orders_max'] ?? null,
+                1,
+                10,
+            ),
+            'recency_window_days' => $this->normalizedRange(
+                $validated['recency_min_days'] ?? null,
+                $validated['recency_max_days'] ?? null,
+                1,
+                30,
+            ),
+            'lifetime_spend' => $this->normalizedRange(
+                $validated['total_spent_min'] ?? null,
+                $validated['total_spent_max'] ?? null,
+                1000,
+                20000,
+            ),
+            'average_order_value' => $this->normalizedRange(
+                $validated['avg_order_value_min'] ?? null,
+                $validated['avg_order_value_max'] ?? null,
+                200,
+                3000,
+            ),
+            'include_item_purchases' => $this->menuItemNamesFromIds($validated['include_menu_item_ids'] ?? []),
+            'exclude_item_purchases' => $this->menuItemNamesFromIds($validated['exclude_menu_item_ids'] ?? []),
+        ];
+
+        try {
+            $response = Http::connectTimeout(10)
+                ->timeout(60)
+                ->retry(
+                    3,
+                    1500,
+                    fn ($exception) => $exception instanceof \Illuminate\Http\Client\ConnectionException,
+                    false,
+                )
+                ->acceptJson()
+                ->asJson()
+                ->post(
+                    'https://hotel-add-ai-txt.onrender.com/api/v1/ad-text/generate',
+                    $payload,
+                );
+        } catch (\Throwable) {
+            Log::warning('Promo recommendation service connection failure.', [
+                'service' => 'hotel-add-ai-txt',
+                'payload' => $payload,
+            ]);
+
+            return response()->json([
+                'message' => 'Unable to reach promo recommendation service right now. Please try again in a few seconds.',
+            ], 502);
+        }
+
+        $json = $response->json();
+        $adText = is_array($json) && isset($json['ad_text']) && is_string($json['ad_text'])
+            ? trim($json['ad_text'])
+            : '';
+
+        if (! $response->successful() || $adText === '') {
+            $message = is_array($json) && isset($json['message']) && is_string($json['message'])
+                ? $json['message']
+                : 'Promo recommendation service did not return a valid ad text.';
+
+            Log::warning('Promo recommendation service returned non-success response.', [
+                'service' => 'hotel-add-ai-txt',
+                'status' => $response->status(),
+                'payload' => $payload,
+                'response' => is_array($json) ? $json : $response->body(),
+            ]);
+
+            $status = $response->status();
+            $clientErrorStatus = $status >= 400 && $status < 500 ? $status : 502;
+
+            return response()->json([
+                'message' => $message,
+            ], $clientErrorStatus);
+        }
+
+        return response()->json([
+            'ad_text' => $adText,
+        ]);
+    }
+
+    /**
      * Send a promo campaign to the currently targeted audience.
      */
     public function sendCampaign(
@@ -438,6 +539,62 @@ class SmsTemplateController extends Controller
         }
 
         return null;
+    }
+
+    /**
+     * @return array{min: int|float, max: int|float}
+     */
+    protected function normalizedRange(
+        mixed $minRaw,
+        mixed $maxRaw,
+        int|float $fallbackMin,
+        int|float $fallbackMax,
+    ): array {
+        $min = is_numeric($minRaw) ? (float) $minRaw : (float) $fallbackMin;
+        $max = is_numeric($maxRaw) ? (float) $maxRaw : (float) $fallbackMax;
+
+        if ($max < $min) {
+            $max = $min;
+        }
+
+        if (is_int($fallbackMin) && is_int($fallbackMax)) {
+            return [
+                'min' => (int) round($min),
+                'max' => (int) round($max),
+            ];
+        }
+
+        return [
+            'min' => round($min, 2),
+            'max' => round($max, 2),
+        ];
+    }
+
+    /**
+     * @param  array<int, mixed>  $menuItemIds
+     * @return list<string>
+     */
+    protected function menuItemNamesFromIds(array $menuItemIds): array
+    {
+        $ids = collect($menuItemIds)
+            ->map(fn ($id) => (int) $id)
+            ->filter(fn (int $id) => $id > 0)
+            ->unique()
+            ->values()
+            ->all();
+
+        if ($ids === []) {
+            return [];
+        }
+
+        return MenuItem::query()
+            ->whereIn('id', $ids)
+            ->orderBy('name')
+            ->pluck('name')
+            ->map(fn ($name) => trim((string) $name))
+            ->filter(fn ($name) => $name !== '')
+            ->values()
+            ->all();
     }
 
     /**
