@@ -13,9 +13,13 @@ use Modules\Ordering\Http\Controllers\Staff\KitchenBoardController;
 use Modules\Ordering\Http\Controllers\Staff\OrderController as StaffOrderController;
 use Modules\Ordering\Http\Controllers\Staff\WaiterBoardController;
 
-Route::get('/', [OrderController::class, 'index'])
+Route::get('/', function () {
+    return \Inertia\Inertia::render('customer/landing');
+})->name('home');
+
+Route::get('/menu', [OrderController::class, 'index'])
     ->middleware('feature:customer_menu_browsing')
-    ->name('home');
+    ->name('menu.index');
 Route::get('/telegram/menu', [OrderController::class, 'telegramMenu'])
     ->middleware('feature:customer_menu_browsing')
     ->name('telegram.menu');

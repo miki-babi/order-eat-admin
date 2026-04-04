@@ -2,7 +2,7 @@ import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFo
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::index
 * @see Modules/Ordering/app/Http/Controllers/OrderController.php:32
-* @route '/'
+* @route '/menu'
 */
 export const index = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
     url: index.url(options),
@@ -11,13 +11,13 @@ export const index = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 index.definition = {
     methods: ["get","head"],
-    url: '/',
+    url: '/menu',
 } satisfies RouteDefinition<["get","head"]>
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::index
 * @see Modules/Ordering/app/Http/Controllers/OrderController.php:32
-* @route '/'
+* @route '/menu'
 */
 index.url = (options?: RouteQueryOptions) => {
     return index.definition.url + queryParams(options)
@@ -26,7 +26,7 @@ index.url = (options?: RouteQueryOptions) => {
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::index
 * @see Modules/Ordering/app/Http/Controllers/OrderController.php:32
-* @route '/'
+* @route '/menu'
 */
 index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
     url: index.url(options),
@@ -36,7 +36,7 @@ index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::index
 * @see Modules/Ordering/app/Http/Controllers/OrderController.php:32
-* @route '/'
+* @route '/menu'
 */
 index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     url: index.url(options),
@@ -46,7 +46,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::index
 * @see Modules/Ordering/app/Http/Controllers/OrderController.php:32
-* @route '/'
+* @route '/menu'
 */
 const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
     action: index.url(options),
@@ -56,7 +56,7 @@ const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => (
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::index
 * @see Modules/Ordering/app/Http/Controllers/OrderController.php:32
-* @route '/'
+* @route '/menu'
 */
 indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
     action: index.url(options),
@@ -66,7 +66,7 @@ indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::index
 * @see Modules/Ordering/app/Http/Controllers/OrderController.php:32
-* @route '/'
+* @route '/menu'
 */
 indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
     action: index.url({

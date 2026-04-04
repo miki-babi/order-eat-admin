@@ -11,6 +11,16 @@ type VirtualTourViewerModule = {
     default: ComponentType<VirtualTourViewerProps>;
 };
 
+let virtualTourViewerLoader: Promise<VirtualTourViewerModule> | null = null;
+
+function loadVirtualTourViewer() {
+    if (!virtualTourViewerLoader) {
+        virtualTourViewerLoader = import('@/components/rooms/virtual-tour-viewer');
+    }
+
+    return virtualTourViewerLoader;
+}
+
 const TOUR_IMAGE_SET = [
     '/virtual-tour/lobby.jpg',
     '/virtual-tour/hallway.jpg',
@@ -40,7 +50,29 @@ const AMENITIES = [
 
 export default function RoomShow({ roomId }: { roomId: string }) {
     const [VirtualTourViewer, setVirtualTourViewer] = useState<ComponentType<VirtualTourViewerProps> | null>(null);
-    const [loadError, setLoadError] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (typeof window === 'undefined') {
+            return;
+        }
+
+        let mounted = true;
+
+        void loadVirtualTourViewer()
+            .then((module) => {
+                if (!mounted) {
+                    return;
+                }
+                setVirtualTourViewer(() => module.default);
+            })
+            .catch((error) => {
+                console.error('[RoomShow] failed to load virtual tour viewer', error);
+            });
+
+        return () => {
+            mounted = false;
+        };
+    }, []);
 
     const initialNodeId = useMemo<TourNodeId>(() => {
         if (roomId === 'room-102') return 'hallway';
@@ -51,23 +83,16 @@ export default function RoomShow({ roomId }: { roomId: string }) {
     const initialPanorama = useMemo(() => {
         if (initialNodeId === 'hallway') return '/virtual-tour/hallway.jpg';
         if (initialNodeId === 'suite') return '/virtual-tour/suite-interior.jpg';
-        return '/virtual-tour/lobby.jpg';
+        return '/virtual-tour/pano.jpg';
     }, [initialNodeId]);
 
     useEffect(() => {
-        let active = true;
-        if (typeof window === 'undefined') return;
-
-        void import('@/components/rooms/virtual-tour-viewer')
-            .then((module: VirtualTourViewerModule) => {
-                if (active) setVirtualTourViewer(() => module.default);
-            })
-            .catch(() => {
-                if (active) setLoadError('Virtual tour dependencies are missing.');
-            });
-
-        return () => { active = false; };
-    }, []);
+        console.error('[RoomShow] virtual tour route state', {
+            roomId,
+            initialNodeId,
+            initialPanorama,
+        });
+    }, [roomId, initialNodeId, initialPanorama]);
 
     return (
         <>
@@ -130,13 +155,10 @@ export default function RoomShow({ roomId }: { roomId: string }) {
                                 </header>
                                 <div className="mt-8 overflow-hidden rounded-[32px] border border-[#E5E5E5] bg-[#F8F8F8] shadow-2xl shadow-black/5">
                                     {VirtualTourViewer ? (
-                                        <div className="aspect-video w-full">
-                                            <VirtualTourViewer initialNodeId={initialNodeId} />
-                                        </div>
+                                        <VirtualTourViewer key={initialNodeId} initialNodeId={initialNodeId} />
                                     ) : (
-                                        <div className="flex h-[500px] flex-col items-center justify-center gap-4 text-center">
-                                            <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#E5E5E5] border-t-[#111111]" />
-                                            <p className="text-sm font-bold text-[#646464]">{loadError ?? 'Preparing your virtual tour...'}</p>
+                                        <div className="flex h-[58vh] min-h-[420px] items-center justify-center rounded-2xl border border-slate-300 bg-slate-950 text-sm font-semibold text-white/80">
+                                            Loading virtual tour...
                                         </div>
                                     )}
                                 </div>
@@ -215,4 +237,3 @@ export default function RoomShow({ roomId }: { roomId: string }) {
         </>
     );
 }
-
