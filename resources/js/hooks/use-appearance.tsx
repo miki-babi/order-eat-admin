@@ -12,6 +12,10 @@ export type UseAppearanceReturn = {
 const listeners = new Set<() => void>();
 let currentAppearance: Appearance = 'system';
 
+const isAppearance = (value: string | null | undefined): value is Appearance => {
+    return value === 'light' || value === 'dark' || value === 'system';
+};
+
 const prefersDark = (): boolean => {
     if (typeof window === 'undefined') return false;
 
@@ -24,10 +28,20 @@ const setCookie = (name: string, value: string, days = 365): void => {
     document.cookie = `${name}=${value};path=/;max-age=${maxAge};SameSite=Lax`;
 };
 
+const getDefaultAppearance = (): Appearance => {
+    if (typeof document === 'undefined') return 'system';
+
+    const appearance = document.documentElement.dataset.defaultAppearance;
+
+    return isAppearance(appearance) ? appearance : 'system';
+};
+
 const getStoredAppearance = (): Appearance => {
     if (typeof window === 'undefined') return 'system';
 
-    return (localStorage.getItem('appearance') as Appearance) || 'system';
+    const appearance = localStorage.getItem('appearance');
+
+    return isAppearance(appearance) ? appearance : getDefaultAppearance();
 };
 
 const isDarkMode = (appearance: Appearance): boolean => {
@@ -61,11 +75,6 @@ const handleSystemThemeChange = (): void => applyTheme(currentAppearance);
 
 export function initializeTheme(): void {
     if (typeof window === 'undefined') return;
-
-    if (!localStorage.getItem('appearance')) {
-        localStorage.setItem('appearance', 'system');
-        setCookie('appearance', 'system');
-    }
 
     currentAppearance = getStoredAppearance();
     applyTheme(currentAppearance);
