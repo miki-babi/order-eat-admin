@@ -1,6 +1,6 @@
 import { Head, router } from '@inertiajs/react';
 import { CheckCheck, Clock3, ConciergeBell, Flame, HandPlatter, History, Package, Tags, Timer, UtensilsCrossed } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -234,7 +234,6 @@ export default function WaiterBoard({
     const [isTagEditorOpen, setIsTagEditorOpen] = useState(false);
     const [tagSelection, setTagSelection] = useState<Record<string, string[]>>({});
     const [isSavingTags, setIsSavingTags] = useState(false);
-    const initializedTagOrderIdRef = useRef<number | null>(null);
 
     const allOrders = [...pendingConfirmationOrders, ...awaitingKitchenOrders, ...readyToServeOrders, ...servedOrders];
     const activeOrders = [...pendingConfirmationOrders, ...awaitingKitchenOrders, ...readyToServeOrders];
@@ -283,24 +282,14 @@ export default function WaiterBoard({
 
     useEffect(() => {
         if (selectedOrderId !== null && !selectedOrder) {
-            setSelectedOrderId(null);
+            const timeoutId = window.setTimeout(() => {
+                setSelectedOrderId((current) => (current === selectedOrderId ? null : current));
+                setTagSelection({});
+            }, 0);
+
+            return () => window.clearTimeout(timeoutId);
         }
     }, [selectedOrderId, selectedOrder]);
-
-    useEffect(() => {
-        if (selectedOrderId === null) {
-            setTagSelection({});
-            initializedTagOrderIdRef.current = null;
-            return;
-        }
-
-        if (initializedTagOrderIdRef.current === selectedOrderId) {
-            return;
-        }
-
-        setTagSelection(buildInitialTagSelection(selectedCustomerInsight?.behavior_tags ?? null, behaviorTagCatalog));
-        initializedTagOrderIdRef.current = selectedOrderId;
-    }, [selectedOrderId, selectedCustomerInsight, behaviorTagCatalog]);
 
     const selectScreen = (screenId: number) => {
         router.get(
@@ -340,7 +329,20 @@ export default function WaiterBoard({
     };
 
     const openOrderDetails = (orderId: number) => {
+        const order = allOrders.find((candidate) => candidate.id === orderId) ?? null;
+        const customerInsight =
+            order?.customer_id !== null && order?.customer_id !== undefined
+                ? (customerInsights[String(order.customer_id)] ?? null)
+                : null;
+
         setSelectedOrderId(orderId);
+        setTagSelection(buildInitialTagSelection(customerInsight?.behavior_tags ?? null, behaviorTagCatalog));
+    };
+
+    const closeOrderDetails = () => {
+        setSelectedOrderId(null);
+        setIsTagEditorOpen(false);
+        setTagSelection({});
     };
 
     const toggleBehaviorTag = (group: BehaviorTagGroup, tag: string) => {
@@ -646,7 +648,7 @@ export default function WaiterBoard({
                     open={Boolean(selectedOrder)}
                     onOpenChange={(open) => {
                         if (!open) {
-                            setSelectedOrderId(null);
+                            closeOrderDetails();
                         }
                     }}
                 >

@@ -1,5 +1,5 @@
 import { useForm } from '@inertiajs/react';
-import { MessageSquare, Star, ThumbsUp, ThumbsDown, Send, X, CheckCircle2 } from 'lucide-react';
+import { MessageSquare, Star, ThumbsUp, ThumbsDown, Send,  CheckCircle2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -24,7 +24,7 @@ export function FeedbackModal({ orderId, customerId, customerToken, trigger }: F
     const [step, setStep] = useState<'initial' | 'complaint' | 'success'>('initial');
     const [open, setOpen] = useState(false);
 
-    const { data, setData, post, processing, reset } = useForm({
+    const { data, setData, processing, reset } = useForm({
         rating: '' as 'satisfied' | 'unsatisfied' | '',
         comment: '',
         order_id: orderId,

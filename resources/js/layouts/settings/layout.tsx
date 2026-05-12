@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react';
+import { Link, type InertiaLinkProps } from '@inertiajs/react';
 import type { PropsWithChildren } from 'react';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
@@ -11,7 +11,11 @@ import { show } from '@/routes/two-factor';
 import { edit as editPassword } from '@/routes/user-password';
 import type { NavItem } from '@/types';
 
-const sidebarNavItems: NavItem[] = [
+type SettingsNavItem = NavItem & {
+    href: NonNullable<InertiaLinkProps['href']>;
+};
+
+const sidebarNavItems: SettingsNavItem[] = [
     {
         title: 'Profile',
         href: edit(),

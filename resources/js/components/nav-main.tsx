@@ -1,15 +1,13 @@
 import { Link } from '@inertiajs/react';
 import { ChevronRight } from 'lucide-react';
-import { useState } from 'react';
+// import { useState } from 'react';
 import {
     Collapsible,
     CollapsibleContent,
     CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 import {
-    SidebarGroup,
-    SidebarGroupContent,
-    SidebarGroupLabel,
+  
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
@@ -25,7 +23,7 @@ export function NavMain({ groups = [] }: { groups: NavGroup[] }) {
     const visibleGroups = groups.filter((group) => group.items.length > 0);
 
     // Default to the first group being open
-    const [openGroup, setOpenGroup] = useState<string | null>(visibleGroups[0]?.label ?? null);
+    // const [openGroup] = useState<string | null>(visibleGroups[0]?.label ?? null);
 
     const renderItems = (items: NavItem[]) => (
         <SidebarMenu className="gap-0.5">
@@ -122,7 +120,7 @@ export function NavMain({ groups = [] }: { groups: NavGroup[] }) {
     return (
         <div className="space-y-4 px-4 py-6 group-data-[collapsible=icon]:px-2 group-data-[collapsible=icon]:py-4">
             {visibleGroups.map((group) => {
-                const isOpen = openGroup === group.label;
+                // const isOpen = openGroup === group.label;
 
                 return (
                     <div key={group.label} className="space-y-2">

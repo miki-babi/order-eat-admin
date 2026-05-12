@@ -1,10 +1,10 @@
+import BusinessSettingsController from './BusinessSettingsController'
+import CakePreorderController from './CakePreorderController'
+import CashierBoardController from './CashierBoardController'
+import CateringRequestController from './CateringRequestController'
+import KitchenBoardController from './KitchenBoardController'
 import OrderController from './OrderController'
 import WaiterBoardController from './WaiterBoardController'
-import KitchenBoardController from './KitchenBoardController'
-import CashierBoardController from './CashierBoardController'
-import CakePreorderController from './CakePreorderController'
-import CateringRequestController from './CateringRequestController'
-import BusinessSettingsController from './BusinessSettingsController'
 
 const Staff = {
     OrderController: Object.assign(OrderController, OrderController),

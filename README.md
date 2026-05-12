@@ -16,10 +16,6 @@ Empower your staff to remember the "little things" that make guests feel special
 - **Benefit:** Creates a personalized service experience that drives loyalty. When a "Regular" sits down, the staff already knows their preference before they even speak.
 - **Implementation:** Integrated directly into the Waiter Board order details, allowing for instant tagging during service.
 
-### 🗺️ Virtual Room Tour (Digital Table & QR Mapping)
-The system virtualizes your physical dining area into a structured digital map. Every table/location is assigned a unique QR code linked to a specific pickup point or service zone.
-- **Benefit:** Seamlessly routes orders from any corner of the room directly to the correct kitchen station. Guests order from their table, and the system handles the spatial logic of where the food should come from.
-- **Workflow:** Dynamic table management allows for quick reconfiguration of the dining space without technical overhead.
 
 ### 📊 Customer Insight (Predictive Service)
 Go beyond basic history. **Customer Insight** provides staff with a real-time snapshot of guest preferences, including their most frequent items and total visit frequency.

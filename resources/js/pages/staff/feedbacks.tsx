@@ -33,13 +33,7 @@ type Feedback = {
     };
 };
 
-// function currency(value: number): string {
-//     return new Intl.NumberFormat('en-ET', {
-//         style: 'currency',
-//         currency: 'ETB',
-//         maximumFractionDigits: 2,
-//     }).format(value);
-// }
+
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -186,7 +180,7 @@ export default function Feedbacks({
                     <div className="flex justify-center pt-6">
                         {/* Simple pagination or use a Pagination component if available */}
                         <div className="flex gap-2">
-                            {feedbacks.links.map((link: any, i: number) => (
+                            {feedbacks.links.map((link, i) => (
                                 <Button
                                     key={i}
                                     variant={link.active ? 'default' : 'outline'}

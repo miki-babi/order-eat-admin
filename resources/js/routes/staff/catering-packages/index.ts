@@ -141,7 +141,7 @@ store.form = storeForm
 * @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:161
 * @route '/staff/catering-packages/{cateringPackage}'
 */
-export const update = (args: { cateringPackage: string | number | { id: string | number } } | [cateringPackage: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
+export const update = (args: { cateringPackage: number | { id: number } } | [cateringPackage: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
     url: update.url(args, options),
     method: 'put',
 })
@@ -156,7 +156,7 @@ update.definition = {
 * @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:161
 * @route '/staff/catering-packages/{cateringPackage}'
 */
-update.url = (args: { cateringPackage: string | number | { id: string | number } } | [cateringPackage: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions) => {
+update.url = (args: { cateringPackage: number | { id: number } } | [cateringPackage: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { cateringPackage: args }
     }
@@ -189,7 +189,7 @@ update.url = (args: { cateringPackage: string | number | { id: string | number }
 * @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:161
 * @route '/staff/catering-packages/{cateringPackage}'
 */
-update.put = (args: { cateringPackage: string | number | { id: string | number } } | [cateringPackage: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
+update.put = (args: { cateringPackage: number | { id: number } } | [cateringPackage: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
     url: update.url(args, options),
     method: 'put',
 })
@@ -199,7 +199,7 @@ update.put = (args: { cateringPackage: string | number | { id: string | number }
 * @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:161
 * @route '/staff/catering-packages/{cateringPackage}'
 */
-const updateForm = (args: { cateringPackage: string | number | { id: string | number } } | [cateringPackage: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+const updateForm = (args: { cateringPackage: number | { id: number } } | [cateringPackage: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: update.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PUT',
@@ -214,7 +214,7 @@ const updateForm = (args: { cateringPackage: string | number | { id: string | nu
 * @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:161
 * @route '/staff/catering-packages/{cateringPackage}'
 */
-updateForm.put = (args: { cateringPackage: string | number | { id: string | number } } | [cateringPackage: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+updateForm.put = (args: { cateringPackage: number | { id: number } } | [cateringPackage: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: update.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PUT',
@@ -231,7 +231,7 @@ update.form = updateForm
 * @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:189
 * @route '/staff/catering-packages/{cateringPackage}'
 */
-export const destroy = (args: { cateringPackage: string | number | { id: string | number } } | [cateringPackage: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
+export const destroy = (args: { cateringPackage: number | { id: number } } | [cateringPackage: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
     url: destroy.url(args, options),
     method: 'delete',
 })
@@ -246,7 +246,7 @@ destroy.definition = {
 * @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:189
 * @route '/staff/catering-packages/{cateringPackage}'
 */
-destroy.url = (args: { cateringPackage: string | number | { id: string | number } } | [cateringPackage: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions) => {
+destroy.url = (args: { cateringPackage: number | { id: number } } | [cateringPackage: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { cateringPackage: args }
     }
@@ -279,7 +279,7 @@ destroy.url = (args: { cateringPackage: string | number | { id: string | number 
 * @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:189
 * @route '/staff/catering-packages/{cateringPackage}'
 */
-destroy.delete = (args: { cateringPackage: string | number | { id: string | number } } | [cateringPackage: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
+destroy.delete = (args: { cateringPackage: number | { id: number } } | [cateringPackage: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
     url: destroy.url(args, options),
     method: 'delete',
 })
@@ -289,7 +289,7 @@ destroy.delete = (args: { cateringPackage: string | number | { id: string | numb
 * @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:189
 * @route '/staff/catering-packages/{cateringPackage}'
 */
-const destroyForm = (args: { cateringPackage: string | number | { id: string | number } } | [cateringPackage: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+const destroyForm = (args: { cateringPackage: number | { id: number } } | [cateringPackage: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: destroy.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'DELETE',
@@ -304,7 +304,7 @@ const destroyForm = (args: { cateringPackage: string | number | { id: string | n
 * @see Modules/Ordering/app/Http/Controllers/Staff/CateringRequestController.php:189
 * @route '/staff/catering-packages/{cateringPackage}'
 */
-destroyForm.delete = (args: { cateringPackage: string | number | { id: string | number } } | [cateringPackage: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+destroyForm.delete = (args: { cateringPackage: number | { id: number } } | [cateringPackage: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: destroy.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'DELETE',

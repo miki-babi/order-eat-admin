@@ -10,7 +10,7 @@ import {
     SidebarHeader,
     SidebarMenu,
     SidebarMenuItem
-    
+
 } from '@/components/ui/sidebar';
 import { toUrl } from '@/lib/utils';
 import type { NavGroup, NavItem } from '@/types';
@@ -57,26 +57,26 @@ export function AppSidebar() {
                         ]
                     }]
                     : []),
-                // ...(can('orders.view')
-                //     ? [{
-                //         title: 'Cake Preorders',
-                //         icon: Coffee,
-                //         items: [
-                //             { title: 'Preorder List', href: '/staff/cake-preorders', icon: ClipboardList },
-                //             { title: 'Cake Packages', href: '/staff/cake-packages', icon: Package },
-                //         ]
-                //     }]
-                //     : []),
-                // ...(can('orders.view')
-                //     ? [{
-                //         title: 'Catering',
-                //         icon: UtensilsCrossed,
-                //         items: [
-                //             { title: 'Requests', href: '/staff/catering-requests', icon: ClipboardList },
-                //             { title: 'Catering Packages', href: '/staff/catering-packages', icon: Package },
-                //         ]
-                //     }]
-                //     : []),
+                ...(can('orders.view')
+                    ? [{
+                        title: 'Cake Preorders',
+                        icon: Coffee,
+                        items: [
+                            { title: 'Preorder List', href: '/staff/cake-preorders', icon: ClipboardList },
+                            { title: 'Cake Packages', href: '/staff/cake-packages', icon: Package },
+                        ]
+                    }]
+                    : []),
+                ...(can('orders.view')
+                    ? [{
+                        title: 'Catering',
+                        icon: UtensilsCrossed,
+                        items: [
+                            { title: 'Requests', href: '/staff/catering-requests', icon: ClipboardList },
+                            { title: 'Catering Packages', href: '/staff/catering-packages', icon: Package },
+                        ]
+                    }]
+                    : []),
             ],
         },
         {
@@ -88,9 +88,9 @@ export function AppSidebar() {
                 ...(can('customers.view')
                     ? [{ title: 'Customers', href: '/staff/customers', icon: Users }]
                     : []),
-                // ...(can('orders.view')
-                //     ? [{ title: 'Feedback', href: '/staff/feedbacks', icon: MessageSquareText }]
-                //     : []),
+                ...(can('orders.view')
+                    ? [{ title: 'Feedback', href: '/staff/feedbacks', icon: MessageSquareText }]
+                    : []),
                 ...(can('sms_templates.manage')
                     ? [{ title: 'Marketing', href: '/staff/sms-templates', icon: MessageSquareText }]
                     : []),

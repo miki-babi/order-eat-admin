@@ -412,6 +412,11 @@ export default function CustomerMenuPage({
         receipt: null,
         items: [],
     });
+    const formRef = useRef(form);
+
+    useEffect(() => {
+        formRef.current = form;
+    }, [form]);
 
     const menuById = useMemo(
         () =>
@@ -676,7 +681,7 @@ export default function CustomerMenuPage({
                         return;
                     }
 
-                    form.setData((current) => ({
+                    formRef.current.setData((current) => ({
                         ...current,
                         channel: 'telegram',
                         customer_token:
@@ -726,7 +731,7 @@ export default function CustomerMenuPage({
             const displayName = telegramDisplayName(user);
 
             if (telegramId !== null) {
-                form.setData((current) => ({
+                formRef.current.setData((current) => ({
                     ...current,
                     channel: 'telegram',
                     telegram_id: telegramId,
@@ -735,8 +740,8 @@ export default function CustomerMenuPage({
                 }));
             }
 
-            if (displayName && form.data.name.trim() === '') {
-                form.setData('name', displayName);
+            if (displayName && formRef.current.data.name.trim() === '') {
+                formRef.current.setData('name', displayName);
             }
 
             const initDataFromWebApp =

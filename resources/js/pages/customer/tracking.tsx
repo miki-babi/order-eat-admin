@@ -9,7 +9,7 @@ import {
     MapPin,
     Package,
     Receipt,
-    ShoppingBag,
+    // ShoppingBag,
     Upload
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
@@ -191,10 +191,8 @@ export default function Tracking({ order }: { order: Order }) {
                 <header className={`sticky top-0 z-50 border-b border-zinc-100 bg-white/80 backdrop-blur-md transition-all duration-300 md:translate-y-0 md:opacity-100 md:pointer-events-auto ${hideTopChrome ? '-translate-y-[120%] opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}`}>
                     <div className="mx-auto flex h-16 max-w-4xl items-center justify-between px-4">
                         <Link href={menuHref} className="flex items-center gap-2 group">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#212121] transition-transform group-hover:rotate-12">
-                                <ShoppingBag className="size-4 text-[#F57C00]" />
-                            </div>
-                            <span className="text-sm font-black uppercase tracking-tighter">Cafe</span>
+
+                            <span className="text-sm font-black uppercase tracking-tighter">Kaldi</span>
                         </Link>
                         <div className="flex items-center gap-4">
                             <span className="text-xs font-black uppercase tracking-widest text-[#9E9E9E]">Order #{order.id}</span>

@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Services\CustomerIdentityService;
+use Illuminate\Http\Request;
 use Modules\Ordering\Http\Controllers\CakePreorderController;
 use Modules\Ordering\Http\Controllers\CateringServiceController;
 use Modules\Ordering\Http\Controllers\OrderController;
@@ -13,9 +15,18 @@ use Modules\Ordering\Http\Controllers\Staff\KitchenBoardController;
 use Modules\Ordering\Http\Controllers\Staff\OrderController as StaffOrderController;
 use Modules\Ordering\Http\Controllers\Staff\WaiterBoardController;
 
-Route::get('/', function () {
-    return \Inertia\Inertia::render('customer/landing');
+Route::get('/', function (Request $request, CustomerIdentityService $customerIdentityService) {
+    $customerToken = $customerIdentityService->resolveClientToken($request);
+    $customerIdentityService->queueClientTokenCookie($customerToken);
+
+    return \Inertia\Inertia::render('customer/landing', [
+        'customerToken' => $customerToken,
+    ]);
 })->name('home');
+
+Route::get('/home', function () {
+    return view('home');
+})->name('home.main');
 
 Route::get('/menu', [OrderController::class, 'index'])
     ->middleware('feature:customer_menu_browsing')
