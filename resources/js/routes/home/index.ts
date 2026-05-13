@@ -1,6 +1,6 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition } from './../../wayfinder'
 /**
-* @see Modules/Ordering/routes/web.php:20
+* @see Modules/Ordering/routes/web.php:27
 * @route '/home'
 */
 export const main = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -14,7 +14,7 @@ main.definition = {
 } satisfies RouteDefinition<["get","head"]>
 
 /**
-* @see Modules/Ordering/routes/web.php:20
+* @see Modules/Ordering/routes/web.php:27
 * @route '/home'
 */
 main.url = (options?: RouteQueryOptions) => {
@@ -22,7 +22,7 @@ main.url = (options?: RouteQueryOptions) => {
 }
 
 /**
-* @see Modules/Ordering/routes/web.php:20
+* @see Modules/Ordering/routes/web.php:27
 * @route '/home'
 */
 main.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -31,7 +31,7 @@ main.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 })
 
 /**
-* @see Modules/Ordering/routes/web.php:20
+* @see Modules/Ordering/routes/web.php:27
 * @route '/home'
 */
 main.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -40,7 +40,7 @@ main.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 })
 
 /**
-* @see Modules/Ordering/routes/web.php:20
+* @see Modules/Ordering/routes/web.php:27
 * @route '/home'
 */
 const mainForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -49,7 +49,7 @@ const mainForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 })
 
 /**
-* @see Modules/Ordering/routes/web.php:20
+* @see Modules/Ordering/routes/web.php:27
 * @route '/home'
 */
 mainForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -58,7 +58,7 @@ mainForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 })
 
 /**
-* @see Modules/Ordering/routes/web.php:20
+* @see Modules/Ordering/routes/web.php:27
 * @route '/home'
 */
 mainForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({

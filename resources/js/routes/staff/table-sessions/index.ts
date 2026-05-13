@@ -4,7 +4,7 @@ import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFo
 * @see Modules/Operations/app/Http/Controllers/Staff/TableQrController.php:147
 * @route '/staff/table-sessions/{tableSession}/verify'
 */
-export const verify = (args: { tableSession: number | { id: number } } | [tableSession: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
+export const verify = (args: { tableSession: string | number | { id: string | number } } | [tableSession: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
     url: verify.url(args, options),
     method: 'patch',
 })
@@ -19,7 +19,7 @@ verify.definition = {
 * @see Modules/Operations/app/Http/Controllers/Staff/TableQrController.php:147
 * @route '/staff/table-sessions/{tableSession}/verify'
 */
-verify.url = (args: { tableSession: number | { id: number } } | [tableSession: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
+verify.url = (args: { tableSession: string | number | { id: string | number } } | [tableSession: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { tableSession: args }
     }
@@ -52,7 +52,7 @@ verify.url = (args: { tableSession: number | { id: number } } | [tableSession: n
 * @see Modules/Operations/app/Http/Controllers/Staff/TableQrController.php:147
 * @route '/staff/table-sessions/{tableSession}/verify'
 */
-verify.patch = (args: { tableSession: number | { id: number } } | [tableSession: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
+verify.patch = (args: { tableSession: string | number | { id: string | number } } | [tableSession: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
     url: verify.url(args, options),
     method: 'patch',
 })
@@ -62,7 +62,7 @@ verify.patch = (args: { tableSession: number | { id: number } } | [tableSession:
 * @see Modules/Operations/app/Http/Controllers/Staff/TableQrController.php:147
 * @route '/staff/table-sessions/{tableSession}/verify'
 */
-const verifyForm = (args: { tableSession: number | { id: number } } | [tableSession: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+const verifyForm = (args: { tableSession: string | number | { id: string | number } } | [tableSession: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: verify.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PATCH',
@@ -77,7 +77,7 @@ const verifyForm = (args: { tableSession: number | { id: number } } | [tableSess
 * @see Modules/Operations/app/Http/Controllers/Staff/TableQrController.php:147
 * @route '/staff/table-sessions/{tableSession}/verify'
 */
-verifyForm.patch = (args: { tableSession: number | { id: number } } | [tableSession: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+verifyForm.patch = (args: { tableSession: string | number | { id: string | number } } | [tableSession: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: verify.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PATCH',

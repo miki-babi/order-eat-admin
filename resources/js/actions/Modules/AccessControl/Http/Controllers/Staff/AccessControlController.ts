@@ -141,7 +141,7 @@ storeRole.form = storeRoleForm
 * @see Modules/AccessControl/app/Http/Controllers/Staff/AccessControlController.php:154
 * @route '/staff/access-control/roles/{role}'
 */
-export const updateRole = (args: { role: number | { id: number } } | [role: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
+export const updateRole = (args: { role: string | number | { id: string | number } } | [role: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
     url: updateRole.url(args, options),
     method: 'put',
 })
@@ -156,7 +156,7 @@ updateRole.definition = {
 * @see Modules/AccessControl/app/Http/Controllers/Staff/AccessControlController.php:154
 * @route '/staff/access-control/roles/{role}'
 */
-updateRole.url = (args: { role: number | { id: number } } | [role: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
+updateRole.url = (args: { role: string | number | { id: string | number } } | [role: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { role: args }
     }
@@ -189,7 +189,7 @@ updateRole.url = (args: { role: number | { id: number } } | [role: number | { id
 * @see Modules/AccessControl/app/Http/Controllers/Staff/AccessControlController.php:154
 * @route '/staff/access-control/roles/{role}'
 */
-updateRole.put = (args: { role: number | { id: number } } | [role: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
+updateRole.put = (args: { role: string | number | { id: string | number } } | [role: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
     url: updateRole.url(args, options),
     method: 'put',
 })
@@ -199,7 +199,7 @@ updateRole.put = (args: { role: number | { id: number } } | [role: number | { id
 * @see Modules/AccessControl/app/Http/Controllers/Staff/AccessControlController.php:154
 * @route '/staff/access-control/roles/{role}'
 */
-const updateRoleForm = (args: { role: number | { id: number } } | [role: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+const updateRoleForm = (args: { role: string | number | { id: string | number } } | [role: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: updateRole.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PUT',
@@ -214,7 +214,7 @@ const updateRoleForm = (args: { role: number | { id: number } } | [role: number 
 * @see Modules/AccessControl/app/Http/Controllers/Staff/AccessControlController.php:154
 * @route '/staff/access-control/roles/{role}'
 */
-updateRoleForm.put = (args: { role: number | { id: number } } | [role: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+updateRoleForm.put = (args: { role: string | number | { id: string | number } } | [role: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: updateRole.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PUT',
@@ -343,7 +343,7 @@ storeUser.form = storeUserForm
 * @see Modules/AccessControl/app/Http/Controllers/Staff/AccessControlController.php:233
 * @route '/staff/access-control/users/{user}'
 */
-export const updateUser = (args: { user: number | { id: number } } | [user: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
+export const updateUser = (args: { user: string | number | { id: string | number } } | [user: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
     url: updateUser.url(args, options),
     method: 'put',
 })
@@ -358,7 +358,7 @@ updateUser.definition = {
 * @see Modules/AccessControl/app/Http/Controllers/Staff/AccessControlController.php:233
 * @route '/staff/access-control/users/{user}'
 */
-updateUser.url = (args: { user: number | { id: number } } | [user: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
+updateUser.url = (args: { user: string | number | { id: string | number } } | [user: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { user: args }
     }
@@ -391,7 +391,7 @@ updateUser.url = (args: { user: number | { id: number } } | [user: number | { id
 * @see Modules/AccessControl/app/Http/Controllers/Staff/AccessControlController.php:233
 * @route '/staff/access-control/users/{user}'
 */
-updateUser.put = (args: { user: number | { id: number } } | [user: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
+updateUser.put = (args: { user: string | number | { id: string | number } } | [user: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
     url: updateUser.url(args, options),
     method: 'put',
 })
@@ -401,7 +401,7 @@ updateUser.put = (args: { user: number | { id: number } } | [user: number | { id
 * @see Modules/AccessControl/app/Http/Controllers/Staff/AccessControlController.php:233
 * @route '/staff/access-control/users/{user}'
 */
-const updateUserForm = (args: { user: number | { id: number } } | [user: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+const updateUserForm = (args: { user: string | number | { id: string | number } } | [user: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: updateUser.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PUT',
@@ -416,7 +416,7 @@ const updateUserForm = (args: { user: number | { id: number } } | [user: number 
 * @see Modules/AccessControl/app/Http/Controllers/Staff/AccessControlController.php:233
 * @route '/staff/access-control/users/{user}'
 */
-updateUserForm.put = (args: { user: number | { id: number } } | [user: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+updateUserForm.put = (args: { user: string | number | { id: string | number } } | [user: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: updateUser.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PUT',

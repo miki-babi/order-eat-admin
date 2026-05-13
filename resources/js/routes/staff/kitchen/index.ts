@@ -85,7 +85,7 @@ index.form = indexForm
 * @see Modules/Ordering/app/Http/Controllers/Staff/KitchenBoardController.php:118
 * @route '/staff/kitchen-board/statuses/{orderScreenStatus}'
 */
-export const update = (args: { orderScreenStatus: number | { id: number } } | [orderScreenStatus: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
+export const update = (args: { orderScreenStatus: string | number | { id: string | number } } | [orderScreenStatus: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
     url: update.url(args, options),
     method: 'patch',
 })
@@ -100,7 +100,7 @@ update.definition = {
 * @see Modules/Ordering/app/Http/Controllers/Staff/KitchenBoardController.php:118
 * @route '/staff/kitchen-board/statuses/{orderScreenStatus}'
 */
-update.url = (args: { orderScreenStatus: number | { id: number } } | [orderScreenStatus: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
+update.url = (args: { orderScreenStatus: string | number | { id: string | number } } | [orderScreenStatus: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { orderScreenStatus: args }
     }
@@ -133,7 +133,7 @@ update.url = (args: { orderScreenStatus: number | { id: number } } | [orderScree
 * @see Modules/Ordering/app/Http/Controllers/Staff/KitchenBoardController.php:118
 * @route '/staff/kitchen-board/statuses/{orderScreenStatus}'
 */
-update.patch = (args: { orderScreenStatus: number | { id: number } } | [orderScreenStatus: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
+update.patch = (args: { orderScreenStatus: string | number | { id: string | number } } | [orderScreenStatus: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
     url: update.url(args, options),
     method: 'patch',
 })
@@ -143,7 +143,7 @@ update.patch = (args: { orderScreenStatus: number | { id: number } } | [orderScr
 * @see Modules/Ordering/app/Http/Controllers/Staff/KitchenBoardController.php:118
 * @route '/staff/kitchen-board/statuses/{orderScreenStatus}'
 */
-const updateForm = (args: { orderScreenStatus: number | { id: number } } | [orderScreenStatus: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+const updateForm = (args: { orderScreenStatus: string | number | { id: string | number } } | [orderScreenStatus: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: update.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PATCH',
@@ -158,7 +158,7 @@ const updateForm = (args: { orderScreenStatus: number | { id: number } } | [orde
 * @see Modules/Ordering/app/Http/Controllers/Staff/KitchenBoardController.php:118
 * @route '/staff/kitchen-board/statuses/{orderScreenStatus}'
 */
-updateForm.patch = (args: { orderScreenStatus: number | { id: number } } | [orderScreenStatus: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+updateForm.patch = (args: { orderScreenStatus: string | number | { id: string | number } } | [orderScreenStatus: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: update.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PATCH',

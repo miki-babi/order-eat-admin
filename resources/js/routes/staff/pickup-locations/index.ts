@@ -141,7 +141,7 @@ store.form = storeForm
 * @see Modules/Operations/app/Http/Controllers/Staff/PickupLocationController.php:201
 * @route '/staff/pickup-locations/{pickupLocation}'
 */
-export const update = (args: { pickupLocation: number | { id: number } } | [pickupLocation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
+export const update = (args: { pickupLocation: string | number | { id: string | number } } | [pickupLocation: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
     url: update.url(args, options),
     method: 'put',
 })
@@ -156,7 +156,7 @@ update.definition = {
 * @see Modules/Operations/app/Http/Controllers/Staff/PickupLocationController.php:201
 * @route '/staff/pickup-locations/{pickupLocation}'
 */
-update.url = (args: { pickupLocation: number | { id: number } } | [pickupLocation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
+update.url = (args: { pickupLocation: string | number | { id: string | number } } | [pickupLocation: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { pickupLocation: args }
     }
@@ -189,7 +189,7 @@ update.url = (args: { pickupLocation: number | { id: number } } | [pickupLocatio
 * @see Modules/Operations/app/Http/Controllers/Staff/PickupLocationController.php:201
 * @route '/staff/pickup-locations/{pickupLocation}'
 */
-update.put = (args: { pickupLocation: number | { id: number } } | [pickupLocation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
+update.put = (args: { pickupLocation: string | number | { id: string | number } } | [pickupLocation: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
     url: update.url(args, options),
     method: 'put',
 })
@@ -199,7 +199,7 @@ update.put = (args: { pickupLocation: number | { id: number } } | [pickupLocatio
 * @see Modules/Operations/app/Http/Controllers/Staff/PickupLocationController.php:201
 * @route '/staff/pickup-locations/{pickupLocation}'
 */
-const updateForm = (args: { pickupLocation: number | { id: number } } | [pickupLocation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+const updateForm = (args: { pickupLocation: string | number | { id: string | number } } | [pickupLocation: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: update.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PUT',
@@ -214,7 +214,7 @@ const updateForm = (args: { pickupLocation: number | { id: number } } | [pickupL
 * @see Modules/Operations/app/Http/Controllers/Staff/PickupLocationController.php:201
 * @route '/staff/pickup-locations/{pickupLocation}'
 */
-updateForm.put = (args: { pickupLocation: number | { id: number } } | [pickupLocation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+updateForm.put = (args: { pickupLocation: string | number | { id: string | number } } | [pickupLocation: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: update.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PUT',
@@ -231,7 +231,7 @@ update.form = updateForm
 * @see Modules/Operations/app/Http/Controllers/Staff/PickupLocationController.php:220
 * @route '/staff/pickup-locations/{pickupLocation}'
 */
-export const destroy = (args: { pickupLocation: number | { id: number } } | [pickupLocation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
+export const destroy = (args: { pickupLocation: string | number | { id: string | number } } | [pickupLocation: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
     url: destroy.url(args, options),
     method: 'delete',
 })
@@ -246,7 +246,7 @@ destroy.definition = {
 * @see Modules/Operations/app/Http/Controllers/Staff/PickupLocationController.php:220
 * @route '/staff/pickup-locations/{pickupLocation}'
 */
-destroy.url = (args: { pickupLocation: number | { id: number } } | [pickupLocation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
+destroy.url = (args: { pickupLocation: string | number | { id: string | number } } | [pickupLocation: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { pickupLocation: args }
     }
@@ -279,7 +279,7 @@ destroy.url = (args: { pickupLocation: number | { id: number } } | [pickupLocati
 * @see Modules/Operations/app/Http/Controllers/Staff/PickupLocationController.php:220
 * @route '/staff/pickup-locations/{pickupLocation}'
 */
-destroy.delete = (args: { pickupLocation: number | { id: number } } | [pickupLocation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
+destroy.delete = (args: { pickupLocation: string | number | { id: string | number } } | [pickupLocation: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
     url: destroy.url(args, options),
     method: 'delete',
 })
@@ -289,7 +289,7 @@ destroy.delete = (args: { pickupLocation: number | { id: number } } | [pickupLoc
 * @see Modules/Operations/app/Http/Controllers/Staff/PickupLocationController.php:220
 * @route '/staff/pickup-locations/{pickupLocation}'
 */
-const destroyForm = (args: { pickupLocation: number | { id: number } } | [pickupLocation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+const destroyForm = (args: { pickupLocation: string | number | { id: string | number } } | [pickupLocation: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: destroy.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'DELETE',
@@ -304,7 +304,7 @@ const destroyForm = (args: { pickupLocation: number | { id: number } } | [pickup
 * @see Modules/Operations/app/Http/Controllers/Staff/PickupLocationController.php:220
 * @route '/staff/pickup-locations/{pickupLocation}'
 */
-destroyForm.delete = (args: { pickupLocation: number | { id: number } } | [pickupLocation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+destroyForm.delete = (args: { pickupLocation: string | number | { id: string | number } } | [pickupLocation: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: destroy.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'DELETE',
