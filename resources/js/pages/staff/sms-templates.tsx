@@ -209,8 +209,6 @@ export default function SmsTemplates({
     const [audiencePreview, setAudiencePreview] = useState<PromoAudiencePreview | null>(null);
     const [audiencePreviewLoading, setAudiencePreviewLoading] = useState(false);
     const [audiencePreviewError, setAudiencePreviewError] = useState<string | null>(null);
-    const [recommendedTextLoading, setRecommendedTextLoading] = useState(false);
-    const [recommendedTextError, setRecommendedTextError] = useState<string | null>(null);
     const [promoShowcaseIndex, setPromoShowcaseIndex] = useState(0);
     const [isPromoShowcaseHovered, setIsPromoShowcaseHovered] = useState(false);
     const [selectedPlaceholder, setSelectedPlaceholder] = useState<SmsPlaceholder | null>(null);
@@ -438,9 +436,9 @@ export default function SmsTemplates({
         setAudiencePreviewError(null);
     };
 
-    const clearRecommendedTextState = () => {
-        setRecommendedTextError(null);
-    };
+    // const clearRecommendedTextState = () => {
+    //     setRecommendedTextError(null);
+    // };
 
     const updatePromoTargetingField = <K extends keyof PromoWizardData>(
         key: K,
@@ -448,7 +446,7 @@ export default function SmsTemplates({
     ) => {
         promoForm.setData(key, value);
         clearAudiencePreview();
-        clearRecommendedTextState();
+        // clearRecommendedTextState();
     };
 
     const openPromoWizard = () => {
@@ -460,7 +458,7 @@ export default function SmsTemplates({
         setPromoConfirmMode(null);
         setAudiencePreview(null);
         setAudiencePreviewError(null);
-        clearRecommendedTextState();
+        // clearRecommendedTextState();
     };
 
     const closePromoWizard = () => {
@@ -469,8 +467,8 @@ export default function SmsTemplates({
         setPromoConfirmOpen(false);
         setPromoConfirmMode(null);
         setPromoSubmitMode(null);
-        setRecommendedTextLoading(false);
-        clearRecommendedTextState();
+        // setRecommendedTextLoading(false);
+        // clearRecommendedTextState();
     };
 
     const goToPreviousPromoStep = () => {
@@ -488,7 +486,7 @@ export default function SmsTemplates({
     const updatePromoPlatform = (platform: PromoPlatform) => {
         promoForm.setData('platform', platform);
         clearAudiencePreview();
-        clearRecommendedTextState();
+        // clearRecommendedTextState();
 
         if (platform === 'sms' && promoForm.data.message.length > 480) {
             promoForm.setData('message', promoForm.data.message.slice(0, 480));
@@ -500,76 +498,76 @@ export default function SmsTemplates({
         }
     };
 
-    const generateRecommendedPromoText = async () => {
-        if (!promoForm.data.platform) {
-            return;
-        }
+    // const generateRecommendedPromoText = async () => {
+    //     if (!promoForm.data.platform) {
+    //         return;
+    //     }
 
-        setRecommendedTextLoading(true);
-        setRecommendedTextError(null);
+    //     setRecommendedTextLoading(true);
+    //     setRecommendedTextError(null);
 
-        try {
-            const response = await fetch('/staff/sms-campaigns/recommended-text', {
-                method: 'POST',
-                headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement | null)?.content ?? '',
-                },
-                body: JSON.stringify({
-                    platform: promoForm.data.platform,
-                    search: promoForm.data.search,
-                    orders_min: promoForm.data.orders_min,
-                    orders_max: promoForm.data.orders_max,
-                    recency_min_days: promoForm.data.recency_min_days,
-                    recency_max_days: promoForm.data.recency_max_days,
-                    total_spent_min: promoForm.data.total_spent_min,
-                    total_spent_max: promoForm.data.total_spent_max,
-                    avg_order_value_min: promoForm.data.avg_order_value_min,
-                    avg_order_value_max: promoForm.data.avg_order_value_max,
-                    branch_ids: promoForm.data.branch_ids,
-                    include_menu_item_ids: promoForm.data.include_menu_item_ids,
-                    exclude_menu_item_ids: promoForm.data.exclude_menu_item_ids,
-                }),
-            });
+    //     try {
+    //         const response = await fetch('/staff/sms-campaigns/recommended-text', {
+    //             method: 'POST',
+    //             headers: {
+    //                 Accept: 'application/json',
+    //                 'Content-Type': 'application/json',
+    //                 'X-Requested-With': 'XMLHttpRequest',
+    //                 'X-CSRF-TOKEN': (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement | null)?.content ?? '',
+    //             },
+    //             body: JSON.stringify({
+    //                 platform: promoForm.data.platform,
+    //                 search: promoForm.data.search,
+    //                 orders_min: promoForm.data.orders_min,
+    //                 orders_max: promoForm.data.orders_max,
+    //                 recency_min_days: promoForm.data.recency_min_days,
+    //                 recency_max_days: promoForm.data.recency_max_days,
+    //                 total_spent_min: promoForm.data.total_spent_min,
+    //                 total_spent_max: promoForm.data.total_spent_max,
+    //                 avg_order_value_min: promoForm.data.avg_order_value_min,
+    //                 avg_order_value_max: promoForm.data.avg_order_value_max,
+    //                 branch_ids: promoForm.data.branch_ids,
+    //                 include_menu_item_ids: promoForm.data.include_menu_item_ids,
+    //                 exclude_menu_item_ids: promoForm.data.exclude_menu_item_ids,
+    //             }),
+    //         });
 
-            const payload: unknown = await response.json();
+    //         const payload: unknown = await response.json();
 
-            if (!response.ok) {
-                const message =
-                    typeof payload === 'object' &&
-                    payload !== null &&
-                    'message' in payload &&
-                    typeof payload.message === 'string'
-                        ? payload.message
-                        : 'Unable to generate recommended promo text right now.';
+    //         if (!response.ok) {
+    //             const message =
+    //                 typeof payload === 'object' &&
+    //                 payload !== null &&
+    //                 'message' in payload &&
+    //                 typeof payload.message === 'string'
+    //                     ? payload.message
+    //                     : 'Unable to generate recommended promo text right now.';
 
-                setRecommendedTextError(message);
-                return;
-            }
+    //             setRecommendedTextError(message);
+    //             return;
+    //         }
 
-            const adText =
-                typeof payload === 'object' &&
-                payload !== null &&
-                'ad_text' in payload &&
-                typeof payload.ad_text === 'string'
-                    ? payload.ad_text.trim()
-                    : '';
+    //         const adText =
+    //             typeof payload === 'object' &&
+    //             payload !== null &&
+    //             'ad_text' in payload &&
+    //             typeof payload.ad_text === 'string'
+    //                 ? payload.ad_text.trim()
+    //                 : '';
 
-            if (adText === '') {
-                setRecommendedTextError('Recommendation service returned an empty promo text.');
-                return;
-            }
+    //         if (adText === '') {
+    //             setRecommendedTextError('Recommendation service returned an empty promo text.');
+    //             return;
+    //         }
 
-            promoForm.setData('message', adText.slice(0, promoMessageLimit));
-            setRecommendedTextError(null);
-        } catch {
-            setRecommendedTextError('Unable to generate recommended promo text right now.');
-        } finally {
-            setRecommendedTextLoading(false);
-        }
-    };
+    //         promoForm.setData('message', adText.slice(0, promoMessageLimit));
+    //         setRecommendedTextError(null);
+    //     } catch {
+    //         setRecommendedTextError('Unable to generate recommended promo text right now.');
+    //     } finally {
+    //         setRecommendedTextLoading(false);
+    //     }
+    // };
 
     const togglePromoBranch = (branchId: number) => {
         const isSelected = promoForm.data.branch_ids.includes(branchId);
@@ -974,9 +972,9 @@ export default function SmsTemplates({
                                         Flow: Start, choose platform, set customer filters, then write your platform-specific message.
                                     </DialogDescription>
                                 </div>
-                                <Badge className="rounded-lg bg-[#212121] px-3 py-1 text-[10px] font-black uppercase tracking-widest text-white">
+                                {/* <Badge className="rounded-lg bg-[#212121] px-3 py-1 text-[10px] font-black uppercase tracking-widest text-white">
                                     Step {promoStepIndex + 1} / {promoSteps.length}
-                                </Badge>
+                                </Badge> */}
                             </div>
                             <div className="mt-5 grid gap-2 sm:grid-cols-4">
                                 {promoSteps.map((stepLabel, stepIndex) => {
@@ -1087,7 +1085,7 @@ export default function SmsTemplates({
 
                             {promoStepIndex === 2 ? (
                                 <div className="space-y-5">
-                                    <div className="flex flex-wrap items-end justify-between gap-3 rounded-2xl border border-zinc-200 bg-zinc-50/50 p-4">
+                                    {/* <div className="flex flex-wrap items-end justify-between gap-3 rounded-2xl border border-zinc-200 bg-zinc-50/50 p-4">
                                         <div className="grid w-full gap-2 sm:max-w-sm">
                                             <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]" htmlFor="promo-customer-search">
                                                 Customer Search
@@ -1110,7 +1108,7 @@ export default function SmsTemplates({
                                         >
                                             {audiencePreviewLoading ? 'Previewing...' : 'Preview Audience'}
                                         </Button>
-                                    </div>
+                                    </div> */}
 
                                     <div className="grid gap-4 md:grid-cols-2">
                                         <div className="rounded-2xl border border-zinc-200 bg-white p-4">
@@ -1357,7 +1355,16 @@ export default function SmsTemplates({
                                             )}
                                         </div>
                                     </div>
-
+                                    <div className="flex justify-end">
+                                        <Button
+                                            type="button"
+                                            className="h-auto rounded-xl bg-[#212121] px-6 font-black uppercase tracking-widest hover:bg-[#F57C00]"
+                                            disabled={audiencePreviewLoading || !promoForm.data.platform}
+                                            onClick={previewPromoAudience}
+                                        >
+                                            {audiencePreviewLoading ? 'Previewing...' : 'Preview Audience'}
+                                        </Button>
+                                    </div>
                                     {audiencePreviewError ? (
                                         <div className="rounded-2xl border-none bg-rose-50 px-4 py-3 text-xs font-black text-rose-700 ring-1 ring-rose-200">
                                             {audiencePreviewError}
@@ -1447,7 +1454,7 @@ export default function SmsTemplates({
 
                             {promoStepIndex === 3 ? (
                                 <div className="space-y-5">
-                                    <div className="rounded-2xl border border-zinc-200 bg-zinc-50/50 p-4">
+                                    {/* <div className="rounded-2xl border border-zinc-200 bg-zinc-50/50 p-4">
                                         <div className="flex flex-wrap items-center justify-between gap-2">
                                             <p className="text-[10px] font-black uppercase tracking-widest text-[#212121]">
                                                 Promo Message ({promoForm.data.platform === 'sms' ? 'SMS' : 'Telegram'})
@@ -1478,7 +1485,7 @@ export default function SmsTemplates({
                                         {recommendedTextError ? (
                                             <p className="mt-2 text-xs font-black text-rose-600">{recommendedTextError}</p>
                                         ) : null}
-                                    </div>
+                                    </div> */}
 
                                     <textarea
                                         ref={promoMessageTextareaRef}
@@ -1907,7 +1914,7 @@ export default function SmsTemplates({
                         <CardHeader className="border-b border-zinc-100 py-6">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-[10px] font-black uppercase tracking-widest text-[#F57C00]">Editor console</p>
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-[#F57C00]">template editor</p>
                                     <CardTitle className="mt-1 text-xl font-black text-[#212121]">
                                         {editingTemplate ? editingTemplate.label : 'Select Blueprint'}
                                     </CardTitle>
@@ -1971,7 +1978,7 @@ export default function SmsTemplates({
                                     </div>
                                     <div className="flex items-center gap-3">
                                         <Button type="submit" disabled={templateForm.processing} className="h-12 px-10 rounded-xl bg-[#F57C00] font-black shadow-lg shadow-[#F57C00]/20 hover:bg-[#E65100]">
-                                            {templateForm.processing ? 'Syncing...' : 'Commit Changes'}
+                                            {templateForm.processing ? 'Syncing...' : 'save changes'}
                                         </Button>
                                         <Button
                                             type="button"
@@ -1979,7 +1986,7 @@ export default function SmsTemplates({
                                             className="h-12 rounded-xl font-bold border-zinc-200"
                                             onClick={() => selectTemplate(editingTemplate)}
                                         >
-                                            Revert
+                                            cancel
                                         </Button>
                                     </div>
                                 </form>

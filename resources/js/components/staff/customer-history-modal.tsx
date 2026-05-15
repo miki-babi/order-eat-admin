@@ -94,30 +94,30 @@ export function CustomerHistoryModal({ customer, onClose }: CustomerHistoryModal
             }}
         >
             {customer && (
-                <DialogContent className="max-h-[92vh] overflow-y-auto border-none p-0 sm:max-w-6xl">
+                <DialogContent className="max-h-[92vh] overflow-y-auto border-none p-0 sm:max-w-6xl bg-white">
                     <DialogHeader className="sr-only">
                         <DialogTitle>Customer History</DialogTitle>
                         <DialogDescription>
                             Detailed order history, source channels, top branch, and ordering habits.
                         </DialogDescription>
                     </DialogHeader>
-                    <div className="border-b border-zinc-100 bg-[#212121] px-6 py-6 text-white md:px-8">
+                    <div className="border-b border-zinc-100 bg-white px-6 py-6 text-black md:px-8">
                         <div className="flex flex-wrap items-center justify-between gap-4">
                             <div>
-                                <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">Client Dossier</p>
+                                <p className="text-[10px] font-black text-black uppercase tracking-[0.3em] opacity-40">Customer detail</p>
                                 <h3 className="mt-2 text-2xl font-black">
                                     {customer.name}
                                 </h3>
                                 <p className="mt-1 font-bold text-[#F57C00] opacity-80">{customer.phone}</p>
                                 {customer.telegram_username && (
-                                    <p className="mt-1 text-xs font-semibold text-sky-200">@{customer.telegram_username}</p>
+                                    <p className="mt-1 text-xs font-semibold text-black">@{customer.telegram_username}</p>
                                 )}
                                 {customer.telegram_id && (
-                                    <p className="mt-1 text-[11px] font-semibold text-zinc-300">TG ID: {customer.telegram_id}</p>
+                                    <p className="mt-1 text-[11px] font-semibold text-black">TG ID: {customer.telegram_id}</p>
                                 )}
                             </div>
                             <div className="text-right">
-                                <Badge className="border border-white/20 bg-white/10 font-black uppercase tracking-widest text-white shadow-none backdrop-blur-md">
+                                <Badge className="border border-white/20 bg-white/10 font-black uppercase tracking-widest text-black shadow-none backdrop-blur-md">
                                     {customer.source_summary.total} Total Orders
                                 </Badge>
                             </div>

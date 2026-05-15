@@ -1,14 +1,7 @@
-import { Head, router, useForm } from '@inertiajs/react';
-import { BarChart3, Filter, TrendingUp, Users, ChevronDown, ChevronUp } from 'lucide-react';
-import { type FormEvent, useState } from 'react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import {
-    Collapsible,
-    CollapsibleContent,
-} from '@/components/ui/collapsible';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Head } from '@inertiajs/react';
+import { BarChart3, Filter, TrendingUp, Users } from 'lucide-react';
+import {  useState } from 'react';
+
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
@@ -446,8 +439,7 @@ function MiniLineChart({
 }
 
 export default function Reports({
-    filters,
-    pickupLocations,
+  
     overview,
     growthTrends,
     retention,
@@ -468,22 +460,22 @@ export default function Reports({
     menuIntelligence: MenuIntelligence;
     revenueIntelligence: RevenueIntelligence;
 }) {
-    const filterForm = useForm({
-        from: filters.from,
-        to: filters.to,
-        pickup_location_id: filters.pickup_location_id ?? '',
-    });
+    // const filterForm = useForm({
+    //     from: filters.from,
+    //     to: filters.to,
+    //     pickup_location_id: filters.pickup_location_id ?? '',
+    // });
     const [activeTab, setActiveTab] = useState<ReportTab>('overview');
-    const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+    // const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
-    const applyFilters = (event: FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
+    // const applyFilters = (event: FormEvent<HTMLFormElement>) => {
+    //     event.preventDefault();
 
-        router.get('/staff/reports', filterForm.data, {
-            preserveState: true,
-            replace: true,
-        });
-    };
+    //     router.get('/staff/reports', filterForm.data, {
+    //         preserveState: true,
+    //         replace: true,
+    //     });
+    // };
 
     const firstTrend = growthTrends[0] ?? null;
     const lastTrend = growthTrends[growthTrends.length - 1] ?? null;
@@ -594,102 +586,7 @@ export default function Reports({
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Intelligence Dashboard" />
             <div className="min-h-screen space-y-8 bg-zinc-50/30 p-8">
-                {/* Brand Header */}
-                <div className="flex flex-col gap-2">
-                    <h1 className="text-2xl font-black tracking-tight text-zinc-900">Intelligence Dashboard</h1>
-                    <p className="text-sm font-medium text-zinc-500">Deep insights into business performance, retention, and menu health.</p>
-                </div>
-
-                {/* Parameters & Filters */}
-                <div className="rounded-3xl border border-zinc-100 bg-white shadow-sm overflow-hidden">
-                    <button
-                        type="button"
-                        onClick={() => setIsFiltersOpen(!isFiltersOpen)}
-                        className="flex w-full items-center justify-between p-6 transition-colors hover:bg-zinc-50/50"
-                    >
-                        <div className="flex items-center gap-2">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#F57C00]/10 text-[#F57C00]">
-                                <Filter className="size-4" />
-                            </div>
-                            <h2 className="text-[11px] font-black uppercase tracking-[0.2em] text-zinc-400">Analysis Parameters</h2>
-                            {!isFiltersOpen && (
-                                <div className="ml-4 flex items-center gap-2">
-                                    <Badge variant="outline" className="rounded-full bg-zinc-50 text-[10px] font-bold text-zinc-500 border-zinc-100">
-                                        {filterForm.data.from} to {filterForm.data.to}
-                                    </Badge>
-                                </div>
-                            )}
-                        </div>
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full text-zinc-300 transition-transform duration-300">
-                            {isFiltersOpen ? <ChevronUp className="size-5" /> : <ChevronDown className="size-5" />}
-                        </div>
-                    </button>
-
-                    <Collapsible open={isFiltersOpen}>
-                        <CollapsibleContent className="animate-in slide-in-from-top-2 duration-300 ease-out">
-                            <div className="px-6 pb-6 pt-2 border-t border-zinc-50">
-                                <form className="grid gap-6 md:grid-cols-4 lg:grid-cols-5" onSubmit={applyFilters}>
-                                    <div className="space-y-2 lg:col-span-1">
-                                        <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400" htmlFor="from">
-                                            Start Date
-                                        </Label>
-                                        <Input
-                                            id="from"
-                                            type="date"
-                                            className="h-11 rounded-xl border-zinc-100 bg-zinc-50/50 px-4 font-bold transition-all focus:border-[#F57C00] focus:ring-4 focus:ring-[#F57C00]/5"
-                                            value={filterForm.data.from}
-                                            onChange={(event) => filterForm.setData('from', event.target.value)}
-                                        />
-                                    </div>
-                                    <div className="space-y-2 lg:col-span-1">
-                                        <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400" htmlFor="to">
-                                            End Date
-                                        </Label>
-                                        <Input
-                                            id="to"
-                                            type="date"
-                                            className="h-11 rounded-xl border-zinc-100 bg-zinc-50/50 px-4 font-bold transition-all focus:border-[#F57C00] focus:ring-4 focus:ring-[#F57C00]/5"
-                                            value={filterForm.data.to}
-                                            onChange={(event) => filterForm.setData('to', event.target.value)}
-                                        />
-                                    </div>
-                                    <div className="space-y-2 lg:col-span-2">
-                                        <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400" htmlFor="pickup_location_id">
-                                            Branch Network
-                                        </Label>
-                                        <select
-                                            id="pickup_location_id"
-                                            className="h-11 w-full rounded-xl border border-zinc-100 bg-zinc-50/50 px-4 text-xs font-bold ring-offset-white transition-all focus:border-[#F57C00] focus:outline-none focus:ring-4 focus:ring-[#F57C00]/5"
-                                            value={filterForm.data.pickup_location_id}
-                                            onChange={(event) => filterForm.setData('pickup_location_id', event.target.value)}
-                                        >
-                                            <option value="">Global Network (All Branches)</option>
-                                            {pickupLocations.map((location) => (
-                                                <option key={location.id} value={location.id}>
-                                                    {location.name}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                    <div className="flex items-end gap-3">
-                                        <Button type="submit" className="h-11 flex-1 rounded-xl bg-[#212121] text-[11px] font-black uppercase tracking-widest text-white transition-all hover:bg-[#F57C00] hover:shadow-lg hover:shadow-[#F57C00]/20 active:scale-95">
-                                            Analyze
-                                        </Button>
-                                        <Button
-                                            type="button"
-                                            variant="outline"
-                                            className="h-11 rounded-xl border-zinc-100 font-bold transition-all hover:bg-zinc-50 active:scale-95"
-                                            onClick={() => router.get('/staff/reports')}
-                                        >
-                                            Reset
-                                        </Button>
-                                    </div>
-                                </form>
-                            </div>
-                        </CollapsibleContent>
-                    </Collapsible>
-                </div>
-
+             
                 {/* Tab Navigation */}
                 <div className="inline-flex w-full overflow-hidden rounded-2xl border border-zinc-100 bg-white p-1.5 shadow-sm lg:w-auto">
                     <div className="flex flex-wrap gap-1">

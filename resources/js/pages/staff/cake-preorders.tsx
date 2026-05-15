@@ -3,7 +3,6 @@ import {
     CakeSlice,
     Clock3,
     Edit3,
-    PackageCheck,
     Search,
     ChevronDown,
     ChevronUp,
@@ -12,7 +11,7 @@ import {
     Calendar,
     Phone,
     Package,
-    ArrowRight
+    UtensilsCrossed
 } from 'lucide-react';
 import {  useState, type FormEvent } from 'react';
 import { Badge } from '@/components/ui/badge';
@@ -131,7 +130,6 @@ export default function CakePreorders({
     preorders,
     filters,
     statusOptions,
-    summary,
 }: {
     packages: CakePackageRow[];
     preorders: Paginated<CakePreorderRow>;
@@ -190,59 +188,25 @@ export default function CakePreorders({
             <Head title="Cake Preorders" />
             <div className="min-h-screen bg-[#FAFAFA] p-4 sm:p-6 lg:p-8 space-y-8">
                 {/* 📌 Section 1 — Status Summary Cards */}
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    <Card className="border-none shadow-sm ring-1 ring-zinc-200 overflow-hidden bg-white">
-                        <CardContent className="p-6">
-                            <div className="flex items-center gap-4">
-                                <div className="p-3 rounded-2xl bg-zinc-50 text-zinc-400">
-                                    <PackageCheck className="size-6" />
-                                </div>
-                                <div>
-                                    <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Cake Packages</p>
-                                    <h3 className="text-2xl font-black text-zinc-900">{summary.total_packages}</h3>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-                    <Card className="border-none shadow-sm ring-1 ring-zinc-200 overflow-hidden bg-white">
-                        <CardContent className="p-6">
-                            <div className="flex items-center gap-4">
-                                <div className="p-3 rounded-2xl bg-emerald-50 text-emerald-500">
-                                    <CakeSlice className="size-6" />
-                                </div>
-                                <div>
-                                    <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Active Packages</p>
-                                    <h3 className="text-2xl font-black text-zinc-900">{summary.active_packages}</h3>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-                    <Card className="border-none shadow-sm ring-1 ring-zinc-200 overflow-hidden bg-white">
-                        <CardContent className="p-6">
-                            <div className="flex items-center gap-4">
-                                <div className="p-3 rounded-2xl bg-sky-50 text-sky-500">
-                                    <Clock3 className="size-6" />
-                                </div>
-                                <div>
-                                    <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Total Preorders</p>
-                                    <h3 className="text-2xl font-black text-zinc-900">{summary.total_preorders}</h3>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-                    <Card className="border-none shadow-sm ring-1 ring-zinc-200 overflow-hidden bg-white">
-                        <CardContent className="p-6">
-                            <div className="flex items-center gap-4">
-                                <div className="p-3 rounded-2xl bg-amber-50 text-amber-500">
-                                    <Clock3 className="size-6" />
-                                </div>
-                                <div>
-                                    <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Pending</p>
-                                    <h3 className="text-2xl font-black text-zinc-900">{summary.pending_preorders}</h3>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
+             {/* Header Section */}
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <h1 className="text-2xl font-black tracking-tight text-zinc-900 flex items-center gap-3">
+                            <UtensilsCrossed className="size-8 text-[#F57C00]" />
+                            Cake Preorders
+                        </h1>
+                        <p className="text-sm font-medium text-zinc-500">Manage institutional and event catering service requests.</p>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                        <Button asChild className="h-12 rounded-xl bg-[#212121] text-white hover:bg-black font-bold px-6 shadow-lg shadow-zinc-200">
+                            <Link href="/staff/cake-packages">
+                                <Package className="mr-2 size-4" />
+                                Manage Packages
+                                
+                            </Link>
+                        </Button>
+                    </div>
                 </div>
 
                 {/* 📌 Section 2 — Filters & Tabs */}
@@ -508,23 +472,7 @@ export default function CakePreorders({
                     </div>
                 </div>
 
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between rounded-3xl border border-zinc-100 bg-white p-6 shadow-sm">
-                    <div className="flex items-center gap-4">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#F57C00]/10 text-[#F57C00]">
-                            <PackageCheck className="size-6" />
-                        </div>
-                        <div>
-                            <h3 className="text-base font-black text-zinc-900">Cake Package Management</h3>
-                            <p className="text-xs font-medium text-zinc-500">Configure your cake packages, sizes, and pricing catalog.</p>
-                        </div>
-                    </div>
-                    <Button asChild className="h-11 rounded-xl bg-[#212121] text-white hover:bg-black font-bold px-6 shadow-lg shadow-zinc-200 gap-2">
-                        <Link href="/staff/cake-packages">
-                            Manage Packages
-                            <ArrowRight className="size-4" />
-                        </Link>
-                    </Button>
-                </div>
+          
 
                 <div className="flex justify-end">
                     <Button asChild variant="outline" className="rounded-xl border-zinc-200">

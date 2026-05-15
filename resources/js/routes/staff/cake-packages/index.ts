@@ -141,7 +141,7 @@ store.form = storeForm
 * @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:165
 * @route '/staff/cake-packages/{cakePackage}'
 */
-export const update = (args: { cakePackage: string | number | { id: string | number } } | [cakePackage: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
+export const update = (args: { cakePackage: number | { id: number } } | [cakePackage: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
     url: update.url(args, options),
     method: 'put',
 })
@@ -156,7 +156,7 @@ update.definition = {
 * @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:165
 * @route '/staff/cake-packages/{cakePackage}'
 */
-update.url = (args: { cakePackage: string | number | { id: string | number } } | [cakePackage: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions) => {
+update.url = (args: { cakePackage: number | { id: number } } | [cakePackage: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { cakePackage: args }
     }
@@ -189,7 +189,7 @@ update.url = (args: { cakePackage: string | number | { id: string | number } } |
 * @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:165
 * @route '/staff/cake-packages/{cakePackage}'
 */
-update.put = (args: { cakePackage: string | number | { id: string | number } } | [cakePackage: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
+update.put = (args: { cakePackage: number | { id: number } } | [cakePackage: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
     url: update.url(args, options),
     method: 'put',
 })
@@ -199,7 +199,7 @@ update.put = (args: { cakePackage: string | number | { id: string | number } } |
 * @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:165
 * @route '/staff/cake-packages/{cakePackage}'
 */
-const updateForm = (args: { cakePackage: string | number | { id: string | number } } | [cakePackage: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+const updateForm = (args: { cakePackage: number | { id: number } } | [cakePackage: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: update.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PUT',
@@ -214,7 +214,7 @@ const updateForm = (args: { cakePackage: string | number | { id: string | number
 * @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:165
 * @route '/staff/cake-packages/{cakePackage}'
 */
-updateForm.put = (args: { cakePackage: string | number | { id: string | number } } | [cakePackage: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+updateForm.put = (args: { cakePackage: number | { id: number } } | [cakePackage: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: update.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PUT',
@@ -231,7 +231,7 @@ update.form = updateForm
 * @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:202
 * @route '/staff/cake-packages/{cakePackage}'
 */
-export const destroy = (args: { cakePackage: string | number | { id: string | number } } | [cakePackage: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
+export const destroy = (args: { cakePackage: number | { id: number } } | [cakePackage: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
     url: destroy.url(args, options),
     method: 'delete',
 })
@@ -246,7 +246,7 @@ destroy.definition = {
 * @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:202
 * @route '/staff/cake-packages/{cakePackage}'
 */
-destroy.url = (args: { cakePackage: string | number | { id: string | number } } | [cakePackage: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions) => {
+destroy.url = (args: { cakePackage: number | { id: number } } | [cakePackage: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { cakePackage: args }
     }
@@ -279,7 +279,7 @@ destroy.url = (args: { cakePackage: string | number | { id: string | number } } 
 * @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:202
 * @route '/staff/cake-packages/{cakePackage}'
 */
-destroy.delete = (args: { cakePackage: string | number | { id: string | number } } | [cakePackage: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
+destroy.delete = (args: { cakePackage: number | { id: number } } | [cakePackage: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
     url: destroy.url(args, options),
     method: 'delete',
 })
@@ -289,7 +289,7 @@ destroy.delete = (args: { cakePackage: string | number | { id: string | number }
 * @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:202
 * @route '/staff/cake-packages/{cakePackage}'
 */
-const destroyForm = (args: { cakePackage: string | number | { id: string | number } } | [cakePackage: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+const destroyForm = (args: { cakePackage: number | { id: number } } | [cakePackage: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: destroy.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'DELETE',
@@ -304,7 +304,7 @@ const destroyForm = (args: { cakePackage: string | number | { id: string | numbe
 * @see Modules/Ordering/app/Http/Controllers/Staff/CakePreorderController.php:202
 * @route '/staff/cake-packages/{cakePackage}'
 */
-destroyForm.delete = (args: { cakePackage: string | number | { id: string | number } } | [cakePackage: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+destroyForm.delete = (args: { cakePackage: number | { id: number } } | [cakePackage: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: destroy.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'DELETE',

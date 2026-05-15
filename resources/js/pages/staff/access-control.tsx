@@ -263,7 +263,7 @@ export default function AccessControl({
                     <CardHeader className="border-b border-zinc-100 bg-zinc-50/50 py-4">
                         <CardTitle className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-[#212121]">
                             <KeyRound className="size-4 text-[#F57C00]" />
-                            Declare new permission
+                            create new permission
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="pt-6">
@@ -303,7 +303,7 @@ export default function AccessControl({
                                         placeholder="Briefly define scope of this access level..."
                                     />
                                     <Button type="submit" className="h-10 px-6 rounded-xl bg-[#212121] font-black hover:bg-[#F57C00]" disabled={permissionForm.processing}>
-                                        Deploy
+                                        save
                                     </Button>
                                 </div>
                                 <InputError message={permissionForm.errors.description} />
@@ -426,7 +426,7 @@ export default function AccessControl({
                     <div className="space-y-4">
                         <h2 className="flex items-center gap-2 text-sm font-black uppercase tracking-widest text-[#212121]">
                             <UserCog className="size-4 text-[#F57C00]" />
-                            Identity Console
+                            staff members & permissions
                         </h2>
 
                         <Card className="border-none shadow-md ring-1 ring-zinc-200">
@@ -437,7 +437,7 @@ export default function AccessControl({
                                 <form className="space-y-4" onSubmit={submitCreateUser}>
                                     <div className="grid gap-4 md:grid-cols-2">
                                         <div className="grid gap-2">
-                                            <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]" htmlFor="user-name">Legal Name</Label>
+                                            <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]" htmlFor="user-name">Name</Label>
                                             <Input
                                                 id="user-name"
                                                 className="h-10 rounded-xl border-zinc-200"
@@ -449,7 +449,7 @@ export default function AccessControl({
                                             <InputError message={createUserForm.errors.name} />
                                         </div>
                                         <div className="grid gap-2">
-                                            <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]" htmlFor="user-email">Comms Channel (Email)</Label>
+                                            <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]" htmlFor="user-email">Email</Label>
                                             <Input
                                                 id="user-email"
                                                 className="h-10 rounded-xl border-zinc-200"
@@ -463,7 +463,7 @@ export default function AccessControl({
                                     </div>
                                     <div className="grid gap-4 md:grid-cols-2">
                                         <div className="grid gap-2">
-                                            <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]" htmlFor="user-password">Secure Secret</Label>
+                                            <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]" htmlFor="user-password">password</Label>
                                             <Input
                                                 id="user-password"
                                                 type="password"
@@ -475,7 +475,7 @@ export default function AccessControl({
                                             />
                                         </div>
                                         <div className="grid gap-2">
-                                            <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]" htmlFor="user-password-confirmation">Verify Secret</Label>
+                                            <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]" htmlFor="user-password-confirmation">Confirm Password</Label>
                                             <Input
                                                 id="user-password-confirmation"
                                                 type="password"
@@ -511,7 +511,7 @@ export default function AccessControl({
                                             </div>
                                         </div>
                                         <div className="space-y-3">
-                                            <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">Branch Sovereignty</Label>
+                                            <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]">Branch Assignments</Label>
                                             <div className="grid gap-2 rounded-2xl border border-zinc-100 bg-zinc-50/50 p-4 ring-1 ring-zinc-100">
                                                 {pickupLocations.map((location) => (
                                                     <label key={location.id} className="flex items-center gap-3 group cursor-pointer">
@@ -536,7 +536,7 @@ export default function AccessControl({
                                         </div>
                                     </div>
                                     <Button type="submit" className="h-11 w-full rounded-xl bg-[#212121] font-black hover:bg-[#F57C00]" disabled={createUserForm.processing}>
-                                        Inaugurate User
+                                        Register staff member
                                     </Button>
                                 </form>
                             </CardContent>

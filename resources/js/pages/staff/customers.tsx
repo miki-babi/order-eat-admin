@@ -1,5 +1,5 @@
 import { Head, Link, router, useForm } from '@inertiajs/react';
-import { ChevronLeft, ChevronRight,  MessageSquare,Search,  TrendingUp, Users } from 'lucide-react';
+import { ChevronLeft, ChevronRight,  MessageSquare,Search,   Users } from 'lucide-react';
 import { useMemo, useRef, useState, type FormEvent } from 'react';
 import { CustomerHistoryModal, type SelectedCustomer } from '@/components/staff/customer-history-modal';
 import { Badge } from '@/components/ui/badge';
@@ -100,7 +100,6 @@ export default function StaffCustomers({
     filters,
     smsTemplates,
     smsPlaceholders,
-    summary,
 }: {
     customers: Paginated<CustomerRow>;
     selectedCustomer: SelectedCustomer;
@@ -244,7 +243,7 @@ export default function StaffCustomers({
             <Head title="Customers" />
             <div className="space-y-8 bg-zinc-50/50 p-6 min-h-screen">
                 {/* 📌 Header Summary Cards */}
-                <div className="grid gap-4 md:grid-cols-2">
+                {/* <div className="grid gap-4 md:grid-cols-2">
                     <Card className="border-none shadow-sm ring-1 ring-zinc-200">
                         <CardContent className="pt-6">
                             <div className="flex items-center justify-between">
@@ -271,17 +270,17 @@ export default function StaffCustomers({
                             </div>
                         </CardContent>
                     </Card>
-                </div>
+                </div> */}
 
                 {/* 📌 Search & Filter Section */}
                 <Card className="border-none shadow-md ring-1 ring-zinc-200">
-                    <CardHeader className="border-b border-zinc-100 bg-zinc-50/50 py-4">
+                    {/* <CardHeader className="border-b border-zinc-100 bg-zinc-50/50 py-4">
                         <CardTitle className="flex items-center gap-2 text-sm font-black uppercase tracking-widest text-[#212121]">
                             <Search className="size-4 text-[#F57C00]" />
                             Search Database
                         </CardTitle>
-                    </CardHeader>
-                    <CardContent className="pt-6">
+                    </CardHeader> */}
+                    <CardContent className="pt-2">
                         <form className="flex flex-wrap items-end gap-3" onSubmit={applySearch}>
                             <div className="min-w-[300px] flex-1">
                                 <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]" htmlFor="search">Name or Phone Number</Label>

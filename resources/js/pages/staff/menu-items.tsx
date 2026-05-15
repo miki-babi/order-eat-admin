@@ -1,5 +1,5 @@
 import { Head, router, useForm } from '@inertiajs/react';
-import { Coffee, Filter, ImagePlus, Search, Trash2 } from 'lucide-react';
+import { Coffee,  ImagePlus, Trash2 } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
 import InputError from '@/components/input-error';
 import { Badge } from '@/components/ui/badge';
@@ -63,9 +63,7 @@ function visibilityChannelLabel(channel: string): string {
 
 export default function MenuItems({
     items,
-    categories,
-    filters,
-    summary,
+    
     visibilityChannels,
 }: {
     items: MenuItemRow[];
@@ -77,11 +75,11 @@ export default function MenuItems({
     const channelOptions = visibilityChannels.length > 0 ? visibilityChannels : defaultVisibilityChannels;
     const [editing, setEditing] = useState<MenuItemRow | null>(null);
 
-    const filterForm = useForm({
-        search: filters.search ?? '',
-        category: filters.category ?? '',
-        status: filters.status ?? 'all',
-    });
+    // const filterForm = useForm({
+    //     search: filters.search ?? '',
+    //     category: filters.category ?? '',
+    //     status: filters.status ?? 'all',
+    // });
 
     const createForm = useForm({
         name: '',
@@ -106,13 +104,13 @@ export default function MenuItems({
         visibility_channels: [...channelOptions],
     });
 
-    const applyFilters = (event: FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        router.get('/staff/menu-items', filterForm.data, {
-            preserveState: true,
-            replace: true,
-        });
-    };
+    // const applyFilters = (event: FormEvent<HTMLFormElement>) => {
+    //     event.preventDefault();
+    //     router.get('/staff/menu-items', filterForm.data, {
+    //         preserveState: true,
+    //         replace: true,
+    //     });
+    // };
 
     const createItem = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -186,7 +184,7 @@ export default function MenuItems({
             <Head title="Menu Items" />
             <div className="space-y-8 bg-zinc-50/50 p-6 min-h-screen">
                 {/* 📌 Summary Cards */}
-                <div className="grid gap-4 md:grid-cols-2">
+                {/* <div className="grid gap-4 md:grid-cols-2">
                     <Card className="border-none shadow-sm ring-1 ring-zinc-200">
                         <CardContent className="pt-6">
                             <div className="flex items-center justify-between">
@@ -213,10 +211,10 @@ export default function MenuItems({
                             </div>
                         </CardContent>
                     </Card>
-                </div>
+                </div> */}
 
                 {/* 📌 Filter Control Panel */}
-                <Card className="border-none shadow-md ring-1 ring-zinc-200">
+                {/* <Card className="border-none shadow-md ring-1 ring-zinc-200">
                     <CardHeader className="border-b border-zinc-100 bg-zinc-50/50 py-4">
                         <CardTitle className="flex items-center gap-2 text-sm font-black uppercase tracking-widest text-[#212121]">
                             <Filter className="size-4 text-[#F57C00]" />
@@ -275,7 +273,7 @@ export default function MenuItems({
                             </div>
                         </form>
                     </CardContent>
-                </Card>
+                </Card> */}
 
 
                 {/* 📌 Edit Control Card */}
@@ -405,10 +403,10 @@ export default function MenuItems({
                                             className="h-11 rounded-xl font-bold"
                                             onClick={() => setEditing(null)}
                                         >
-                                            Cancel
+                                            cancel
                                         </Button>
                                         <Button type="submit" className="h-11 px-8 rounded-xl bg-[#F57C00] font-black shadow-lg shadow-[#F57C00]/20 hover:bg-[#E65100]" disabled={editForm.processing}>
-                                            Commit Updates
+                                            save changes
                                         </Button>
                                     </div>
                                 </div>
@@ -638,7 +636,7 @@ export default function MenuItems({
                                     <Label htmlFor="is_featured_new" className="cursor-pointer text-xs font-bold text-zinc-600">Featured Item</Label>
                                 </div>
                                 <Button type="submit" className="h-11 px-8 ml-auto rounded-xl bg-[#212121] font-black shadow-lg shadow-zinc-200 hover:bg-[#F57C00]" disabled={createForm.processing}>
-                                    {createForm.processing ? 'Publishing...' : 'Add to Catalog'}
+                                    {createForm.processing ? 'Publishing...' : 'add to menu'}
                                 </Button>
                             </div>
                         </form>

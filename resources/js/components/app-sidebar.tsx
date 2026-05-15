@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { BarChart3, ClipboardList, Coffee, ConciergeBell, KeyRound, MapPin, MessageSquareText, MonitorSmartphone, Package, QrCode, Search, Shield, Store, Users, UtensilsCrossed, Wallet } from 'lucide-react';
+import { BarChart3, ClipboardList, Coffee, ConciergeBell, KeyRound, MapPin, MegaphoneIcon, MessageSquareText, MonitorSmartphone, Package, QrCode, Search, Shield, Store, Users, UtensilsCrossed, Wallet } from 'lucide-react';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -92,7 +92,7 @@ export function AppSidebar() {
                     ? [{ title: 'Feedback', href: '/staff/feedbacks', icon: MessageSquareText }]
                     : []),
                 ...(can('sms_templates.manage')
-                    ? [{ title: 'Marketing', href: '/staff/sms-templates', icon: MessageSquareText }]
+                    ? [{ title: 'Marketing', href: '/staff/sms-templates', icon: MegaphoneIcon }]
                     : []),
             ],
         },

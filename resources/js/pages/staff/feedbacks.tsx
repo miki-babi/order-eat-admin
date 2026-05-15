@@ -101,7 +101,7 @@ export default function Feedbacks({
                         feedbacks.data.map((feedback: Feedback) => {
                             
                             return (
-                            <Card key={feedback.id} className="border-none shadow-sm ring-1 ring-zinc-200 transition-all hover:ring-zinc-300">
+                            <Card key={feedback.id} className={`border-none shadow-sm ring-1 ring-zinc-200 transition-all hover:ring-zinc-300 ${feedback.rating === 'unsatisfied' ? ' ' : 'hidden'}`}>
                                 <CardContent className="p-6">
                                     <div className="flex flex-col md:flex-row justify-between gap-4">
                                         <div className="space-y-3 flex-1">
