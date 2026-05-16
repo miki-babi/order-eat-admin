@@ -946,40 +946,7 @@ export default function CustomerMenuPage({
                     </div>
 
                     {/* Material Step Tracker */}
-                    {/* <div className={`sticky top-0 z-40 mb-8 overflow-hidden rounded-2xl bg-white p-1 shadow-md ring-1 ring-zinc-100 transition-all duration-300 dark:bg-zinc-900 dark:ring-zinc-800 md:relative md:top-0 ${hideTopChrome ? '-translate-y-[130%] opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}`}>
-                        <div className="flex flex-row items-center gap-1">
-                            {steps.map((label, index) => {
-                                const isActive = step === index + 1;
-                                const isCompleted = step > index + 1;
-                                return (
-                                    <div
-                                        key={label}
-                                        className={`flex flex-1 items-center justify-center rounded-xl px-2 py-3 transition-all duration-500 dark:bg-transparent ${isActive
-                                            ? 'bg-orange-50 text-orange-600 shadow-sm dark:bg-orange-950/20 dark:text-orange-400'
-                                            : 'bg-transparent'
-                                            }`}
-                                    >
-                                        <div
-                                            className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10px] font-bold transition-all duration-500 ${isActive
-                                                ? 'bg-orange-600 text-white shadow-md shadow-orange-600/20 scale-110 dark:bg-orange-500 dark:shadow-orange-500/10'
-                                                : isCompleted
-                                                    ? 'bg-emerald-600 text-white dark:bg-emerald-500'
-                                                    : 'bg-zinc-100 text-zinc-400 dark:bg-zinc-800 dark:text-zinc-600'
-                                                } ${isActive ? 'mr-2' : 'md:mr-3'}`}
-                                        >
-                                            {isCompleted ? <CheckCircle2 className="size-4" strokeWidth={3} /> : index + 1}
-                                        </div>
-                                        <span
-                                            className={`text-[11px] font-bold uppercase tracking-tight md:text-sm md:normal-case md:tracking-normal ${isActive ? 'block' : 'hidden md:block'
-                                                } ${isActive ? 'text-orange-600 dark:text-orange-400' : 'text-zinc-500 dark:text-zinc-400'}`}
-                                        >
-                                            {label.split('. ')[1]}
-                                        </span>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div> */}
+                    
 
                     <div
                         className={`sticky top-0 z-60 mb-8 overflow-hidden bg-white/80 py-2 backdrop-blur-xl transition-all duration-300 md:relative md:top-0 dark:bg-zinc-950/80 ${step === 1 ? 'block' : 'hidden'} ${hideTopChrome ? 'pointer-events-none -translate-y-[160%] opacity-0' : 'translate-y-0 opacity-100'}`}

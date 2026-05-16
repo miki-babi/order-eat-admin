@@ -1,6 +1,6 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../wayfinder'
 /**
-* @see routes/web.php:56
+* @see [serialized-closure]:2
 * @route '/rooms'
 */
 export const index = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -14,7 +14,7 @@ index.definition = {
 } satisfies RouteDefinition<["get","head"]>
 
 /**
-* @see routes/web.php:56
+* @see [serialized-closure]:2
 * @route '/rooms'
 */
 index.url = (options?: RouteQueryOptions) => {
@@ -22,7 +22,7 @@ index.url = (options?: RouteQueryOptions) => {
 }
 
 /**
-* @see routes/web.php:56
+* @see [serialized-closure]:2
 * @route '/rooms'
 */
 index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -31,7 +31,7 @@ index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 })
 
 /**
-* @see routes/web.php:56
+* @see [serialized-closure]:2
 * @route '/rooms'
 */
 index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -40,7 +40,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 })
 
 /**
-* @see routes/web.php:56
+* @see [serialized-closure]:2
 * @route '/rooms'
 */
 const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -49,7 +49,7 @@ const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => (
 })
 
 /**
-* @see routes/web.php:56
+* @see [serialized-closure]:2
 * @route '/rooms'
 */
 indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -58,7 +58,7 @@ indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 })
 
 /**
-* @see routes/web.php:56
+* @see [serialized-closure]:2
 * @route '/rooms'
 */
 indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -74,7 +74,7 @@ indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 index.form = indexForm
 
 /**
-* @see routes/web.php:81
+* @see [serialized-closure]:2
 * @route '/room/{roomId}'
 */
 export const show = (args: { roomId: string | number } | [roomId: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -88,7 +88,7 @@ show.definition = {
 } satisfies RouteDefinition<["get","head"]>
 
 /**
-* @see routes/web.php:81
+* @see [serialized-closure]:2
 * @route '/room/{roomId}'
 */
 show.url = (args: { roomId: string | number } | [roomId: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -114,7 +114,7 @@ show.url = (args: { roomId: string | number } | [roomId: string | number ] | str
 }
 
 /**
-* @see routes/web.php:81
+* @see [serialized-closure]:2
 * @route '/room/{roomId}'
 */
 show.get = (args: { roomId: string | number } | [roomId: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -123,7 +123,7 @@ show.get = (args: { roomId: string | number } | [roomId: string | number ] | str
 })
 
 /**
-* @see routes/web.php:81
+* @see [serialized-closure]:2
 * @route '/room/{roomId}'
 */
 show.head = (args: { roomId: string | number } | [roomId: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -132,7 +132,7 @@ show.head = (args: { roomId: string | number } | [roomId: string | number ] | st
 })
 
 /**
-* @see routes/web.php:81
+* @see [serialized-closure]:2
 * @route '/room/{roomId}'
 */
 const showForm = (args: { roomId: string | number } | [roomId: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -141,7 +141,7 @@ const showForm = (args: { roomId: string | number } | [roomId: string | number ]
 })
 
 /**
-* @see routes/web.php:81
+* @see [serialized-closure]:2
 * @route '/room/{roomId}'
 */
 showForm.get = (args: { roomId: string | number } | [roomId: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -150,7 +150,7 @@ showForm.get = (args: { roomId: string | number } | [roomId: string | number ] |
 })
 
 /**
-* @see routes/web.php:81
+* @see [serialized-closure]:2
 * @route '/room/{roomId}'
 */
 showForm.head = (args: { roomId: string | number } | [roomId: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
