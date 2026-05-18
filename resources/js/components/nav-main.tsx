@@ -44,7 +44,7 @@ export function NavMain({ groups = [] }: { groups: NavGroup[] }) {
                                         >
                                             <div className="flex items-center gap-3 w-full group-data-[collapsible=icon]:justify-center">
                                                 {item.icon && (
-                                                    <div className={`flex size-7 items-center justify-center rounded-lg transition-colors duration-300 ${anyChildActive ? 'bg-[#F57C00]/10 text-[#F57C00]' : 'bg-zinc-100/50 text-zinc-400 group-hover/nav-item:bg-white group-hover/nav-item:text-zinc-900 group-hover/nav-item:shadow-sm'}`}>
+                                                    <div className={`flex size-7 items-center justify-center rounded-lg transition-colors duration-300 ${anyChildActive ? 'bg-primary/10 text-primary' : 'bg-zinc-100/50 text-zinc-400 group-hover/nav-item:bg-white group-hover/nav-item:text-zinc-900 group-hover/nav-item:shadow-sm'}`}>
                                                         <item.icon className="size-4 shrink-0" />
                                                     </div>
                                                 )}
@@ -65,12 +65,12 @@ export function NavMain({ groups = [] }: { groups: NavGroup[] }) {
                                                             asChild
                                                             isActive={subActive}
                                                             className={`group/sub h-9 rounded-lg px-3 transition-all duration-300 ${subActive
-                                                                ? 'bg-white text-[#F57C00] font-bold shadow-sm ring-1 ring-zinc-200/50'
+                                                                ? 'bg-white text-primary font-bold shadow-sm ring-1 ring-zinc-200/50'
                                                                 : 'text-zinc-400 hover:bg-white hover:text-zinc-900 hover:shadow-sm'
                                                                 }`}
                                                         >
                                                             <Link href={subItem.href || '#'} prefetch className="flex items-center gap-3">
-                                                                <span className={`text-[10px] uppercase tracking-wide transition-colors ${subActive ? 'text-[#F57C00]' : 'group-hover/sub:text-zinc-900'}`}>
+                                                                <span className={`text-[10px] uppercase tracking-wide transition-colors ${subActive ? 'text-primary' : 'group-hover/sub:text-zinc-900'}`}>
                                                                     {subItem.title}
                                                                 </span>
                                                             </Link>
@@ -99,7 +99,7 @@ export function NavMain({ groups = [] }: { groups: NavGroup[] }) {
                         >
                             <Link href={item.href || '#'} prefetch className="flex items-center gap-3 group-data-[collapsible=icon]:justify-center">
                                 {item.icon && (
-                                    <div className={`flex size-7 items-center justify-center rounded-lg transition-all duration-300 ${active ? 'bg-[#F57C00] text-white shadow-lg shadow-[#F57C00]/20' : 'bg-zinc-100/50 text-zinc-400 group-hover/nav-item:bg-white group-hover/nav-item:text-zinc-900 group-hover/nav-item:shadow-sm'}`}>
+                                    <div className={`flex size-7 items-center justify-center rounded-lg transition-all duration-300 ${active ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-zinc-100/50 text-zinc-400 group-hover/nav-item:bg-white group-hover/nav-item:text-zinc-900 group-hover/nav-item:shadow-sm'}`}>
                                         <item.icon className="size-4 shrink-0 transition-transform group-hover/nav-item:scale-110" />
                                     </div>
                                 )}

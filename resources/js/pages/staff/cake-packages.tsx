@@ -187,7 +187,7 @@ export default function CakePackages({
                     {canManagePackages && (
                         <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
                             <DialogTrigger asChild>
-                                <Button className="h-12 rounded-xl bg-[#212121] text-white hover:bg-black font-bold px-6 shadow-lg shadow-zinc-200 gap-2">
+                                <Button className="h-12 rounded-xl bg-primary text-white hover:bg-primary/90 font-bold px-6 shadow-lg shadow-zinc-200 gap-2">
                                     <Plus className="size-4" />
                                     Add New Package
                                 </Button>
@@ -260,7 +260,7 @@ export default function CakePackages({
                                                 id="new-image"
                                                 type="file"
                                                 accept="image/png,image/jpeg,image/jpg,image/webp"
-                                                className="h-12 rounded-xl border border-zinc-100 bg-zinc-50/50 px-4 text-sm font-bold focus:bg-white transition-all outline-none ring-offset-white focus-visible:ring-2 focus-visible:ring-zinc-950 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-black file:bg-[#F57C00]/10 file:text-[#F57C00] hover:file:bg-[#F57C00]/20"
+                                                className="h-12 rounded-xl border border-zinc-100 bg-zinc-50/50 px-4 text-sm font-bold focus:bg-white transition-all outline-none ring-offset-white focus-visible:ring-2 focus-visible:ring-zinc-950 file:mr-4 file:py-2 file:px-4  file:rounded-full file:border-0 file:text-xs file:font-black file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
                                                 onChange={(event) => createPackageForm.setData('image', event.target.files?.[0] ?? null)}
                                             />
                                             <InputError message={createPackageForm.errors.image} />
@@ -271,7 +271,7 @@ export default function CakePackages({
                                             <div className="relative flex items-center">
                                                 <input
                                                     type="checkbox"
-                                                    className="peer size-5 rounded-lg border-zinc-200 text-[#F57C00] focus:ring-[#F57C00]/20 transition-all cursor-pointer"
+                                                    className="peer size-5 rounded-lg border-zinc-200 text-primary focus:ring-primary/20 transition-all cursor-pointer"
                                                     checked={createPackageForm.data.is_active}
                                                     onChange={(event) => createPackageForm.setData('is_active', event.target.checked)}
                                                 />
@@ -282,7 +282,7 @@ export default function CakePackages({
                                             <Button type="button" variant="ghost" className="rounded-xl font-bold text-zinc-500 hover:bg-zinc-100" onClick={() => setIsCreateModalOpen(false)}>
                                                 Cancel
                                             </Button>
-                                            <Button type="submit" className="rounded-xl bg-[#F57C00] text-white hover:bg-[#E65100] font-bold px-6 shadow-lg shadow-[#F57C00]/20" disabled={createPackageForm.processing}>
+                                            <Button type="submit" className="rounded-xl bg-primary text-white hover:bg-primary/90 font-bold px-6 shadow-lg shadow-primary/20" disabled={createPackageForm.processing}>
                                                 Add Package
                                             </Button>
                                         </div>

@@ -1,18 +1,18 @@
 <?php
 
 use App\Http\Controllers\FeatureLockedController;
+use App\Http\Controllers\TelegramSettingController;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
 
-use Illuminate\Support\Facades\Artisan;
-
 Route::get('/create-storage-link', function () {
     Artisan::call('storage:link');
+
     return 'Storage link created successfully!';
 });
-
 
 Route::get('dashboard', function (Request $request) {
     $user = $request->user();
@@ -78,10 +78,16 @@ Route::get('/rooms', function () {
     ]);
 })->name('rooms.index');
 
-Route::get('/room/{roomId}', function (string $roomId) {
-    return Inertia::render('rooms/show', [
-        'roomId' => $roomId,
-    ]);
-})->where('roomId', '[A-Za-z0-9_-]+')->name('rooms.show');
+Route::middleware(['auth', 'verified', 'staff'])
+    ->prefix('staff')
+    ->name('staff.')
+    ->group(function (): void {
+        Route::get('telegram-settings', [TelegramSettingController::class, 'index'])
+            ->middleware(['permission:users.manage'])
+            ->name('telegram-settings.index');
+        Route::patch('telegram-settings', [TelegramSettingController::class, 'update'])
+            ->middleware(['permission:users.manage'])
+            ->name('telegram-settings.update');
+    });
 
 require __DIR__.'/settings.php';

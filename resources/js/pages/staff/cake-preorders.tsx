@@ -199,7 +199,7 @@ export default function CakePreorders({
                     </div>
 
                     <div className="flex items-center gap-3">
-                        <Button asChild className="h-12 rounded-xl bg-[#212121] text-white hover:bg-black font-bold px-6 shadow-lg shadow-zinc-200">
+                        <Button asChild className="h-12 rounded-xl bg-primary text-white hover:bg-primary/90 font-bold px-6 shadow-lg shadow-primary/20">
                             <Link href="/staff/cake-packages">
                                 <Package className="mr-2 size-4" />
                                 Manage Packages
@@ -228,7 +228,7 @@ export default function CakePreorders({
                                             router.get('/staff/cake-preorders', { ...filterForm.data, status: tab.value }, { preserveState: true, replace: true });
                                         }}
                                         className={`rounded-lg px-6 h-9 text-xs font-bold transition-all shrink-0 ${isActive
-                                            ? 'bg-[#F57C00] text-white shadow-md hover:bg-[#E65100] hover:text-white'
+                                            ? 'bg-primary text-white shadow-md hover:bg-primary/90 hover:text-white'
                                             : 'text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900'
                                             }`}
                                     >
@@ -295,7 +295,7 @@ export default function CakePreorders({
                                         </div>
 
                                         <div className="flex items-end gap-2">
-                                            <Button type="submit" className="h-11 flex-1 rounded-xl bg-[#212121] text-white hover:bg-black font-bold shadow-lg shadow-zinc-200">
+                                            <Button type="submit" className="h-11 flex-1 rounded-xl bg-primary text-white hover:bg-primary/90 font-bold shadow-lg shadow-primary/20">
                                                 Apply Filters
                                             </Button>
                                             <Button type="button" variant="outline" className="h-11 rounded-xl px-6 font-bold border-zinc-200" onClick={clearFilters}>
@@ -457,7 +457,7 @@ export default function CakePreorders({
                                     key={link.label}
                                     type="button"
                                     variant={link.active ? 'default' : 'outline'}
-                                    className={`h-9 rounded-xl px-4 text-xs font-bold transition-all ${link.active ? 'bg-[#212121] text-white' : 'bg-white text-zinc-600 border-zinc-200 hover:bg-zinc-50'}`}
+                                    className={`h-9 rounded-xl px-4 text-xs font-bold transition-all ${link.active ? 'bg-primary text-white' : 'bg-white text-zinc-600 border-zinc-200 hover:bg-zinc-50'}`}
                                     disabled={!link.url}
                                     onClick={() => {
                                         if (link.url) {

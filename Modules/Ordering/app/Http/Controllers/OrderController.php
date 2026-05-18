@@ -29,7 +29,7 @@ class OrderController extends Controller
     /**
      * Show the customer ordering page.
      */
-    public function index(Request $request, CustomerIdentityService $customerIdentityService): Response
+    public function menu(Request $request, CustomerIdentityService $customerIdentityService): Response
     {
         return $this->renderMenuPage(
             request: $request,
@@ -37,6 +37,16 @@ class OrderController extends Controller
             pageComponent: 'customer/menu',
         );
     }
+
+     public function order(Request $request, CustomerIdentityService $customerIdentityService): Response
+    {
+        return $this->renderMenuPage(
+            request: $request,
+            customerIdentityService: $customerIdentityService,
+            pageComponent: 'customer/order',
+        );
+    }
+
 
     /**
      * Show the Telegram miniapp ordering page.

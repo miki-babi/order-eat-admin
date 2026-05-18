@@ -383,7 +383,7 @@ export default function AccessControl({
                                             ))}
                                         </div>
                                     </div>
-                                    <Button type="submit" className="h-11 w-full rounded-xl bg-[#212121] font-black hover:bg-[#F57C00]" disabled={createRoleForm.processing}>
+                                    <Button type="submit" className="h-11 w-full rounded-xl bg-primary font-black hover:bg-primary/90" disabled={createRoleForm.processing}>
                                         Register Tier
                                     </Button>
                                 </form>
@@ -535,7 +535,7 @@ export default function AccessControl({
                                             </div>
                                         </div>
                                     </div>
-                                    <Button type="submit" className="h-11 w-full rounded-xl bg-[#212121] font-black hover:bg-[#F57C00]" disabled={createUserForm.processing}>
+                                    <Button type="submit" className="h-11 w-full rounded-xl bg-primary font-black hover:bg-primary/90" disabled={createUserForm.processing}>
                                         Register staff member
                                     </Button>
                                 </form>

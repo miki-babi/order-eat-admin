@@ -28,7 +28,7 @@ Route::get('/home', function () {
     return view('home');
 })->name('home.main');
 
-Route::get('/menu', [OrderController::class, 'index'])
+Route::get('/menu', [OrderController::class, 'menu'])
     ->middleware('feature:customer_menu_browsing')
     ->name('menu.index');
 Route::get('/telegram/menu', [OrderController::class, 'telegramMenu'])
@@ -56,6 +56,10 @@ Route::post('/qr-menu/{diningTable:qr_code}/orders', [QrMenuController::class, '
     ->middleware('feature:customer_qr_checkout')
     ->name('qr-menu.orders.store');
 
+
+Route::get('/order', [OrderController::class, 'order'])
+    ->middleware('feature:customer_menu_browsing')
+    ->name('order.index');
 Route::post('/orders', [OrderController::class, 'store'])
     ->middleware('feature:customer_web_checkout')
     ->name('orders.store');

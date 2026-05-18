@@ -170,7 +170,7 @@ export default function CateringRequests({
                     </div>
 
                     <div className="flex items-center gap-3">
-                        <Button asChild className="h-12 rounded-xl bg-[#212121] text-white hover:bg-black font-bold px-6 shadow-lg shadow-zinc-200">
+                        <Button asChild className="h-12 rounded-xl bg-primary text-white hover:bg-primary/90 font-bold px-6 shadow-lg shadow-primary/20">
                             <Link href="/staff/catering-packages">
                                 <Package className="mr-2 size-4" />
                                 Manage Packages
@@ -253,13 +253,13 @@ export default function CateringRequests({
                                         router.get('/staff/catering-requests', { ...filterForm.data, status: tab.value }, { preserveState: true, replace: true });
                                     }}
                                     className={`relative rounded-lg px-6 h-9 text-xs font-bold transition-all shrink-0 ${isActive
-                                        ? 'bg-[#F57C00] text-white shadow-md hover:bg-[#E65100] hover:text-white'
+                                        ? 'bg-primary text-white shadow-md hover:bg-primary/90 hover:text-white'
                                         : 'text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900'
                                         }`}
                                 >
                                     {tab.label}
                                     {tab.count > 0 && (
-                                        <span className={`absolute -top-1 -right-1 flex size-4 items-center justify-center rounded-[10px] text-[10px] ring-1 ${isActive ? 'bg-white text-[#F57C00] ring-[#F57C00]' : 'bg-[#F57C00] text-white ring-white'}`}>
+                                        <span className={`absolute -top-1 -right-1 flex size-4 items-center justify-center rounded-[10px] text-[10px] ring-1 ${isActive ? 'bg-white text-primary ring-primary' : 'bg-primary text-white ring-white'}`}>
                                             {tab.count}
                                         </span>
                                     )}
@@ -311,7 +311,7 @@ export default function CateringRequests({
                                     </div>
 
                                     <div className="flex items-end">
-                                        <Button type="submit" className="h-12 w-auto px-6 text-lg font-bold rounded-[1rem] bg-[#F57C00] text-white hover:bg-[#E65100] shadow-lg shadow-zinc-200">
+                                        <Button type="submit" className="h-12 w-auto px-6 text-lg font-bold rounded-[1rem] bg-primary text-white hover:bg-primary/90 shadow-lg shadow-primary/20">
                                             Search
                                         </Button>
                                     </div>

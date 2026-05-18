@@ -22,6 +22,13 @@ return new class extends Migration
             $table->string('tracking_token')->unique();
             $table->decimal('total_amount', 10, 2)->default(0);
             $table->text('disapproval_reason')->nullable();
+            $table->enum('waiter_status', ['pending_confirmation', 'confirmed', 'served'])
+                ->default('pending_confirmation')
+                ;
+            $table->timestamp('waiter_confirmed_at')->nullable();
+            $table->timestamp('served_at')->nullable();
+
+            $table->index('waiter_status');
             $table->timestamps();
         });
     }

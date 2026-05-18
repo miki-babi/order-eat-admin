@@ -15,9 +15,16 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('phone', 20)->unique();
+            $table->string('password')->nullable();
             $table->string('telegram_id')->nullable();
             $table->string('telegram_username')->nullable();
             $table->timestamps();
+        });
+      
+        Schema::create('customer_password_reset_tokens', function (Blueprint $table) {
+            $table->string('email')->primary();
+            $table->string('token');
+            $table->timestamp('created_at')->nullable();
         });
     }
 
@@ -27,5 +34,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('customers');
+        Schema::dropIfExists('customer_password_reset_tokens');
+
     }
 };

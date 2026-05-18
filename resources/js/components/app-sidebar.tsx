@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { BarChart3, ClipboardList, Coffee, ConciergeBell, KeyRound, MapPin, MegaphoneIcon, MessageSquareText, MonitorSmartphone, Package, QrCode, Search, Shield, Store, Users, UtensilsCrossed, Wallet } from 'lucide-react';
+import { BarChart3, ClipboardList, Coffee, ConciergeBell, KeyRound, MapPin, MegaphoneIcon, MessageCircle, MessageSquareText, MonitorSmartphone, Package, QrCode, Search, Shield, Store, Users, UtensilsCrossed, Wallet } from 'lucide-react';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -121,6 +121,9 @@ export function AppSidebar() {
                     : []),
                 ...(can('users.manage') || can('roles.manage') || can('permissions.manage')
                     ? [{ title: 'Access Control', href: '/staff/access-control', icon: KeyRound }]
+                    : []),
+                ...(can('users.manage')
+                    ? [{ title: 'Telegram', href: '/staff/telegram-settings', icon: MessageCircle }]
                     : []),
                 ...(isSystemAdmin
                     ? [{ title: 'System Admin', href: '/__system-admin/dashboard', icon: Shield }]

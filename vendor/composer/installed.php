@@ -3,7 +3,7 @@
         'name' => 'laravel/react-starter-kit',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '79bc2e130fec10668c2d2c84f58ae30a82db9412',
+        'reference' => '65f743f760fc79e52b5c8cbcccf113b88b4645e2',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -36,6 +36,12 @@
             'install_path' => __DIR__ . '/../bacon/bacon-qr-code',
             'aliases' => array(),
             'dev_requirement' => false,
+        ),
+        'barryvdh/laravel-debugbar' => array(
+            'dev_requirement' => true,
+            'replaced' => array(
+                0 => 'v4.2.8',
+            ),
         ),
         'brianium/paratest' => array(
             'pretty_version' => 'v7.20.0',
@@ -181,6 +187,15 @@
             'reference' => 'd2102955e48b9fd9ab24280a7ad12ed552752c4d',
             'type' => 'library',
             'install_path' => __DIR__ . '/../filp/whoops',
+            'aliases' => array(),
+            'dev_requirement' => true,
+        ),
+        'fruitcake/laravel-debugbar' => array(
+            'pretty_version' => 'v4.2.8',
+            'version' => '4.2.8.0',
+            'reference' => '799d70c1101d3f8840dd76ff68ff6a78f9352905',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../fruitcake/laravel-debugbar',
             'aliases' => array(),
             'dev_requirement' => true,
         ),
@@ -487,6 +502,15 @@
                 0 => '*',
             ),
         ),
+        'laminas/laminas-diactoros' => array(
+            'pretty_version' => '3.8.0',
+            'version' => '3.8.0.0',
+            'reference' => '60c182916b2749480895601649563970f3f12ec4',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../laminas/laminas-diactoros',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
         'laravel/ai' => array(
             'pretty_version' => 'v0.6.8',
             'version' => '0.6.8.0',
@@ -511,6 +535,15 @@
             'reference' => '6172ae1f44ba5d89e111057ee4a4e7c27f5a610d',
             'type' => 'library',
             'install_path' => __DIR__ . '/../laravel/framework',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'laravel/octane' => array(
+            'pretty_version' => 'v2.17.3',
+            'version' => '2.17.3.0',
+            'reference' => '040bfbebfdf545a752376f4396d942cd6f7da036',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../laravel/octane',
             'aliases' => array(),
             'dev_requirement' => false,
         ),
@@ -553,7 +586,7 @@
         'laravel/react-starter-kit' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '79bc2e130fec10668c2d2c84f58ae30a82db9412',
+            'reference' => '65f743f760fc79e52b5c8cbcccf113b88b4645e2',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -666,6 +699,12 @@
             'install_path' => __DIR__ . '/../league/uri-interfaces',
             'aliases' => array(),
             'dev_requirement' => false,
+        ),
+        'maximebf/debugbar' => array(
+            'dev_requirement' => true,
+            'replaced' => array(
+                0 => 'v3.7.6',
+            ),
         ),
         'mockery/mockery' => array(
             'pretty_version' => '1.6.12',
@@ -850,6 +889,24 @@
             'reference' => '4f7fd7836c6f332bb2933569e566a0d6c4cbed74',
             'type' => 'library',
             'install_path' => __DIR__ . '/../phar-io/version',
+            'aliases' => array(),
+            'dev_requirement' => true,
+        ),
+        'php-debugbar/php-debugbar' => array(
+            'pretty_version' => 'v3.7.6',
+            'version' => '3.7.6.0',
+            'reference' => '1690ee1728827f9deb4b60457fa387cf44672c56',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../php-debugbar/php-debugbar',
+            'aliases' => array(),
+            'dev_requirement' => true,
+        ),
+        'php-debugbar/symfony-bridge' => array(
+            'pretty_version' => 'v1.1.0',
+            'version' => '1.1.0.0',
+            'reference' => 'e37d2debe5d316408b00d0ab2688d9c2cf59b5ad',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../php-debugbar/symfony-bridge',
             'aliases' => array(),
             'dev_requirement' => true,
         ),
@@ -1043,6 +1100,7 @@
             'dev_requirement' => false,
             'provided' => array(
                 0 => '1.0',
+                1 => '^1.0',
             ),
         ),
         'psr/http-message' => array(
@@ -1058,6 +1116,7 @@
             'dev_requirement' => false,
             'provided' => array(
                 0 => '1.0',
+                1 => '^1.1 || ^2.0',
             ),
         ),
         'psr/log' => array(
@@ -1520,6 +1579,15 @@
             'reference' => 'ac5e82528b986c4f7cfccbf7764b5d2e824d6175',
             'type' => 'library',
             'install_path' => __DIR__ . '/../symfony/property-info',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'symfony/psr-http-message-bridge' => array(
+            'pretty_version' => 'v8.0.8',
+            'version' => '8.0.8.0',
+            'reference' => '94facc221260c1d5f20e31ee43cd6c6a824b4a19',
+            'type' => 'symfony-bridge',
+            'install_path' => __DIR__ . '/../symfony/psr-http-message-bridge',
             'aliases' => array(),
             'dev_requirement' => false,
         ),

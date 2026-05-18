@@ -319,7 +319,7 @@ export default function BranchScreens({
 
                             <Button
                                 type="submit"
-                                className="h-11 rounded-xl bg-[#F57C00] font-black hover:bg-[#E65100]"
+                                className="h-11 rounded-xl bg-primary font-black hover:bg-[#E65100]"
                                 disabled={createForm.processing}
                             >
                                 {createForm.processing ? 'Saving...' : 'Create Screen'}
@@ -389,7 +389,7 @@ export default function BranchScreens({
                                         <Button
                                             type="button"
                                             size="sm"
-                                            className="h-9 rounded-xl bg-[#212121] hover:bg-black"
+                                            className="h-9 rounded-xl bg-primary hover:bg-[#00402d]"
                                             onClick={() => openEdit(screen)}
                                         >
                                             <Settings2 className="mr-1 size-3" />

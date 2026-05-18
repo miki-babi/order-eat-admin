@@ -271,7 +271,7 @@ export default function TableQr({
                                     />
                                     <span className="text-sm font-bold text-zinc-700">Active table</span>
                                 </label>
-                                <Button type="submit" className="h-11 rounded-xl bg-[#F57C00] font-black hover:bg-[#E65100]" disabled={createForm.processing}>
+                                <Button type="submit" className="h-11 rounded-xl bg-primary font-black hover:bg-[#00402d]" disabled={createForm.processing}>
                                     {createForm.processing ? 'Saving...' : 'Create Table QR'}
                                 </Button>
                             </form>
@@ -389,7 +389,7 @@ export default function TableQr({
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-2">
-                                                <Button type="button" size="sm" className="h-9 rounded-xl bg-[#F57C00] hover:bg-[#E65100]" onClick={() => startEdit(table)}>
+                                                <Button type="button" size="sm" className="h-9 rounded-xl bg-primary hover:bg-[#00402d]" onClick={() => startEdit(table)}>
                                                     Edit
                                                 </Button>
                                                 <Button type="button" size="sm" variant="outline" className="h-9 rounded-xl" onClick={() => copyQrUrl(table)}>

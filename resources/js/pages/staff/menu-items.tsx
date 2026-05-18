@@ -449,7 +449,7 @@ export default function MenuItems({
                                                 <Badge className="w-fit bg-[#212121] text-white font-black uppercase tracking-widest text-[9px] shadow-xl">
                                                     {item.category ?? 'General'}
                                                 </Badge>
-                                                <Badge className={`w-fit font-black uppercase tracking-widest text-[9px] shadow-xl ${item.is_active ? 'bg-[#F57C00] text-white' : 'bg-white text-zinc-500 ring-1 ring-zinc-200'}`}>
+                                                <Badge className={`w-fit font-black uppercase tracking-widest text-[9px] shadow-xl ${item.is_active ? 'bg-primary text-white' : 'bg-white text-zinc-500 ring-1 ring-zinc-200'}`}>
                                                     {item.is_active ? 'Live' : 'Draft'}
                                                 </Badge>
                                                 {item.is_featured ? (
@@ -475,7 +475,7 @@ export default function MenuItems({
                                                         {item.description || "No description provided for this catalog item."}
                                                     </p>
                                                 </div>
-                                                <p className="text-lg font-black text-[#F57C00]">{currency(item.price)}</p>
+                                                <p className="text-lg font-black text-primary">{currency(item.price)}</p>
                                             </div>
 
                                             <div className="mt-6 flex items-center justify-between border-t border-zinc-100 pt-5">
@@ -635,8 +635,8 @@ export default function MenuItems({
                                     />
                                     <Label htmlFor="is_featured_new" className="cursor-pointer text-xs font-bold text-zinc-600">Featured Item</Label>
                                 </div>
-                                <Button type="submit" className="h-11 px-8 ml-auto rounded-xl bg-[#212121] font-black shadow-lg shadow-zinc-200 hover:bg-[#F57C00]" disabled={createForm.processing}>
-                                    {createForm.processing ? 'Publishing...' : 'add to menu'}
+                                <Button type="submit" className="h-11 px-8 ml-auto rounded-xl bg-primary font-black shadow-lg shadow-zinc-200 hover:bg-[#00402d]" disabled={createForm.processing}>
+                                    {createForm.processing ? 'Publishing...' : 'Add to menu'}
                                 </Button>
                             </div>
                         </form>

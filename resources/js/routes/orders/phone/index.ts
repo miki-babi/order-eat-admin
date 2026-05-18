@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../wayfinder'
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::store
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:388
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:398
 * @route '/orders/{trackingToken}/phone'
 */
 export const store = (args: { trackingToken: string | number } | [trackingToken: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -16,7 +16,7 @@ store.definition = {
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::store
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:388
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:398
 * @route '/orders/{trackingToken}/phone'
 */
 store.url = (args: { trackingToken: string | number } | [trackingToken: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -43,7 +43,7 @@ store.url = (args: { trackingToken: string | number } | [trackingToken: string |
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::store
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:388
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:398
 * @route '/orders/{trackingToken}/phone'
 */
 store.post = (args: { trackingToken: string | number } | [trackingToken: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -53,7 +53,7 @@ store.post = (args: { trackingToken: string | number } | [trackingToken: string 
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::store
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:388
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:398
 * @route '/orders/{trackingToken}/phone'
 */
 const storeForm = (args: { trackingToken: string | number } | [trackingToken: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -63,7 +63,7 @@ const storeForm = (args: { trackingToken: string | number } | [trackingToken: st
 
 /**
 * @see \Modules\Ordering\Http\Controllers\OrderController::store
-* @see Modules/Ordering/app/Http/Controllers/OrderController.php:388
+* @see Modules/Ordering/app/Http/Controllers/OrderController.php:398
 * @route '/orders/{trackingToken}/phone'
 */
 storeForm.post = (args: { trackingToken: string | number } | [trackingToken: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({

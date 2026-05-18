@@ -2,7 +2,7 @@ import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFo
 /**
 * @see \Modules\TelegramBot\Http\Controllers\WebhookController::__invoke
 * @see Modules/TelegramBot/app/Http/Controllers/WebhookController.php:28
-* @route '/api/telegram/webhook'
+* @route '/api/telegram/telegram/webhook'
 */
 const WebhookController = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
     url: WebhookController.url(options),
@@ -11,13 +11,13 @@ const WebhookController = (options?: RouteQueryOptions): RouteDefinition<'post'>
 
 WebhookController.definition = {
     methods: ["post"],
-    url: '/api/telegram/webhook',
+    url: '/api/telegram/telegram/webhook',
 } satisfies RouteDefinition<["post"]>
 
 /**
 * @see \Modules\TelegramBot\Http\Controllers\WebhookController::__invoke
 * @see Modules/TelegramBot/app/Http/Controllers/WebhookController.php:28
-* @route '/api/telegram/webhook'
+* @route '/api/telegram/telegram/webhook'
 */
 WebhookController.url = (options?: RouteQueryOptions) => {
     return WebhookController.definition.url + queryParams(options)
@@ -26,7 +26,7 @@ WebhookController.url = (options?: RouteQueryOptions) => {
 /**
 * @see \Modules\TelegramBot\Http\Controllers\WebhookController::__invoke
 * @see Modules/TelegramBot/app/Http/Controllers/WebhookController.php:28
-* @route '/api/telegram/webhook'
+* @route '/api/telegram/telegram/webhook'
 */
 WebhookController.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
     url: WebhookController.url(options),
@@ -36,7 +36,7 @@ WebhookController.post = (options?: RouteQueryOptions): RouteDefinition<'post'> 
 /**
 * @see \Modules\TelegramBot\Http\Controllers\WebhookController::__invoke
 * @see Modules/TelegramBot/app/Http/Controllers/WebhookController.php:28
-* @route '/api/telegram/webhook'
+* @route '/api/telegram/telegram/webhook'
 */
 const WebhookControllerForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: WebhookController.url(options),
@@ -46,7 +46,7 @@ const WebhookControllerForm = (options?: RouteQueryOptions): RouteFormDefinition
 /**
 * @see \Modules\TelegramBot\Http\Controllers\WebhookController::__invoke
 * @see Modules/TelegramBot/app/Http/Controllers/WebhookController.php:28
-* @route '/api/telegram/webhook'
+* @route '/api/telegram/telegram/webhook'
 */
 WebhookControllerForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: WebhookController.url(options),

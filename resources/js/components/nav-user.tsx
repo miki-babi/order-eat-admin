@@ -31,13 +31,13 @@ export function NavUser() {
                     <DropdownMenuTrigger asChild>
                         <SidebarMenuButton
                             size="lg"
-                            className="h-14 w-full rounded-2xl bg-[#212121] text-white shadow-xl ring-1 ring-white/10 transition-all hover:bg-[#212121] hover:scale-[0.98] data-[state=open]:bg-[#212121] group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:rounded-xl group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:justify-center"
+                            className="h-14 w-full rounded-md bg-primary text-white shadow-xl border  transition-all hover:bg-grey-400 hover:scale-[0.98] data-[state=open]:bg-grey-900 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:rounded-xl group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:justify-center"
                             data-test="sidebar-menu-button"
                         >
                             <div className="flex w-full items-center gap-3 group-data-[collapsible=icon]:justify-center">
-                                <Avatar className="size-9 border-2 border-[#F57C00] shadow-sm group-data-[collapsible=icon]:size-8 group-data-[collapsible=icon]:border">
+                                <Avatar className="size-9 bg-white border-2 border-[#F57C00] shadow-sm group-data-[collapsible=icon]:size-8 group-data-[collapsible=icon]:border">
                                     <AvatarImage src={user.avatar} alt={user.name} />
-                                    <AvatarFallback className="bg-zinc-800 text-[10px] font-black uppercase text-white">
+                                    <AvatarFallback className="bg-white text-[10px] font-black uppercase text-black">
                                         {getInitials(user.name)}
                                     </AvatarFallback>
                                 </Avatar>
@@ -47,7 +47,7 @@ export function NavUser() {
                                     </span>
                                     <div className="flex items-center gap-1">
                                         <ShieldCheck className="size-2.5 text-[#F57C00]" />
-                                        <span className="truncate text-[9px] font-bold text-zinc-400 uppercase tracking-tighter">
+                                        <span className="truncate text-[9px] font-bold text-white uppercase tracking-tighter">
                                             Operator Level
                                         </span>
                                     </div>

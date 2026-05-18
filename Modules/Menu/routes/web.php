@@ -20,3 +20,4 @@ Route::middleware(['auth', 'verified', 'staff'])
             ->middleware(['permission:menu_items.manage', 'feature:staff_menu_management'])
             ->name('menu-items.destroy');
     });
+

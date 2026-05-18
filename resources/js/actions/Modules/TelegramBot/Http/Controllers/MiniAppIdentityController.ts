@@ -2,7 +2,7 @@ import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFo
 /**
 * @see \Modules\TelegramBot\Http\Controllers\MiniAppIdentityController::__invoke
 * @see Modules/TelegramBot/app/Http/Controllers/MiniAppIdentityController.php:17
-* @route '/api/telegram/miniapp/identity'
+* @route '/api/telegram/telegram/miniapp/identity'
 */
 const MiniAppIdentityController = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
     url: MiniAppIdentityController.url(options),
@@ -11,13 +11,13 @@ const MiniAppIdentityController = (options?: RouteQueryOptions): RouteDefinition
 
 MiniAppIdentityController.definition = {
     methods: ["post"],
-    url: '/api/telegram/miniapp/identity',
+    url: '/api/telegram/telegram/miniapp/identity',
 } satisfies RouteDefinition<["post"]>
 
 /**
 * @see \Modules\TelegramBot\Http\Controllers\MiniAppIdentityController::__invoke
 * @see Modules/TelegramBot/app/Http/Controllers/MiniAppIdentityController.php:17
-* @route '/api/telegram/miniapp/identity'
+* @route '/api/telegram/telegram/miniapp/identity'
 */
 MiniAppIdentityController.url = (options?: RouteQueryOptions) => {
     return MiniAppIdentityController.definition.url + queryParams(options)
@@ -26,7 +26,7 @@ MiniAppIdentityController.url = (options?: RouteQueryOptions) => {
 /**
 * @see \Modules\TelegramBot\Http\Controllers\MiniAppIdentityController::__invoke
 * @see Modules/TelegramBot/app/Http/Controllers/MiniAppIdentityController.php:17
-* @route '/api/telegram/miniapp/identity'
+* @route '/api/telegram/telegram/miniapp/identity'
 */
 MiniAppIdentityController.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
     url: MiniAppIdentityController.url(options),
@@ -36,7 +36,7 @@ MiniAppIdentityController.post = (options?: RouteQueryOptions): RouteDefinition<
 /**
 * @see \Modules\TelegramBot\Http\Controllers\MiniAppIdentityController::__invoke
 * @see Modules/TelegramBot/app/Http/Controllers/MiniAppIdentityController.php:17
-* @route '/api/telegram/miniapp/identity'
+* @route '/api/telegram/telegram/miniapp/identity'
 */
 const MiniAppIdentityControllerForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: MiniAppIdentityController.url(options),
@@ -46,7 +46,7 @@ const MiniAppIdentityControllerForm = (options?: RouteQueryOptions): RouteFormDe
 /**
 * @see \Modules\TelegramBot\Http\Controllers\MiniAppIdentityController::__invoke
 * @see Modules/TelegramBot/app/Http/Controllers/MiniAppIdentityController.php:17
-* @route '/api/telegram/miniapp/identity'
+* @route '/api/telegram/telegram/miniapp/identity'
 */
 MiniAppIdentityControllerForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: MiniAppIdentityController.url(options),

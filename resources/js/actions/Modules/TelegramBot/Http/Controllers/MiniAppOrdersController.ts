@@ -2,7 +2,7 @@ import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFo
 /**
 * @see \Modules\TelegramBot\Http\Controllers\MiniAppOrdersController::__invoke
 * @see Modules/TelegramBot/app/Http/Controllers/MiniAppOrdersController.php:18
-* @route '/api/telegram/miniapp/orders'
+* @route '/api/telegram/telegram/miniapp/orders'
 */
 const MiniAppOrdersController = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
     url: MiniAppOrdersController.url(options),
@@ -11,13 +11,13 @@ const MiniAppOrdersController = (options?: RouteQueryOptions): RouteDefinition<'
 
 MiniAppOrdersController.definition = {
     methods: ["post"],
-    url: '/api/telegram/miniapp/orders',
+    url: '/api/telegram/telegram/miniapp/orders',
 } satisfies RouteDefinition<["post"]>
 
 /**
 * @see \Modules\TelegramBot\Http\Controllers\MiniAppOrdersController::__invoke
 * @see Modules/TelegramBot/app/Http/Controllers/MiniAppOrdersController.php:18
-* @route '/api/telegram/miniapp/orders'
+* @route '/api/telegram/telegram/miniapp/orders'
 */
 MiniAppOrdersController.url = (options?: RouteQueryOptions) => {
     return MiniAppOrdersController.definition.url + queryParams(options)
@@ -26,7 +26,7 @@ MiniAppOrdersController.url = (options?: RouteQueryOptions) => {
 /**
 * @see \Modules\TelegramBot\Http\Controllers\MiniAppOrdersController::__invoke
 * @see Modules/TelegramBot/app/Http/Controllers/MiniAppOrdersController.php:18
-* @route '/api/telegram/miniapp/orders'
+* @route '/api/telegram/telegram/miniapp/orders'
 */
 MiniAppOrdersController.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
     url: MiniAppOrdersController.url(options),
@@ -36,7 +36,7 @@ MiniAppOrdersController.post = (options?: RouteQueryOptions): RouteDefinition<'p
 /**
 * @see \Modules\TelegramBot\Http\Controllers\MiniAppOrdersController::__invoke
 * @see Modules/TelegramBot/app/Http/Controllers/MiniAppOrdersController.php:18
-* @route '/api/telegram/miniapp/orders'
+* @route '/api/telegram/telegram/miniapp/orders'
 */
 const MiniAppOrdersControllerForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: MiniAppOrdersController.url(options),
@@ -46,7 +46,7 @@ const MiniAppOrdersControllerForm = (options?: RouteQueryOptions): RouteFormDefi
 /**
 * @see \Modules\TelegramBot\Http\Controllers\MiniAppOrdersController::__invoke
 * @see Modules/TelegramBot/app/Http/Controllers/MiniAppOrdersController.php:18
-* @route '/api/telegram/miniapp/orders'
+* @route '/api/telegram/telegram/miniapp/orders'
 */
 MiniAppOrdersControllerForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: MiniAppOrdersController.url(options),

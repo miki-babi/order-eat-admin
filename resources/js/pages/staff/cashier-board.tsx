@@ -160,7 +160,7 @@ export default function CashierBoard({
                                         type="button"
                                         size="sm"
                                         variant={selectedScreenId === screen.id ? 'default' : 'outline'}
-                                        className={selectedScreenId === screen.id ? 'bg-[#F57C00] hover:bg-[#E65100]' : ''}
+                                        className={selectedScreenId === screen.id ? 'bg-primary hover:bg-[#00402d]' : ''}
                                         onClick={() => selectScreen(screen.id)}
                                     >
                                         {screen.name} ({screen.pickup_location_name})

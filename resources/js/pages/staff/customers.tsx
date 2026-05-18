@@ -295,7 +295,7 @@ export default function StaffCustomers({
                                     />
                                 </div>
                             </div>
-                            <Button type="submit" className="h-11 px-8 rounded-xl bg-[#F57C00] font-black shadow-lg shadow-[#F57C00]/20 hover:bg-[#E65100]">Apply Filter</Button>
+                            <Button type="submit" className="h-11 px-8 rounded-xl bg-primary font-black shadow-lg shadow-[#F57C00]/20 hover:bg-[#00402d]">Apply Filter</Button>
                             <Button
                                 type="button"
                                 variant="outline"
@@ -452,7 +452,7 @@ export default function StaffCustomers({
                                             type="button"
                                             className={`rounded-lg px-4 py-1.5 text-xs font-black transition-colors ${
                                                 smsForm.data.platform === 'sms'
-                                                    ? 'bg-[#212121] text-white'
+                                                    ? 'bg-primary text-white'
                                                     : 'text-zinc-600 hover:bg-zinc-50'
                                             }`}
                                             onClick={() => {
@@ -467,7 +467,7 @@ export default function StaffCustomers({
                                             type="button"
                                             className={`rounded-lg px-4 py-1.5 text-xs font-black transition-colors ${
                                                 smsForm.data.platform === 'telegram'
-                                                    ? 'bg-[#212121] text-white'
+                                                    ? 'bg-primary text-white'
                                                     : 'text-zinc-600 hover:bg-zinc-50'
                                             }`}
                                             onClick={() => smsForm.setData('platform', 'telegram')}
@@ -588,7 +588,7 @@ export default function StaffCustomers({
                                             smsForm.data.message.trim() === '' ||
                                             hasPartialTelegramButton
                                         }
-                                        className="h-12 px-10 rounded-xl bg-[#212121] font-black shadow-lg shadow-zinc-200 hover:bg-[#F57C00] transition-colors"
+                                        className="h-12 px-10 rounded-xl bg-primary font-black shadow-lg shadow-zinc-200 hover:bg-[#00402d] transition-colors"
                                     >
                                         {smsForm.processing
                                             ? 'Delivering...'
@@ -618,7 +618,7 @@ export default function StaffCustomers({
                                 size="sm"
                                 disabled={!link.url}
                                 asChild={Boolean(link.url)}
-                                className={`h-11 rounded-xl px-4 font-bold transition-all ${link.active ? 'bg-[#F57C00] text-white shadow-lg shadow-[#F57C00]/20' : 'text-zinc-500 border-zinc-200'}`}
+                                className={`h-11 rounded-xl px-4 font-bold transition-all ${link.active ? 'bg-primary text-white shadow-lg shadow-[#F57C00]/20' : 'text-zinc-500 border-zinc-200'}`}
                             >
                                 {link.url ? (
                                     <Link href={link.url} preserveState preserveScroll>

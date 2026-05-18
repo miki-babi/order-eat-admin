@@ -24,7 +24,17 @@ class Customer extends Model
         'telegram_id',
         'telegram_username',
         'tags',
+        'password',
     ];
+/*
+     * The attributes that should be hidden for serialization.
+     *
+     * @var list<string>
+     */
+    protected $hidden = [
+        'password',
+    ];
+
 
     /**
      * The attributes that should be cast.
@@ -35,8 +45,10 @@ class Customer extends Model
     {
         return [
             'tags' => 'array',
+            'password' => 'hashed',
         ];
     }
+
 
     /**
      * Get all orders for the customer.
@@ -65,7 +77,7 @@ class Customer extends Model
     /**
      * Device/browser tokens associated with this customer.
      */
-    public function tokens(): HasMany
+    public function trackingtokens(): HasMany
     {
         return $this->hasMany(CustomerToken::class);
     }

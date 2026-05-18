@@ -823,7 +823,7 @@ export default function SmsTemplates({
                             <div className="flex flex-wrap items-center gap-3 pt-1">
                                 <Button
                                     type="button"
-                                    className="h-12 rounded-xl bg-[#F57C00] px-7 text-xs font-black uppercase tracking-widest shadow-lg shadow-[#F57C00]/30 hover:bg-[#E65100]"
+                                    className="h-12 rounded-xl bg-primary px-7 text-xs font-black uppercase tracking-widest shadow-lg shadow-primary/30 hover:bg-primary/90"
                                     onClick={openPromoWizard}
                                 >
                                     <Megaphone className="mr-2 size-4" />
@@ -1358,7 +1358,7 @@ export default function SmsTemplates({
                                     <div className="flex justify-end">
                                         <Button
                                             type="button"
-                                            className="h-auto rounded-xl bg-[#212121] px-6 font-black uppercase tracking-widest hover:bg-[#F57C00]"
+                                            className="h-auto rounded-xl bg-primary px-6 font-black uppercase tracking-widest hover:bg-primary/90"
                                             disabled={audiencePreviewLoading || !promoForm.data.platform}
                                             onClick={previewPromoAudience}
                                         >
@@ -1655,7 +1655,7 @@ export default function SmsTemplates({
                                     <div className="flex flex-wrap justify-end gap-2">
                                         <Button
                                             type="button"
-                                            className="h-11 rounded-xl bg-[#F57C00] px-7 font-black uppercase tracking-widest hover:bg-[#E65100]"
+                                            className="h-11 rounded-xl bg-primary px-7 font-black uppercase tracking-widest hover:bg-primary/50"
                                             disabled={!canSendPromoCampaign || promoForm.processing}
                                             onClick={() => requestPromoCampaignConfirmation('send')}
                                         >
@@ -1681,7 +1681,7 @@ export default function SmsTemplates({
                             ) : (
                                 <Button
                                     type="button"
-                                    className="h-11 rounded-xl bg-[#F57C00] px-8 font-black uppercase tracking-widest hover:bg-[#E65100]"
+                                    className="h-11 rounded-xl bg-primary px-8 font-black uppercase tracking-widest hover:bg-primary/90"
                                     disabled={!canMoveToNextPromoStep}
                                     onClick={goToNextPromoStep}
                                 >
@@ -1977,7 +1977,7 @@ export default function SmsTemplates({
                                         <InputError message={templateForm.errors.body} />
                                     </div>
                                     <div className="flex items-center gap-3">
-                                        <Button type="submit" disabled={templateForm.processing} className="h-12 px-10 rounded-xl bg-[#F57C00] font-black shadow-lg shadow-[#F57C00]/20 hover:bg-[#E65100]">
+                                        <Button type="submit" disabled={templateForm.processing} className="h-12 px-10 rounded-xl bg-primary font-black shadow-lg shadow-primary/20 hover:bg-primary/90">
                                             {templateForm.processing ? 'Syncing...' : 'save changes'}
                                         </Button>
                                         <Button

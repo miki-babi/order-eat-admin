@@ -404,7 +404,7 @@ export default function StaffOrders({
                                             router.get('/staff/orders', { ...form.data, status: tab.value }, { preserveState: true, replace: true });
                                         }}
                                         className={`rounded-lg px-6 h-9 text-xs font-bold transition-all ${isActive
-                                            ? 'bg-[#F57C00] text-white shadow-md hover:bg-[#E65100] hover:text-white'
+                                            ? 'bg-primary text-white shadow-md hover:bg-[#E65100] hover:text-white'
                                             : 'text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900'
                                             }`}
                                     >

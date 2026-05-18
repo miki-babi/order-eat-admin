@@ -1,3 +1,4 @@
+import telegramSettings from './telegram-settings'
 import accessControl from './access-control'
 import customers from './customers'
 import menuItems from './menu-items'
@@ -23,6 +24,7 @@ import businessSettings from './business-settings'
 import reports from './reports'
 
 const staff = {
+    telegramSettings: Object.assign(telegramSettings, telegramSettings),
     accessControl: Object.assign(accessControl, accessControl),
     customers: Object.assign(customers, customers),
     menuItems: Object.assign(menuItems, menuItems),

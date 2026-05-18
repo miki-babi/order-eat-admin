@@ -596,7 +596,7 @@ export default function Reports({
                                 type="button"
                                 className={`relative h-10 rounded-xl px-4 text-[10px] font-black uppercase tracking-widest transition-all duration-300 active:scale-95 ${
                                     activeTab === tab.id
-                                        ? 'bg-[#212121] text-white shadow-md'
+                                        ? 'bg-[#004532] text-white shadow-md'
                                         : 'text-zinc-400 hover:bg-zinc-50 hover:text-zinc-600'
                                 }`}
                                 onClick={() => setActiveTab(tab.id)}
