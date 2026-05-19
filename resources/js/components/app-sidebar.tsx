@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { BarChart3, ClipboardList, Coffee, ConciergeBell, KeyRound, MapPin, MegaphoneIcon, MessageCircle, MessageSquareText, MonitorSmartphone, Package, QrCode, Search, Shield, Store, Users, UtensilsCrossed, Wallet } from 'lucide-react';
+import { BarChart3,  BoxIcon, ClipboardList, Coffee, ConciergeBell, KeyRound, MapPin, MegaphoneIcon, MessageCircle, MessageSquareText, MonitorSmartphone, Package, QrCode, Search, Shield, Store, Users, UtensilsCrossed, Wallet } from 'lucide-react';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -42,10 +42,14 @@ export function AppSidebar() {
     const can = (permissionSlug: string): boolean => isAdmin || permissionSlugs.includes(permissionSlug);
 
     const mainNavGroups: NavGroup[] = [
+        
         {
             label: 'Orders',
             items: [
                 ...(can('orders.view')
+                    ? [{ title: 'Customer Orders', href: '/staff/menu-items', icon: BoxIcon }]
+                    : []),
+                    ...(can('orders.view')
                     ? [{
                         title: 'Kitchen Display',
                         icon: MonitorSmartphone,

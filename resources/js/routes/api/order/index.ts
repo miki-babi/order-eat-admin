@@ -1,6 +1,6 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition } from './../../../wayfinder'
 /**
-* @see Modules/Ordering/routes/api.php:8
+* @see [serialized-closure]:2
 * @route '/api/order/my-orders'
 */
 export const myOrders = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -14,7 +14,7 @@ myOrders.definition = {
 } satisfies RouteDefinition<["get","head"]>
 
 /**
-* @see Modules/Ordering/routes/api.php:8
+* @see [serialized-closure]:2
 * @route '/api/order/my-orders'
 */
 myOrders.url = (options?: RouteQueryOptions) => {
@@ -22,7 +22,7 @@ myOrders.url = (options?: RouteQueryOptions) => {
 }
 
 /**
-* @see Modules/Ordering/routes/api.php:8
+* @see [serialized-closure]:2
 * @route '/api/order/my-orders'
 */
 myOrders.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -31,7 +31,7 @@ myOrders.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 })
 
 /**
-* @see Modules/Ordering/routes/api.php:8
+* @see [serialized-closure]:2
 * @route '/api/order/my-orders'
 */
 myOrders.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -40,7 +40,7 @@ myOrders.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 })
 
 /**
-* @see Modules/Ordering/routes/api.php:8
+* @see [serialized-closure]:2
 * @route '/api/order/my-orders'
 */
 const myOrdersForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -49,7 +49,7 @@ const myOrdersForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> =
 })
 
 /**
-* @see Modules/Ordering/routes/api.php:8
+* @see [serialized-closure]:2
 * @route '/api/order/my-orders'
 */
 myOrdersForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -58,7 +58,7 @@ myOrdersForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => 
 })
 
 /**
-* @see Modules/Ordering/routes/api.php:8
+* @see [serialized-closure]:2
 * @route '/api/order/my-orders'
 */
 myOrdersForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
