@@ -1,14 +1,16 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Services\CustomerIdentityService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 use Modules\Ordering\Http\Controllers\CakePreorderController;
 use Modules\Ordering\Http\Controllers\CateringServiceController;
+use Modules\Ordering\Http\Controllers\CustomerOrderController;
 use Modules\Ordering\Http\Controllers\OrderController;
 use Modules\Ordering\Http\Controllers\QrMenuController;
-use Modules\Ordering\Http\Controllers\Staff\CakePreorderController as StaffCakePreorderController;
 use Modules\Ordering\Http\Controllers\Staff\BusinessSettingsController;
+use Modules\Ordering\Http\Controllers\Staff\CakePreorderController as StaffCakePreorderController;
 use Modules\Ordering\Http\Controllers\Staff\CashierBoardController;
 use Modules\Ordering\Http\Controllers\Staff\CateringRequestController as StaffCateringRequestController;
 use Modules\Ordering\Http\Controllers\Staff\KitchenBoardController;
@@ -19,7 +21,7 @@ Route::get('/', function (Request $request, CustomerIdentityService $customerIde
     $customerToken = $customerIdentityService->resolveClientToken($request);
     $customerIdentityService->queueClientTokenCookie($customerToken);
 
-    return \Inertia\Inertia::render('customer/landing', [
+    return Inertia::render('customer/landing', [
         'customerToken' => $customerToken,
     ]);
 })->name('home');
@@ -56,7 +58,6 @@ Route::post('/qr-menu/{diningTable:qr_code}/orders', [QrMenuController::class, '
     ->middleware('feature:customer_qr_checkout')
     ->name('qr-menu.orders.store');
 
-
 Route::get('/order', [OrderController::class, 'order'])
     ->middleware('feature:customer_menu_browsing')
     ->name('order.index');
@@ -80,6 +81,9 @@ Route::middleware(['auth', 'verified', 'staff'])
     ->prefix('staff')
     ->name('staff.')
     ->group(function (): void {
+        Route::get('customer-orders', [CustomerOrderController::class, 'index'])
+            ->middleware(['permission:orders.view', 'feature:staff_order_queue'])
+            ->name('customer-orders.index');
         Route::get('orders', [StaffOrderController::class, 'index'])
             ->middleware(['permission:orders.view', 'feature:staff_order_queue'])
             ->name('orders.index');

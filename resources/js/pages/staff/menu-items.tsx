@@ -1,5 +1,5 @@
 import { Head, router, useForm } from '@inertiajs/react';
-import { Coffee,  ImagePlus, Trash2 } from 'lucide-react';
+import { Coffee, ImagePlus, Trash2 } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
 import InputError from '@/components/input-error';
 import { Badge } from '@/components/ui/badge';
@@ -9,8 +9,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
+import MenuCatalog from '@/components/staff/menu-catalog';
 
-type MenuItemRow = {
+export type MenuItemRow = {
     id: number;
     name: string;
     description: string | null;
@@ -63,7 +64,7 @@ function visibilityChannelLabel(channel: string): string {
 
 export default function MenuItems({
     items,
-    
+
     visibilityChannels,
 }: {
     items: MenuItemRow[];
@@ -183,97 +184,7 @@ export default function MenuItems({
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Menu Items" />
             <div className="space-y-8 bg-zinc-50/50 p-6 min-h-screen">
-                {/* 📌 Summary Cards */}
-                {/* <div className="grid gap-4 md:grid-cols-2">
-                    <Card className="border-none shadow-sm ring-1 ring-zinc-200">
-                        <CardContent className="pt-6">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-xs font-black uppercase tracking-widest text-[#9E9E9E]">Catalog Size</p>
-                                    <h3 className="mt-2 text-3xl font-black text-[#212121]">{summary.total_items} Products</h3>
-                                </div>
-                                <div className="rounded-2xl bg-zinc-100 p-3 text-zinc-500">
-                                    <Search className="size-6" />
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-                    <Card className="border-none shadow-sm ring-1 ring-zinc-200">
-                        <CardContent className="pt-6">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-xs font-black uppercase tracking-widest text-[#F57C00]">Active Listings</p>
-                                    <h3 className="mt-2 text-3xl font-black text-[#212121]">{summary.active_items} Live</h3>
-                                </div>
-                                <div className="rounded-2xl bg-[#F57C00]/10 p-3 text-[#F57C00]">
-                                    <Coffee className="size-6" />
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </div> */}
 
-                {/* 📌 Filter Control Panel */}
-                {/* <Card className="border-none shadow-md ring-1 ring-zinc-200">
-                    <CardHeader className="border-b border-zinc-100 bg-zinc-50/50 py-4">
-                        <CardTitle className="flex items-center gap-2 text-sm font-black uppercase tracking-widest text-[#212121]">
-                            <Filter className="size-4 text-[#F57C00]" />
-                            Product Filters
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent className="pt-6">
-                        <form className="grid gap-6 md:grid-cols-4" onSubmit={applyFilters}>
-                            <div className="grid gap-2">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]" htmlFor="search">Search Keywords</Label>
-                                <Input
-                                    id="search"
-                                    className="h-10 rounded-xl border-zinc-200 focus:ring-[#F57C00]"
-                                    value={filterForm.data.search}
-                                    onChange={(event) => filterForm.setData('search', event.target.value)}
-                                    placeholder="Name or description..."
-                                />
-                            </div>
-                            <div className="grid gap-2">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]" htmlFor="category">Sort Category</Label>
-                                <select
-                                    id="category"
-                                    className="h-10 w-full rounded-xl border border-zinc-200 bg-white px-3 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[#F57C00]/20"
-                                    value={filterForm.data.category}
-                                    onChange={(event) => filterForm.setData('category', event.target.value)}
-                                >
-                                    <option value="">All Categories</option>
-                                    {categories.map((category) => (
-                                        <option key={category} value={category}>{category}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="grid gap-2">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-[#9E9E9E]" htmlFor="status">Listing Status</Label>
-                                <select
-                                    id="status"
-                                    className="h-10 w-full rounded-xl border border-zinc-200 bg-white px-3 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[#F57C00]/20"
-                                    value={filterForm.data.status}
-                                    onChange={(event) => filterForm.setData('status', event.target.value)}
-                                >
-                                    <option value="all">All Status</option>
-                                    <option value="active">Live Only</option>
-                                    <option value="inactive">Drafts Only</option>
-                                </select>
-                            </div>
-                            <div className="flex items-end gap-2">
-                                <Button type="submit" className="h-10 flex-1 rounded-xl bg-[#F57C00] font-black shadow-lg shadow-[#F57C00]/20 hover:bg-[#E65100]">Apply</Button>
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    className="h-10 rounded-xl font-bold border-zinc-200"
-                                    onClick={() => router.get('/staff/menu-items')}
-                                >
-                                    Clear
-                                </Button>
-                            </div>
-                        </form>
-                    </CardContent>
-                </Card> */}
 
 
                 {/* 📌 Edit Control Card */}
@@ -423,93 +334,12 @@ export default function MenuItems({
                             Product Catalog
                         </h2>
                     </div>
-
-                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                        {items.length === 0 ? (
-                            <div className="md:col-span-3 py-20 text-center">
-                                <p className="text-zinc-400 font-bold uppercase tracking-widest text-xs">No products found matching your search</p>
-                            </div>
-                        ) : (
-                            items.map((item) => (
-                                <Card key={item.id} className="group relative overflow-hidden border-none shadow-md ring-1 ring-zinc-200 transition-all hover:ring-[2px] hover:ring-[#212121]">
-                                    <CardContent className="p-0">
-                                        <div className="relative aspect-[16/10] overflow-hidden bg-zinc-100">
-                                            {item.image_url ? (
-                                                <img
-                                                    src={item.image_url}
-                                                    alt={item.name}
-                                                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-                                                />
-                                            ) : (
-                                                <div className="flex h-full w-full items-center justify-center text-zinc-300">
-                                                    <ImagePlus className="size-12" />
-                                                </div>
-                                            )}
-                                            <div className="absolute top-4 left-4 flex flex-col gap-1.5">
-                                                <Badge className="w-fit bg-[#212121] text-white font-black uppercase tracking-widest text-[9px] shadow-xl">
-                                                    {item.category ?? 'General'}
-                                                </Badge>
-                                                <Badge className={`w-fit font-black uppercase tracking-widest text-[9px] shadow-xl ${item.is_active ? 'bg-primary text-white' : 'bg-white text-zinc-500 ring-1 ring-zinc-200'}`}>
-                                                    {item.is_active ? 'Live' : 'Draft'}
-                                                </Badge>
-                                                {item.is_featured ? (
-                                                    <Badge className="w-fit bg-[#FFF3E0] text-[#E65100] font-black uppercase tracking-widest text-[9px] shadow-xl ring-1 ring-[#F57C00]/20">
-                                                        Featured
-                                                    </Badge>
-                                                ) : null}
-                                                <div className="flex flex-wrap gap-1">
-                                                    {item.visibility_channels.map((channel) => (
-                                                        <Badge key={`${item.id}-${channel}`} className="w-fit bg-white/90 text-zinc-700 font-black uppercase tracking-widest text-[9px] ring-1 ring-zinc-200/80">
-                                                            {visibilityChannelLabel(channel)}
-                                                        </Badge>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="p-5">
-                                            <div className="flex items-start justify-between gap-4">
-                                                <div className="flex-1">
-                                                    <p className="text-lg font-black leading-tight text-[#212121]">{item.name}</p>
-                                                    <p className="mt-1 line-clamp-2 text-xs font-medium text-zinc-500 leading-relaxed">
-                                                        {item.description || "No description provided for this catalog item."}
-                                                    </p>
-                                                </div>
-                                                <p className="text-lg font-black text-primary">{currency(item.price)}</p>
-                                            </div>
-
-                                            <div className="mt-6 flex items-center justify-between border-t border-zinc-100 pt-5">
-                                                <div className="flex flex-col">
-                                                    <span className="text-[9px] font-black uppercase tracking-tighter text-zinc-400">Lifetime Demand</span>
-                                                    <span className="text-sm font-black text-[#212121]">{item.order_items_count} units sold</span>
-                                                </div>
-                                                <div className="flex items-center gap-2">
-                                                    <Button
-                                                        type="button"
-                                                        size="sm"
-                                                        variant="ghost"
-                                                        className="h-9 rounded-xl font-bold transition-all hover:bg-[#F57C00]/10 hover:text-[#F57C00]"
-                                                        onClick={() => startEdit(item)}
-                                                    >
-                                                        Details
-                                                    </Button>
-                                                    <Button
-                                                        type="button"
-                                                        size="sm"
-                                                        variant="ghost"
-                                                        className="h-9 rounded-xl font-bold text-rose-500 transition-all hover:bg-rose-50 hover:text-rose-600"
-                                                        onClick={() => deleteItem(item)}
-                                                    >
-                                                        <Trash2 className="size-4" />
-                                                    </Button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            ))
-                        )}
-                    </div>
+                    <MenuCatalog
+                        items={items}
+                        startEdit={startEdit}
+                        deleteItem={deleteItem}
+                        visibilityChannelLabel={visibilityChannelLabel}
+                    />
                 </div>
 
                 {/* 📌 Create Content Card */}

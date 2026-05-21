@@ -1,6 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition } from './../../../wayfinder'
+import orders from './orders'
 /**
-* @see [serialized-closure]:2
+* @see Modules/Ordering/routes/api.php:13
 * @route '/api/order/my-orders'
 */
 export const myOrders = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -14,7 +15,7 @@ myOrders.definition = {
 } satisfies RouteDefinition<["get","head"]>
 
 /**
-* @see [serialized-closure]:2
+* @see Modules/Ordering/routes/api.php:13
 * @route '/api/order/my-orders'
 */
 myOrders.url = (options?: RouteQueryOptions) => {
@@ -22,7 +23,7 @@ myOrders.url = (options?: RouteQueryOptions) => {
 }
 
 /**
-* @see [serialized-closure]:2
+* @see Modules/Ordering/routes/api.php:13
 * @route '/api/order/my-orders'
 */
 myOrders.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -31,7 +32,7 @@ myOrders.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 })
 
 /**
-* @see [serialized-closure]:2
+* @see Modules/Ordering/routes/api.php:13
 * @route '/api/order/my-orders'
 */
 myOrders.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -40,7 +41,7 @@ myOrders.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 })
 
 /**
-* @see [serialized-closure]:2
+* @see Modules/Ordering/routes/api.php:13
 * @route '/api/order/my-orders'
 */
 const myOrdersForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -49,7 +50,7 @@ const myOrdersForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> =
 })
 
 /**
-* @see [serialized-closure]:2
+* @see Modules/Ordering/routes/api.php:13
 * @route '/api/order/my-orders'
 */
 myOrdersForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -58,7 +59,7 @@ myOrdersForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => 
 })
 
 /**
-* @see [serialized-closure]:2
+* @see Modules/Ordering/routes/api.php:13
 * @route '/api/order/my-orders'
 */
 myOrdersForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -74,6 +75,7 @@ myOrdersForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> =>
 myOrders.form = myOrdersForm
 
 const order = {
+    orders: Object.assign(orders, orders),
     myOrders: Object.assign(myOrders, myOrders),
 }
 

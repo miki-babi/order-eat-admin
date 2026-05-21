@@ -2,17 +2,19 @@
 
 namespace App\Models;
 
+use Database\Factories\CustomerFactory;
+use Illuminate\Auth\Authenticatable;
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\CustomerOrder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Laravel\Sanctum\HasApiTokens;
 
-class Customer extends Model
+class Customer extends Model implements AuthenticatableContract
 {
-    /** @use HasFactory<\Database\Factories\CustomerFactory> */
-    use HasFactory , HasApiTokens ;
+    /** @use HasFactory<CustomerFactory> */
+    use Authenticatable , HasApiTokens , HasFactory;
 
     /**
      * The attributes that are mass assignable.
@@ -27,15 +29,15 @@ class Customer extends Model
         'tags',
         'password',
     ];
-/*
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
+
+    /*
+         * The attributes that should be hidden for serialization.
+         *
+         * @var list<string>
+         */
     protected $hidden = [
         'password',
     ];
-
 
     /**
      * The attributes that should be cast.
@@ -49,7 +51,6 @@ class Customer extends Model
             'password' => 'hashed',
         ];
     }
-
 
     /**
      * Get all orders for the customer.

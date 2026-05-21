@@ -1,9 +1,14 @@
 <?php
 
+use Modules\Ordering\Http\Controllers\CustomerOrderController;
 
 Route::get('test', function () {
     return response()->json(['message' => 'API is working']);
 });
+
+Route::post('/orders', [CustomerOrderController::class, 'store'])
+    ->middleware('auth:sanctum')
+    ->name('orders.store');
 
 Route::get('/my-orders', function () {
     // return $request->user();

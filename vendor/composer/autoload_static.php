@@ -194,10 +194,6 @@ class ComposerStaticInit3c79e040a3570288a4004f205416801a
             'Modules\\Customers\\Database\\Seeders\\' => 35,
             'Modules\\Customers\\Database\\Factories\\' => 37,
             'Modules\\Customers\\' => 18,
-            'Modules\\CustomerOrder\\Tests\\' => 28,
-            'Modules\\CustomerOrder\\Database\\Seeders\\' => 39,
-            'Modules\\CustomerOrder\\Database\\Factories\\' => 41,
-            'Modules\\CustomerOrder\\' => 22,
             'Modules\\AccessControl\\Tests\\' => 28,
             'Modules\\AccessControl\\Database\\Seeders\\' => 39,
             'Modules\\AccessControl\\Database\\Factories\\' => 41,
@@ -728,22 +724,6 @@ class ComposerStaticInit3c79e040a3570288a4004f205416801a
             0 => __DIR__ . '/../..' . '/Modules/Customers/app',
             1 => __DIR__ . '/../..' . '/Modules/Customers/app',
         ),
-        'Modules\\CustomerOrder\\Tests\\' => 
-        array (
-            0 => __DIR__ . '/../..' . '/Modules/CustomerOrder/tests',
-        ),
-        'Modules\\CustomerOrder\\Database\\Seeders\\' => 
-        array (
-            0 => __DIR__ . '/../..' . '/Modules/CustomerOrder/database/seeders',
-        ),
-        'Modules\\CustomerOrder\\Database\\Factories\\' => 
-        array (
-            0 => __DIR__ . '/../..' . '/Modules/CustomerOrder/database/factories',
-        ),
-        'Modules\\CustomerOrder\\' => 
-        array (
-            0 => __DIR__ . '/../..' . '/Modules/CustomerOrder/app',
-        ),
         'Modules\\AccessControl\\Tests\\' => 
         array (
             0 => __DIR__ . '/../..' . '/Modules/AccessControl/tests',
@@ -1055,9 +1035,6 @@ class ComposerStaticInit3c79e040a3570288a4004f205416801a
         'App\\Http\\Requests\\Settings\\ProfileDeleteRequest' => __DIR__ . '/../..' . '/app/Http/Requests/Settings/ProfileDeleteRequest.php',
         'App\\Http\\Requests\\Settings\\ProfileUpdateRequest' => __DIR__ . '/../..' . '/app/Http/Requests/Settings/ProfileUpdateRequest.php',
         'App\\Http\\Requests\\Settings\\TwoFactorAuthenticationRequest' => __DIR__ . '/../..' . '/app/Http/Requests/Settings/TwoFactorAuthenticationRequest.php',
-        'App\\Http\\Requests\\StoreCustomerOrderRequest' => __DIR__ . '/../..' . '/app/Http/Requests/StoreCustomerOrderRequest.php',
-        'App\\Http\\Requests\\UpdateCustomerOrderRequest' => __DIR__ . '/../..' . '/app/Http/Requests/UpdateCustomerOrderRequest.php',
-        'App\\Http\\Requests\\UploadOrderReceiptRequest' => __DIR__ . '/../..' . '/app/Http/Requests/UploadOrderReceiptRequest.php',
         'App\\Models\\BranchScreen' => __DIR__ . '/../..' . '/app/Models/BranchScreen.php',
         'App\\Models\\BusinessSetting' => __DIR__ . '/../..' . '/app/Models/BusinessSetting.php',
         'App\\Models\\CakePackage' => __DIR__ . '/../..' . '/app/Models/CakePackage.php',
@@ -6795,8 +6772,6 @@ class ComposerStaticInit3c79e040a3570288a4004f205416801a
         'Modules\\AccessControl\\Http\\Requests\\Staff\\UpdateUserRequest' => __DIR__ . '/../..' . '/Modules/AccessControl/app/Http/Requests/Staff/UpdateUserRequest.php',
         'Modules\\AccessControl\\Providers\\AccessControlServiceProvider' => __DIR__ . '/../..' . '/Modules/AccessControl/app/Providers/AccessControlServiceProvider.php',
         'Modules\\AccessControl\\Providers\\RouteServiceProvider' => __DIR__ . '/../..' . '/Modules/AccessControl/app/Providers/RouteServiceProvider.php',
-        'Modules\\CustomerOrder\\Providers\\CustomerOrderServiceProvider' => __DIR__ . '/../..' . '/Modules/CustomerOrder/app/Providers/CustomerOrderServiceProvider.php',
-        'Modules\\CustomerOrder\\Providers\\RouteServiceProvider' => __DIR__ . '/../..' . '/Modules/CustomerOrder/app/Providers/RouteServiceProvider.php',
         'Modules\\Customers\\Http\\Controllers\\Staff\\CustomerController' => __DIR__ . '/../..' . '/Modules/Customers/app/Http/Controllers/Staff/CustomerController.php',
         'Modules\\Customers\\Http\\Requests\\Staff\\SendCustomerSmsRequest' => __DIR__ . '/../..' . '/Modules/Customers/app/Http/Requests/Staff/SendCustomerSmsRequest.php',
         'Modules\\Customers\\Providers\\CustomersServiceProvider' => __DIR__ . '/../..' . '/Modules/Customers/app/Providers/CustomersServiceProvider.php',
@@ -6829,6 +6804,7 @@ class ComposerStaticInit3c79e040a3570288a4004f205416801a
         'Modules\\Operations\\Providers\\RouteServiceProvider' => __DIR__ . '/../..' . '/Modules/Operations/app/Providers/RouteServiceProvider.php',
         'Modules\\Ordering\\Http\\Controllers\\CakePreorderController' => __DIR__ . '/../..' . '/Modules/Ordering/app/Http/Controllers/CakePreorderController.php',
         'Modules\\Ordering\\Http\\Controllers\\CateringServiceController' => __DIR__ . '/../..' . '/Modules/Ordering/app/Http/Controllers/CateringServiceController.php',
+        'Modules\\Ordering\\Http\\Controllers\\CustomerOrderController' => __DIR__ . '/../..' . '/Modules/Ordering/app/Http/Controllers/CustomerOrderController.php',
         'Modules\\Ordering\\Http\\Controllers\\OrderController' => __DIR__ . '/../..' . '/Modules/Ordering/app/Http/Controllers/OrderController.php',
         'Modules\\Ordering\\Http\\Controllers\\QrMenuController' => __DIR__ . '/../..' . '/Modules/Ordering/app/Http/Controllers/QrMenuController.php',
         'Modules\\Ordering\\Http\\Controllers\\Staff\\BusinessSettingsController' => __DIR__ . '/../..' . '/Modules/Ordering/app/Http/Controllers/Staff/BusinessSettingsController.php',

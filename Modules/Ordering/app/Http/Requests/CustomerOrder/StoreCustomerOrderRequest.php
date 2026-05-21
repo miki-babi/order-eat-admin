@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Http\Requests;
+namespace Modules\Ordering\Http\Requests\CustomerOrder;
 
 use App\Models\CustomerOrder;
-use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule as ValidationRule;
+use Illuminate\Validation\Rule;
 
 class StoreCustomerOrderRequest extends FormRequest
 {
@@ -37,7 +36,7 @@ class StoreCustomerOrderRequest extends FormRequest
     {
         $rules = [
             'customer_token' => ['nullable', 'string', 'max:120', 'regex:/^[A-Za-z0-9_-]{20,120}$/'],
-            'type' => ['required', ValidationRule::in([CustomerOrder::TYPE_PICKUP, CustomerOrder::TYPE_DELIVERY])],
+            'type' => ['required', Rule::in([CustomerOrder::TYPE_PICKUP, CustomerOrder::TYPE_DELIVERY])],
             'pickup_date' => ['nullable', 'date', 'after_or_equal:today'],
             'pickup_time' => ['nullable', 'date_format:H:i'],
             'pickup_location_id' => ['nullable', 'integer', Rule::exists('pickup_locations', 'id')->where('is_active', true)],

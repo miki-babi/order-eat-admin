@@ -2,30 +2,40 @@
 
 namespace App\Models;
 
+use Database\Factories\CustomerOrderFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Facades\Str;
+use Illuminate\Support\Str;
 
 class CustomerOrder extends Model
 {
-    /** @use HasFactory<\Database\Factories\CustomerOrderFactory> */
+    /** @use HasFactory<CustomerOrderFactory> */
     use HasFactory;
 
     public const TYPE_PICKUP = 'pickup';
+
     public const TYPE_DELIVERY = 'delivery';
 
     public const STATUS_PENDING = 'pending';
+
     public const STATUS_CONFIRMED = 'confirmed';
+
     public const STATUS_PREPARING = 'preparing';
+
     public const STATUS_READY = 'ready';
+
     public const STATUS_OUT_FOR_DELIVERY = 'out_for_delivery';
+
     public const STATUS_DELIVERED = 'delivered';
+
     public const STATUS_CANCELLED = 'cancelled';
 
     public const RECEIPT_STATUS_PENDING = 'pending';
+
     public const RECEIPT_STATUS_APPROVED = 'approved';
+
     public const RECEIPT_STATUS_REJECTED = 'rejected';
 
     protected $fillable = [

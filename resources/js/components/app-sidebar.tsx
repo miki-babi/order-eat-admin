@@ -47,20 +47,9 @@ export function AppSidebar() {
             label: 'Orders',
             items: [
                 ...(can('orders.view')
-                    ? [{ title: 'Customer Orders', href: '/staff/menu-items', icon: BoxIcon }]
+                    ? [{ title: 'Customer Orders', href: '/staff/customer-orders', icon: BoxIcon }]
                     : []),
-                    ...(can('orders.view')
-                    ? [{
-                        title: 'Kitchen Display',
-                        icon: MonitorSmartphone,
-                        items: [
-                            { title: 'Order', href: '/staff/orders', icon: ClipboardList },
-                            { title: 'Kitchen Board', href: '/staff/kitchen-board', icon: UtensilsCrossed },
-                            { title: 'Waiter Board', href: '/staff/waiter-board', icon: ConciergeBell },
-                            { title: 'Cashier Board', href: '/staff/cashier-board', icon: Wallet },
-                        ]
-                    }]
-                    : []),
+                    
                 ...(can('orders.view')
                     ? [{
                         title: 'Cake Preorders',
@@ -111,6 +100,18 @@ export function AppSidebar() {
         {
             label: 'Settings',
             items: [
+                ...(can('orders.view')
+                    ? [{
+                        title: 'Kitchen Display',
+                        icon: MonitorSmartphone,
+                        items: [
+                            { title: 'Order', href: '/staff/orders', icon: ClipboardList },
+                            { title: 'Kitchen Board', href: '/staff/kitchen-board', icon: UtensilsCrossed },
+                            { title: 'Waiter Board', href: '/staff/waiter-board', icon: ConciergeBell },
+                            { title: 'Cashier Board', href: '/staff/cashier-board', icon: Wallet },
+                        ]
+                    }]
+                    : []),
                 ...(can('menu_items.manage')
                     ? [{ title: 'Business', href: '/staff/business-settings', icon: Store }]
                     : []),

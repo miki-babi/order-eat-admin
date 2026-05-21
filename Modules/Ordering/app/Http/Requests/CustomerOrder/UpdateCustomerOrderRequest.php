@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests;
+namespace Modules\Ordering\Http\Requests\CustomerOrder;
 
 use App\Models\CustomerOrder;
 use Illuminate\Foundation\Http\FormRequest;

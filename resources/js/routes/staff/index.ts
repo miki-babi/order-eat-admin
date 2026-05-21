@@ -12,6 +12,7 @@ import pickupLocations from './pickup-locations'
 import tableQr from './table-qr'
 import tableSessions from './table-sessions'
 import screens from './screens'
+import customerOrders from './customer-orders'
 import orders from './orders'
 import waiter from './waiter'
 import kitchen from './kitchen'
@@ -38,6 +39,7 @@ const staff = {
     tableQr: Object.assign(tableQr, tableQr),
     tableSessions: Object.assign(tableSessions, tableSessions),
     screens: Object.assign(screens, screens),
+    customerOrders: Object.assign(customerOrders, customerOrders),
     orders: Object.assign(orders, orders),
     waiter: Object.assign(waiter, waiter),
     kitchen: Object.assign(kitchen, kitchen),

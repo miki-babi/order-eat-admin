@@ -1,3 +1,4 @@
+import CustomerOrderController from './CustomerOrderController'
 import OrderController from './OrderController'
 import CakePreorderController from './CakePreorderController'
 import CateringServiceController from './CateringServiceController'
@@ -5,6 +6,7 @@ import QrMenuController from './QrMenuController'
 import Staff from './Staff'
 
 const Controllers = {
+    CustomerOrderController: Object.assign(CustomerOrderController, CustomerOrderController),
     OrderController: Object.assign(OrderController, OrderController),
     CakePreorderController: Object.assign(CakePreorderController, CakePreorderController),
     CateringServiceController: Object.assign(CateringServiceController, CateringServiceController),

@@ -1,6 +1,8 @@
 <?php
 
 use App\Models\Customer;
+use App\Models\CustomerOrder;
+use App\Models\CustomerToken;
 use App\Models\DiningTable;
 use App\Models\MenuItem;
 use App\Models\Order;
@@ -8,7 +10,6 @@ use App\Models\PickupLocation;
 use App\Models\SmsLog;
 use App\Models\SmsNotificationSetting;
 use App\Models\TableSession;
-use App\Models\CustomerToken;
 use App\Models\User;
 use Illuminate\Support\Str;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -228,6 +229,58 @@ test('customers can place an order from the public menu flow', function () {
     expect($order->items()->count())->toBe(1);
 
     $response->assertRedirect(route('orders.confirmation', $order->tracking_token, false));
+});
+
+test('authenticated api customer can place an order with a sanctum bearer token', function () {
+    $customer = Customer::query()->create([
+        'name' => 'Api Customer',
+        'phone' => '251911000001',
+        'password' => 'secret123',
+    ]);
+
+    $token = $customer->createToken('api-device')->plainTextToken;
+
+    $menuItem = MenuItem::query()->create([
+        'name' => 'Api Latte',
+        'description' => 'API order drink',
+        'price' => 100,
+        'category' => 'Drinks',
+        'is_active' => true,
+    ]);
+
+    $location = PickupLocation::query()->create([
+        'name' => 'Api Branch',
+        'address' => 'Addis Ababa',
+        'is_active' => true,
+    ]);
+
+    $response = $this->withHeaders([
+        'Authorization' => "Bearer {$token}",
+        'Accept' => 'application/json',
+    ])->postJson(route('api.order.orders.store'), [
+        'type' => CustomerOrder::TYPE_PICKUP,
+        'pickup_date' => now()->addDay()->toDateString(),
+        'pickup_time' => now()->addHour()->format('H:i'),
+        'pickup_location_id' => $location->id,
+        'items' => [
+            [
+                'menu_item_id' => $menuItem->id,
+                'quantity' => 1,
+            ],
+        ],
+    ]);
+
+    $response->assertCreated()->assertExactJson([
+        'tracking_token' => CustomerOrder::query()->first()->tracking_token,
+        'status' => CustomerOrder::STATUS_PENDING,
+        'type' => CustomerOrder::TYPE_PICKUP,
+    ]);
+
+    $order = CustomerOrder::query()->first();
+
+    expect($order)->not->toBeNull();
+    expect($order->customer_id)->toBe($customer->id);
+    expect($order->customer_token)->toBe($token);
 });
 
 test('non-staff users can not access staff dashboard routes', function () {
